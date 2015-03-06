@@ -296,7 +296,7 @@ class FJmodel(object):
 
         if r > self.ar[-1]:
             for k in range(self.npoly):
-                phip[k]=phil[-1][k]*pow(self.ar[-1]/r, 2*k+1)
+                phip[k] = phil[-1][k]*pow(self.ar[-1]/r, 2*k+1)
 
         else:
             bot = searchsorted(self.ar, r, side='left')-1

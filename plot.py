@@ -26,8 +26,8 @@ def plot2comp():
     f = FJmodel("/Users/lp1osti/git_fJmodels/models/Hernq_0.55_0.55_1.00_1.00_4.out")
     g = FJmodel("/Users/lp1osti/git_fJmodels/models/NFW_0.55_0.55_1.00_1.00_4.out")
     x = np.logspace(-2.5, 1.5)
-    plt.loglog(x, f.rho(x, 0), 'ro', x, hernq(x, .1), 'k-')
-    plt.loglog(x, g.rho(x, 0), 'bo', x, nfw(x, .1), 'k--')
+    plt.loglog(x, f.rho(x, 0), 'r-^', x, hernq(x, .08), 'k-')
+    plt.loglog(x, g.rho(x, 0), 'b-^', x, nfw(x, .08), 'k--')
     plt.show()
 
 if __name__ == "__main__":
