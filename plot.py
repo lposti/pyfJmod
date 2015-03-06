@@ -7,12 +7,12 @@ import matplotlib.pylab as plt
 
 def hernq(x, m):
     x = np.asarray(x)
-    return m/x/pow(.5+x, 3)
+    return m/x/pow(.1+x, 3)
 
 
 def nfw(x, m):
     x = np.asarray(x)
-    return m/x/pow(.5+x, 2)
+    return m/x/pow(2.5+x, 2)
 
 
 def plot():
@@ -23,11 +23,11 @@ def plot():
 
 
 def plot2comp():
-    f = FJmodel("/Users/lp1osti/git_fJmodels/models/Hernq_0.55_0.55_1.00_1.00_4.out")
-    g = FJmodel("/Users/lp1osti/git_fJmodels/models/NFW_0.55_0.55_1.00_1.00_4.out")
+    f = FJmodel("/home/morpheus/git/reworked/fJmodels/models/Hernq_0.55_0.55_1.00_1.00_4.out.2cNFW")
+    g = FJmodel("/home/morpheus/git/reworked/fJmodels/models/NFW_0.55_0.55_1.00_1.00_4.out.2cNFW")
     x = np.logspace(-2.5, 1.5)
-    plt.loglog(x, f.rho(x, 0), 'ro', x, hernq(x, .1), 'k-')
-    plt.loglog(x, g.rho(x, 0), 'bo', x, nfw(x, .1), 'k--')
+    plt.loglog(x, f.rho(x, 0), 'ro', x, hernq(x, .2), 'k-')
+    plt.loglog(x, g.rho(x, 0), 'bo', x, nfw(x, 2.), 'k--')
     plt.show()
 
 if __name__ == "__main__":
