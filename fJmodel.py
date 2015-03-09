@@ -125,10 +125,10 @@ class FJmodel(object):
         ci, wi = self._gaussLeg(0, 1)
 
         pot, KRR, Kzz, WRR, Wzz = 0, 0, 0, 0, 0
-        for i in range(self.nr):
+        for i in range(1, self.nr):
             r, dr = .5 * (self.ar[i - 1] + self.ar[i]), self.ar[i] - self.ar[i - 1]
             for j in range(self.ngauss):
-                sij = sqrt(1 - ci[j] * ci[j])
+                sij = sqrt(1. - ci[j] * ci[j])
                 R, z = r * sij, r * ci[j]
 
                 dens = self.rho(R, z)
@@ -144,9 +144,8 @@ class FJmodel(object):
         Wzz *= 4 * pi
         pot *= 4 * pi
 
-        print self.Pr, self.Pr2
         print "  Virial statistic: "
-        print "  Mass(%f3.1): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0],
+        print "  Mass(%3.1f): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0],
                                         sum(4 * pi * self.ar * self.ar * self.rho(self.ar, 0)))
         print "  KE, PE, W/K = %f %f %f " % (KRR + Kzz, pot, pot / (KRR + Kzz))
         print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
@@ -453,7 +452,7 @@ class Potential(object):
 
         c, r = z / sqrt(R * R + z * z), sqrt(R * R + z * z)
         pol = FJmodel.even_Legendre(c, self.npoly)
-        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly, nr=self.nr)
 
         phi = phip[0]
         for i in range(1, self.npoly):
@@ -493,7 +492,7 @@ class Potential(object):
                                                     Pr=self.fJ.Pr, nr=self.nr)
 
         dr = 0.
-        for i in range(1, self.npoly):
+        for i in range(self.npoly):
             dr += dphip[i] * pol[i]
 
         return dr
@@ -501,7 +500,7 @@ class Potential(object):
     def _dtheta(self, r, c):
 
         dtheta, dpol = 0, zeros(self.npoly)
-        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly, nr=self.nr)
 
         for i in range(self.npoly):
             dpol[i] = self.dlegend(c, 2 * i)
