@@ -71,7 +71,7 @@ class PlotInterface(object):
             if self.ylabel is not None:
                 self.ax.set_ylabel(self.ylabel, fontsize=self.fontsize)
         else:
-            if type(self.xlabel is list):
+            if type(self.xlabel) is list:
                 for i in range(self.nplots):
                     if self.xlabel[i] is not None:
                         self.ax[i].set_xlabel(self.xlabel[i], fontsize=self.fontsize)
@@ -80,7 +80,7 @@ class PlotInterface(object):
                     if self.xlabel is not None:
                         self.ax[i].set_xlabel(self.xlabel, fontsize=self.fontsize)
 
-            if type(self.ylabel is list):
+            if type(self.ylabel) is list:
                 for i in range(self.nplots):
                     if self.ylabel[i] is not None:
                         self.ax[i].set_ylabel(self.ylabel[i], fontsize=self.fontsize)
