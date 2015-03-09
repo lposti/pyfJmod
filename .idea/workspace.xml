@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dd95a18b-d3ec-4387-b8e7-cb079b0d9bb2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plot.py" afterPath="$PROJECT_DIR$/plot.py" />
     </list>
     <ignored path="pyfJmod.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -51,23 +51,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plot.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="plot.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="675">
-              <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.51461244" vertical-offset="0" max-vertical-offset="787">
+              <caret line="27" column="30" selection-start-line="27" selection-start-column="30" selection-end-line="27" selection-end-column="30" />
               <folding>
                 <element signature="e#24#51#0" expanded="true" />
-                <marker date="1425667197000" expanded="true" signature="120:163" placeholder="..." />
+                <marker date="1425892359000" expanded="true" signature="120:163" placeholder="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="fJplots.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="fJplots.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fJplots.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.22871664" vertical-offset="585" max-vertical-offset="2205">
+            <state vertical-scroll-proportion="0.0" vertical-offset="585" max-vertical-offset="2205">
               <caret line="51" column="21" selection-start-line="51" selection-start-column="21" selection-end-line="51" selection-end-column="21" />
               <folding>
                 <element signature="e#206#229#0" expanded="true" />
@@ -86,9 +86,9 @@
       <list>
         <option value="/Python Fragment (fJmodel.py:1054).py" />
         <option value="$PROJECT_DIR$/tests.py" />
-        <option value="$PROJECT_DIR$/plot.py" />
         <option value="$PROJECT_DIR$/fJmodel.py" />
         <option value="$PROJECT_DIR$/fJplots.py" />
+        <option value="$PROJECT_DIR$/plot.py" />
       </list>
     </option>
   </component>
@@ -433,7 +433,7 @@
           <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
           <folding>
             <element signature="e#24#51#0" expanded="true" />
-            <marker date="1425667197000" expanded="true" signature="120:163" placeholder="..." />
+            <marker date="1425892359000" expanded="true" signature="120:163" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -444,17 +444,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#206#229#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/plot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="675">
-          <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
-          <folding>
-            <element signature="e#24#51#0" expanded="true" />
-            <marker date="1425667197000" expanded="true" signature="120:163" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -481,10 +470,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fJplots.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.22871664" vertical-offset="585" max-vertical-offset="2205">
+        <state vertical-scroll-proportion="0.0" vertical-offset="585" max-vertical-offset="2205">
           <caret line="51" column="21" selection-start-line="51" selection-start-column="21" selection-end-line="51" selection-end-column="21" />
           <folding>
             <element signature="e#206#229#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.51461244" vertical-offset="0" max-vertical-offset="787">
+          <caret line="27" column="30" selection-start-line="27" selection-start-column="30" selection-end-line="27" selection-end-column="30" />
+          <folding>
+            <element signature="e#24#51#0" expanded="true" />
+            <marker date="1425892359000" expanded="true" signature="120:163" placeholder="..." />
           </folding>
         </state>
       </provider>
