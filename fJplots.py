@@ -104,7 +104,7 @@ class FJmodelPlot(PlotInterface):
     Inherited from class PlotInterface: the constructor
     explicitly calls that of PlotInterface
     """
-    def __init__(self, fJ, xlabel=None, ylabel=None,
+    def __init__(self, fJ, xlabel=None, ylabel=None, fontsize=15,
                  nrow=1, ncols=1, sharex=False, sharey=False, **fig_kw):
         """
         Constructor of the class. Inherits properties from PlotInterface
@@ -121,7 +121,7 @@ class FJmodelPlot(PlotInterface):
         """
         assert type(fJ) is FJmodel
         self.fJ = fJ
-        PlotInterface.__init__(self, xlabel=xlabel, ylabel=ylabel,
+        PlotInterface.__init__(self, xlabel=xlabel, ylabel=ylabel, fontsize=fontsize,
                                nrow=nrow, ncols=ncols, sharex=sharex, sharey=sharey, **fig_kw)
 
     def plotRho(self, R=None, z=None, show=True):

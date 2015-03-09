@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="dd95a18b-d3ec-4387-b8e7-cb079b0d9bb2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJplots.py" afterPath="$PROJECT_DIR$/fJplots.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/lp1osti.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/lp1osti.xml" />
     </list>
     <ignored path="pyfJmod.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -68,8 +67,8 @@
       <file leaf-file-name="fJplots.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fJplots.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.9771283" vertical-offset="521" max-vertical-offset="2610">
-              <caret line="86" column="17" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
+            <state vertical-scroll-proportion="0.25031766" vertical-offset="1393" max-vertical-offset="2610">
+              <caret line="106" column="65" selection-start-line="106" selection-start-column="65" selection-end-line="106" selection-end-column="65" />
               <folding>
                 <element signature="e#206#229#0" expanded="true" />
               </folding>
@@ -482,8 +481,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fJplots.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9771283" vertical-offset="521" max-vertical-offset="2610">
-          <caret line="86" column="17" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.25031766" vertical-offset="1393" max-vertical-offset="2610">
+          <caret line="106" column="65" selection-start-line="106" selection-start-column="65" selection-end-line="106" selection-end-column="65" />
           <folding>
             <element signature="e#206#229#0" expanded="true" />
           </folding>
