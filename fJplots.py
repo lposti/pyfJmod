@@ -167,3 +167,14 @@ class FJmodelPlot(PlotInterface):
         self.plot(log10(R), self.fJ.sigp(R, z))
         if show:
             self.plotFigure()
+
+    def plotPhi(self, R=None, z=None, show=True):
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = 0
+
+        self.loglog(R, -self.fJ.phi(R, z))
+        if show:
+            self.plotFigure()
