@@ -11,7 +11,7 @@ __author__ = 'lposti'
 
 from os.path import isfile
 from linecache import getline
-from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray
+from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, pi, arccos
 
 
 class FJmodel(object):
@@ -43,6 +43,9 @@ class FJmodel(object):
             self.sigzl = self._getLeg()
             self.sigRzl = self._getLeg()
             self.phil = self._getLeg()
+            self.Pr = self._getLeg()
+            self.Pr2 = self._getLeg()
+
         except AssertionError:
             print "Assert Error: file does not exist!!"
 
@@ -116,7 +119,40 @@ class FJmodel(object):
         R, z = asarray(R), asarray(z)
         return self._getq(R, z, self.sigRzl)
 
-    def _getq(self, R, z, ql, npot = True):
+    def virial(self):
+
+        p = Potential(fJ=self)
+        ci, wi = self._gaussLeg(0, 1)
+
+        pot, KRR, Kzz, WRR, Wzz = 0, 0, 0, 0, 0
+        for i in range(self.nr):
+            r, dr = .5 * (self.ar[i - 1] + self.ar[i]), self.ar[i] - self.ar[i - 1]
+            for j in range(self.ngauss):
+                sij = sqrt(1 - ci[j] * ci[j])
+                R, z = r * sij, r * ci[j]
+
+                dens = self.rho(R, z)
+                pot += .5 * wi[j] * dens * self.phi(R, z) * r * r * dr
+                KRR += .5 * wi[j] * dens * (pow(r * self.sigR(R, z), 2) + pow(r * self.sigp(R, z), 2)) * dr
+                Kzz += .5 * wi[j] * dens * pow(r * self.sigz(R, z), 2) * dr
+                WRR -= wi[j] * dens * R * p.dR(R, z) * r * r * dr
+                Wzz -= wi[j] * dens * z * p.dz(R, z) * r * r * dr
+
+        KRR *= 4 * pi
+        Kzz *= 4 * pi
+        WRR *= 4 * pi
+        Wzz *= 4 * pi
+        pot *= 4 * pi
+
+        print self.Pr, self.Pr2
+        print "  Virial statistic: "
+        print "  Mass(%f3.1): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0],
+                                        sum(4 * pi * self.ar * self.ar * self.rho(self.ar, 0)))
+        print "  KE, PE, W/K = %f %f %f " % (KRR + Kzz, pot, pot / (KRR + Kzz))
+        print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
+        print "  Kzz, Wzz, Wzz/Kzz = %f %f %f" % (Kzz, Wzz, Wzz / Kzz)
+
+    def _getq(self, R, z, ql, npot=True):
         """
         Private method: gets the intended quantity interpolating the Legendre coefficients
         ql in the location (R, z) in the meridional plane
@@ -129,91 +165,91 @@ class FJmodel(object):
             assert type(R) is ndarray
             assert type(z) is ndarray
             if R.size == 1 and z.size == 1:
-                r = sqrt(R*R+z*z)
-                c = z/r
+                r = sqrt(R * R + z * z)
+                c = z / r
 
                 pol = self._evenlegend(c)
                 if npot:
                     qp = self._interp(r, ql)
 
-                    q = .5*qp[0]
+                    q = .5 * qp[0]
                     for i in range(self.npoly):
-                        f = .5*(4*i+1)
-                        q += f*qp[i]*pol[i]
+                        f = .5 * (4 * i + 1)
+                        q += f * qp[i] * pol[i]
                 else:
                     qp = self._interp_pot(r, ql)
 
                     q = qp[0]
                     for i in range(self.npoly):
-                        q += qp[i]*pol[i]
+                        q += qp[i] * pol[i]
 
                 return q
 
             elif R.size > 1 and z.size == 1:
                 q, r, c = zeros(R.size), zeros(R.size), zeros(R.size)
                 for k in range(R.size):
-                    r[k] = sqrt(R[k]*R[k]+z*z)
-                    c[k] = z/r[k]
+                    r[k] = sqrt(R[k] * R[k] + z * z)
+                    c[k] = z / r[k]
 
                     pol = self._evenlegend(c[k])
                     if npot:
                         qp = self._interp(r[k], ql)
 
-                        q[k] = .5*qp[0]
+                        q[k] = .5 * qp[0]
                         for i in range(self.npoly):
-                            f = .5*(4*i+1)
-                            q[k] += f*qp[i]*pol[i]
+                            f = .5 * (4 * i + 1)
+                            q[k] += f * qp[i] * pol[i]
                     else:
                         qp = self._interp_pot(r[k], ql)
 
                         q[k] = qp[0]
                         for i in range(self.npoly):
-                            q[k] += qp[i]*pol[i]
+                            q[k] += qp[i] * pol[i]
 
                 return q
             elif R.size == 1 and z.size > 1:
                 q, r, c = zeros(z.size), zeros(z.size), zeros(z.size)
                 for j in range(z.size):
-                    r[j] = sqrt(R*R+z[j]*z[j])
-                    c[j] = z[j]/r[j]
+                    r[j] = sqrt(R * R + z[j] * z[j])
+                    c[j] = z[j] / r[j]
 
                     pol = self._evenlegend(c[j])
                     if npot:
                         qp = self._interp(r[j], ql)
 
-                        q[j] = .5*qp[0]
+                        q[j] = .5 * qp[0]
                         for i in range(self.npoly):
-                            f = .5*(4*i+1)
-                            q[j] += f*qp[i]*pol[i]
+                            f = .5 * (4 * i + 1)
+                            q[j] += f * qp[i] * pol[i]
                     else:
                         qp = self._interp_pot(r[j], ql)
 
                         q[j] = qp[0]
                         for i in range(self.npoly):
-                            q[j] += qp[i]*pol[i]
+                            q[j] += qp[i] * pol[i]
 
                 return q
             else:
                 q, r, c = zeros((R.size, z.size)), zeros((R.size, z.size)), zeros((R.size, z.size))
                 for k in range(R.size):
                     for j in range(z.size):
-                        r[k, j] = sqrt(R[k]*R[k]+z[j]*z[j])
-                        c[k, j] = z[j]/r[k, j]
+                        r[k, j] = sqrt(R[k] * R[k] + z[j] * z[j])
+                        c[k, j] = z[j] / r[k, j]
 
                         pol = self._evenlegend(c[k, j])
                         if npot:
                             qp = self._interp(r[k, j], ql)
 
-                            q[k, j] = .5*qp[0]
+                            q[k, j] = .5 * qp[0]
                             for i in range(self.npoly):
-                                f = .5*(4*i+1)
-                                q[k, j] += f*qp[i]*pol[i]
+                                f = .5 * (4 * i + 1)
+                                q[k, j] += f * qp[i] * pol[i]
                         else:
                             qp = self._interp_pot(r[k, j], ql)
 
                             q[k, j] = qp[0]
                             for i in range(self.npoly):
-                                q[k, j] += qp[i]*pol[i]
+                                q[k, j] += qp[i] * pol[i]
 
                 return q
         except AssertionError:
@@ -248,24 +284,28 @@ class FJmodel(object):
 
     def _evenlegend(self, c):
         """
-        Private method: computes the even Legendre polynomials at cos(theta)
+        Calls static method to compute the even Legendre polynomials at cos(theta)
         :param c: cos(theta), is z/sqrt(R^2+z^2) in cylindrical
         :return:  list of npoly Legendre polynomials
         """
-        c2 = c*c
-        pol = zeros(self.npoly, dtype=float)
+        return self.even_Legendre(c, self.npoly)
+
+    @staticmethod
+    def even_Legendre(c, npoly):
+        c2 = c * c
+        pol = zeros(npoly, dtype=float)
 
         pol[0] = 1
-        if self.npoly < 2:
+        if npoly < 2:
             return
 
-        pol[1] = 1.5*c2-.5
-        for np in range(2, self.npoly):
-            l = 2*(np-1)
-            l2 = 2*l
-            pol[np] = -pol[np-2]*l*(l-1)/float((l2+1)*(l2-1)) + \
-                pol[np-1]*(c2-(l2*l+l2-1)/float((l2-1)*(l2+3)))
-            pol[np] *= (l2+1)*(l2+3)/float((l+1)*(l+2))
+        pol[1] = 1.5 * c2 - .5
+        for np in range(2, npoly):
+            l = 2 * (np - 1)
+            l2 = 2 * l
+            pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \
+                pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))
+            pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))
 
         return pol
 
@@ -281,44 +321,214 @@ class FJmodel(object):
         if r > self.ar[-1]:
             pass
         else:
-            bot = searchsorted(self.ar, r, side='left')-1
-            top = bot+1
+            bot = searchsorted(self.ar, r, side='left') - 1
+            top = bot + 1
 
-            f = (r-self.ar[bot])/(self.ar[top]-self.ar[bot])
+            f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])
             for i in range(self.npoly):
-                intp[i] = f*ql[top][i]+(1-f)*ql[bot][i]
+                intp[i] = f * ql[top][i] + (1 - f) * ql[bot][i]
 
         return intp
 
     def _interp_pot(self, r, phil):
+        """
+        Calls static method _interpolate_potential with correct parameters
+        :param r: radius to which interpolate
+        :param phil: Legendre coefficients to interpolate
+        :return: list of npoly Legendre coefficients
+        """
+        return self.interpolate_potential(r, phil, self.ar, self.npoly)
 
-        phip = zeros(self.npoly, dtype=float)
+    @staticmethod
+    def interpolate_potential(r, phil, ar, npoly, Pr=None, Pr2=None, nr=None):
 
-        if r > self.ar[-1]:
-            for k in range(self.npoly):
-                phip[k] = phil[-1][k]*pow(self.ar[-1]/r, 2*k+1)
+        assert type(ar) is ndarray
+        assert npoly > 0
+        phip, dphip, d2phip = zeros(npoly, dtype=float), zeros(npoly, dtype=float), zeros(npoly, dtype=float)
+
+        if r > ar[-1]:
+            for k in range(npoly):
+                phip[k] = phil[-1, k] * pow(ar[-1] / r, 2 * k + 1)
+                if Pr is not None and nr is not None:
+                    dphip[k] = - (2 * k + 1) * phil[nr - 1, k] * pow(ar[nr - 1] / r, 2 * k + 1) / r
+                if Pr2 is not None and nr is not None:
+                    d2phip[k] = (2 * k + 2) * (2 * k + 1) * phil[nr - 1, k] * pow(ar[nr - 1] / r, 2 * k + 1) / r / r
 
         else:
-            bot = searchsorted(self.ar, r, side='left')-1
-            top = bot+1
+            bot = searchsorted(ar, r, side='left') - 1
+            top = bot + 1
 
-            db = r-self.ar[bot]
-            f1 = db/(self.ar[top]-self.ar[bot])
+            db = r - ar[bot]
+            f1 = db / (ar[top] - ar[bot])
 
-            for k in range(self.npoly):
-                phip[k] = f1*phil[top][k]+(1-f1)*phil[bot][k]
+            for k in range(npoly):
+                phip[k] = f1 * phil[top, k] + (1 - f1) * phil[bot, k]
+                if Pr is not None and nr is not None:
+                    dphip[k] = f1 * Pr[top, k] + (1 - f1) * Pr[bot, k]
+                if Pr2 is not None and nr is not None:
+                    d2phip[k] = f1 * Pr2[top, k] + (1 - f1) * Pr2[bot, k]
 
             if top < 10:
                 if f1 < 0.5 and bot > 0:
-                    thr = bot-1
+                    thr = bot - 1
                 else:
-                    thr = top+1
+                    thr = top + 1
 
-                dt = r-self.ar[top]
-                f2 = dt*db/((self.ar[thr]-self.ar[top])*(self.ar[thr]-self.ar[bot]))
-                f3 = (self.ar[thr]-self.ar[bot])/(self.ar[top]-self.ar[bot])
+                dt = r - ar[top]
+                f2 = dt * db / ((ar[thr] - ar[top]) * (ar[thr] - ar[bot]))
+                f3 = (ar[thr] - ar[bot]) / (ar[top] - ar[bot])
 
-                for k in range(self.npoly):
-                    phip[k] += f2*(phil[thr][k]-phil[bot][k]-f3*(phil[top][k]-phil[bot][k]))
+                for k in range(npoly):
+                    phip[k] += f2 * (phil[thr, k] - phil[bot, k] - f3 * (phil[top, k] - phil[bot, k]))
+                    if Pr is not None and nr is not None:
+                        dphip[k] += f2 * (Pr[thr, k] - Pr[bot, k] - f3 * (Pr[top, k] - Pr[bot, k]))
+                    if Pr2 is not None and nr is not None:
+                        d2phip[k] += f2 * (Pr2[thr, k] - Pr2[bot, k] - f3 * (Pr2[top, k] - Pr2[bot, k]))
 
-        return phip
+        if Pr is not None:
+            if Pr2 is not None:
+                return phip, dphip, d2phip
+            else:
+                return phip, dphip
+        else:
+            return phip
+
+    def _gaussLeg(self, x1, x2):
+        return self.gauleg(x1, x2, self.ngauss)
+
+    @staticmethod
+    def gauleg(x1, x2, ngauss):
+
+        assert ngauss > 0
+        x, w = zeros(ngauss), zeros(ngauss)
+        m = (ngauss + 1) / 2
+        xm, xl = 0.5 * (x2 + x1), 0.5 * (x2 - x1)
+        for i in range(m):
+            z, z1 = cos(pi * (i + 0.75) / (ngauss + 0.5)), 0
+
+            while abs(z - z1) > 1e-10:
+                p1, p2 = 1, 0
+                for j in range(ngauss):
+                    p3 = p2
+                    p2 = p1
+                    p1 = ((2 * (j + 1) - 1) * z * p2 - j * p3) / float(j + 1)
+
+                pp = ngauss * (z * p1 - p2) / (z * z - 1.0)
+                z1 = z
+                z = z1 - p1 / pp
+
+            x[i] = xm - xl * z
+            x[ngauss - i - 1] = xm + xl * z
+            w[i] = 2 * xl / ((1 - z * z) * pp * pp)
+            w[ngauss - i - 1] = w[i]
+
+        return x, w
+
+
+class Potential(object):
+
+    def __init__(self, fJ=None, phil=None, ar=None, nr=None, npoly=None, ngauss=None):
+
+        if fJ is not None:
+            assert type(fJ) is FJmodel
+            self.fJ = fJ
+            self.phil = fJ.phil
+            self.ar = fJ.ar
+            self.nr, self.npoly, self.ngauss = fJ.nr, fJ.npoly, fJ.ngauss
+
+        elif phil is not None and \
+            ar is not None and \
+            nr is not None and \
+            npoly is not None and \
+            ngauss is not None:
+
+                self.phil = phil
+                self.ar = ar
+                self.nr, self.npoly, self.ngauss = nr, npoly, ngauss
+
+        else:
+            raise ValueError("Call constructor either with FJmodel object or with phil, ar, nr, npoly, ngauss!")
+
+    def __call__(self, R, z):
+
+        c, r = z / sqrt(R * R + z * z), sqrt(R * R + z * z)
+        pol = FJmodel.even_Legendre(c, self.npoly)
+        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+
+        phi = phip[0]
+        for i in range(1, self.npoly):
+            phi += phip[i] * pol[i]
+
+        return phi
+
+    def dR(self, R, z):
+
+        r = sqrt(z * z + R * R)
+        if r < self.ar[0]:
+            r = self.ar[0]
+
+        s, c = R / r, z / r
+        if c == 1:
+            c -= 1e-8
+
+        theta = arccos(c)
+        return self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
+
+    def dz(self, R, z):
+
+        r = sqrt(z * z + R * R)
+        if r < self.ar[0]:
+            r = self.ar[0]
+
+        s, c = R / r, z / r
+        if c == 1:
+            c -= 1e-8
+
+        theta = arccos(c)
+        return self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
+
+    def _dr(self, r, theta):
+        pol = FJmodel.even_Legendre(cos(theta), self.npoly)
+        phip, dphip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly,
+                                                    Pr=self.fJ.Pr, nr=self.nr)
+
+        dr = 0.
+        for i in range(1, self.npoly):
+            dr += dphip[i] * pol[i]
+
+        return dr
+
+    def _dtheta(self, r, c):
+
+        dtheta, dpol = 0, zeros(self.npoly)
+        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+
+        for i in range(self.npoly):
+            dpol[i] = self.dlegend(c, 2 * i)
+
+        for i in range(self.npoly):
+            dtheta += phip[i] * dpol[i]
+
+        dtheta *= -sqrt(1 - c * c)
+        return dtheta
+
+    @staticmethod
+    def legend(allpol, c, npoly):
+
+        npoly += 1
+        allpol[0] = 1
+        if npoly < 2:
+            raise ValueError("Found npoly <2!")
+
+        allpol[1] = c
+        for i in range(2, npoly):
+            allpol[i] = ((2 * i - 1) * c * allpol[i - 1] - (i - 1) * allpol[i - 2]) / float(i)
+
+    @staticmethod
+    def dlegend(c, n):
+
+        if n == 0:
+            return 0
+        allpol = zeros(n + 1)
+        Potential.legend(allpol, c, n)
+        return (n * allpol[n - 1] - n * c * allpol[n]) / (1 - c * c)
