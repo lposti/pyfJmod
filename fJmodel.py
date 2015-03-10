@@ -172,14 +172,14 @@ class FJmodel(object):
                     qp = self._interp(r, ql)
 
                     q = .5 * qp[0]
-                    for i in range(self.npoly):
+                    for i in range(1, self.npoly):
                         f = .5 * (4 * i + 1)
                         q += f * qp[i] * pol[i]
                 else:
                     qp = self._interp_pot(r, ql)
 
                     q = qp[0]
-                    for i in range(self.npoly):
+                    for i in range(1, self.npoly):
                         q += qp[i] * pol[i]
 
                 return q
@@ -195,14 +195,14 @@ class FJmodel(object):
                         qp = self._interp(r[k], ql)
 
                         q[k] = .5 * qp[0]
-                        for i in range(self.npoly):
+                        for i in range(1, self.npoly):
                             f = .5 * (4 * i + 1)
                             q[k] += f * qp[i] * pol[i]
                     else:
                         qp = self._interp_pot(r[k], ql)
 
                         q[k] = qp[0]
-                        for i in range(self.npoly):
+                        for i in range(1, self.npoly):
                             q[k] += qp[i] * pol[i]
 
                 return q
@@ -217,14 +217,14 @@ class FJmodel(object):
                         qp = self._interp(r[j], ql)
 
                         q[j] = .5 * qp[0]
-                        for i in range(self.npoly):
+                        for i in range(1, self.npoly):
                             f = .5 * (4 * i + 1)
                             q[j] += f * qp[i] * pol[i]
                     else:
                         qp = self._interp_pot(r[j], ql)
 
                         q[j] = qp[0]
-                        for i in range(self.npoly):
+                        for i in range(1, self.npoly):
                             q[j] += qp[i] * pol[i]
 
                 return q
@@ -240,14 +240,14 @@ class FJmodel(object):
                             qp = self._interp(r[k, j], ql)
 
                             q[k, j] = .5 * qp[0]
-                            for i in range(self.npoly):
+                            for i in range(1, self.npoly):
                                 f = .5 * (4 * i + 1)
                                 q[k, j] += f * qp[i] * pol[i]
                         else:
                             qp = self._interp_pot(r[k, j], ql)
 
                             q[k, j] = qp[0]
-                            for i in range(self.npoly):
+                            for i in range(1, self.npoly):
                                 q[k, j] += qp[i] * pol[i]
 
                 return q
