@@ -2,7 +2,10 @@
   <dictionary name="lp1osti">
     <words>
       <w>allpol</w>
+      <w>coeffs</w>
       <w>dlegend</w>
+      <w>dphidr</w>
+      <w>dphidz</w>
       <w>dphip</w>
       <w>dtheta</w>
       <w>fontsize</w>
@@ -14,6 +17,7 @@
       <w>ndarray</w>
       <w>npot</w>
       <w>virial</w>
+      <w>vrot</w>
       <w>ylabels</w>
     </words>
   </dictionary>

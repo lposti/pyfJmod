@@ -120,7 +120,12 @@ class FJmodel(object):
         return self._getq(R, z, self.sigRzl)
 
     def virial(self):
-
+        """
+        Computes and prints the quantity involved in the tensor virial theorem.
+        We judge a system to be relaxed to self-consistency if the ratios of the potential over
+        kinetic energies (diagonal and off diagonal tensor terms) are reasonably close to 2
+        :return: Prints the statistic for the tensor virial theorem
+        """
         p = Potential(fJ=self)
         ci, wi = self._gaussLeg(0, 1)
 
@@ -291,6 +296,12 @@ class FJmodel(object):
 
     @staticmethod
     def even_Legendre(c, npoly):
+        """
+        Static method: gets the even Legendre polynomials at cos(theta)
+        :param c: cos(theta)
+        :param npoly: number of polynomials (=2*l)
+        :return: list of npoly Legendre polynomials
+        """
         c2 = c * c
         pol = zeros(npoly, dtype=float)
 
@@ -339,9 +350,20 @@ class FJmodel(object):
         return self.interpolate_potential(r, phil, self.ar, self.npoly)
 
     @staticmethod
-    def interpolate_potential(r, phil, ar, npoly, Pr=None, Pr2=None, nr=None):
+    def interpolate_potential(r, phil, ar, npoly, Pr=None, Pr2=None):
+        """
+        Static method: interpolates the Legendre coefficients of the potential at spherical r
+        :param r: radius
+        :param phil: list of Legendre coefficients
+        :param ar: radial grid where the coefficients are given
+        :param npoly: number of Legendre coefficients
+        :param Pr: list of Legendre coefficients for phi' (Optional, if given returns also interpolated phi' coeffs.)
+        :param Pr2: list of Legendre coefficients for phi'' (Optional, if given returns also interpolated phi'' coeffs.)
+        :return: list of interpolated phi coeffs. (Optional: list of interpolated phi', phi'' coeffs.)
+        """
 
         assert type(ar) is ndarray
+        nr = len(ar)
         assert npoly > 0
         phip, dphip, d2phip = zeros(npoly, dtype=float), zeros(npoly, dtype=float), zeros(npoly, dtype=float)
 
@@ -393,11 +415,23 @@ class FJmodel(object):
             return phip
 
     def _gaussLeg(self, x1, x2):
+        """
+        Calls static method gauleg
+        :param x1: begin
+        :param x2: end
+        :return: Gauss-Legendre coordinates and weights
+        """
         return self.gauleg(x1, x2, self.ngauss)
 
     @staticmethod
     def gauleg(x1, x2, ngauss):
-
+        """
+        Static method: computes the coordinates (zeros of Leg. polynomials) and weights for Gauss-Legendre integration
+        :param x1: x begin
+        :param x2: x end
+        :param ngauss: number of points
+        :return: numpy.arrays of coordinates and weights
+        """
         assert ngauss > 0
         x, w = zeros(ngauss), zeros(ngauss)
         m = (ngauss + 1) / 2
@@ -425,13 +459,27 @@ class FJmodel(object):
 
 
 class Potential(object):
+    """
+    Class for initializing a potential object to get phi, phi', phi'' at arbitrary locations
+    """
 
-    def __init__(self, fJ=None, phil=None, ar=None, nr=None, npoly=None, ngauss=None):
-
+    def __init__(self, fJ=None, phil=None, Pr=None, Pr2=None, ar=None, nr=None, npoly=None, ngauss=None):
+        """
+        Constructor: either init with a FJmodel object or by manually giving phil, ar, nr, npoly, ngauss
+        :param fJ: FJmodel object
+        :param phil: Leg. coeffs. for phi (Optional)
+        :param Pr: Leg. coeffs. for phi' (Optional)
+        :param Pr2: Leg. coeffs. for phi'' (Optional)
+        :param ar: radial grid (Optional)
+        :param nr: number of grid points
+        :param npoly: number of Leg. coeffs.
+        :param ngauss: number of Gauss comp.
+        :return: initializes Potential object
+        """
         if fJ is not None:
             assert type(fJ) is FJmodel
             self.fJ = fJ
-            self.phil = fJ.phil
+            self.phil, self.Pr, self.Pr2 = fJ.phil, fJ.Pr, fJ.Pr2
             self.ar = fJ.ar
             self.nr, self.npoly, self.ngauss = fJ.nr, fJ.npoly, fJ.ngauss
 
@@ -441,7 +489,7 @@ class Potential(object):
             npoly is not None and \
             ngauss is not None:
 
-                self.phil = phil
+                self.phil, self.Pr, self.Pr2 = phil, Pr, Pr2
                 self.ar = ar
                 self.nr, self.npoly, self.ngauss = nr, npoly, ngauss
 
@@ -449,47 +497,219 @@ class Potential(object):
             raise ValueError("Call constructor either with FJmodel object or with phil, ar, nr, npoly, ngauss!")
 
     def __call__(self, R, z):
+        """
+        Call method overriding: gives the potential at a specified location
+        :param R: cylindrical radius (array type)
+        :param z: cylindrical height (array type)
+        :return: Potential (array type)
+        """
+        R, z = asarray(R), asarray(z)
 
-        c, r = z / sqrt(R * R + z * z), sqrt(R * R + z * z)
-        pol = FJmodel.even_Legendre(c, self.npoly)
-        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly, nr=self.nr)
+        # scalar case
+        if R.size == 1 and z.size == 1:
+            c, r = z / sqrt(R * R + z * z), sqrt(R * R + z * z)
+            pol = FJmodel.even_Legendre(c, self.npoly)
+            phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
 
-        phi = phip[0]
-        for i in range(1, self.npoly):
-            phi += phip[i] * pol[i]
+            phi = phip[0]
+            for i in range(1, self.npoly):
+                phi += phip[i] * pol[i]
+
+        # R array case
+        elif R.size > 1 and z.size == 1:
+            phi = zeros(R.size)
+            for k in range(R.size):
+                c, r = z / sqrt(R[k] * R[k] + z * z), sqrt(R[k] * R[k] + z * z)
+                pol = FJmodel.even_Legendre(c, self.npoly)
+                phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+
+                phi[k] = phip[0]
+                for i in range(1, self.npoly):
+                    phi[k] += phip[i] * pol[i]
+
+        # z array case
+        elif R.size == 1 and z.size > 1:
+            phi = zeros(z.size)
+            for j in range(z.size):
+                c, r = z[j] / sqrt(R * R + z[j] * z[j]), sqrt(R * R + z[j] * z[j])
+                pol = FJmodel.even_Legendre(c, self.npoly)
+                phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+
+                phi[j] = phip[0]
+                for i in range(1, self.npoly):
+                    phi[j] += phip[i] * pol[i]
+
+        # [R, z] array case
+        elif R.size > 1 and z.size > 1:
+            phi = zeros((R.size, z.size))
+            for k in range(R.size):
+                for j in range(z.size):
+                    c, r = z[j] / sqrt(R[k] * R[k] + z[j] * z[j]), sqrt(R[k] * R[k] + z[j] * z[j])
+                    pol = FJmodel.even_Legendre(c, self.npoly)
+                    phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
+
+                    phi[k, j] = phip[0]
+                    for i in range(1, self.npoly):
+                        phi[k, j] += phip[i] * pol[i]
+        else:
+            raise IndexError("Cannot determine size of R and/or z in Phi")
 
         return phi
 
     def dR(self, R, z):
+        """
+        Compute the radial derivative dPhi/dR of Phi in cylindrical coordinates
+        :param R: cylindrical radius (array type)
+        :param z: cylindrical height (array type)
+        :return: dPhi/dR (array type)
+        """
+        R, z = asarray(R), asarray(z)
 
-        r = sqrt(z * z + R * R)
-        if r < self.ar[0]:
-            r = self.ar[0]
+        # scalar case
+        if R.size == 1 and z.size == 1:
+            r = sqrt(z * z + R * R)
+            if r < self.ar[0]:
+                r = self.ar[0]
 
-        s, c = R / r, z / r
-        if c == 1:
-            c -= 1e-8
+            s, c = R / r, z / r
+            if c == 1:
+                c -= 1e-8
 
-        theta = arccos(c)
-        return self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
+            theta = arccos(c)
+            dphidr = self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
+
+        # R array case
+        elif R.size > 1 and z.size == 1:
+            dphidr = zeros(R.size)
+            for k in range(R.size):
+                r = sqrt(z * z + R[k] * R[k])
+                if r < self.ar[0]:
+                    r = self.ar[0]
+
+                s, c = R[k] / r, z / r
+                if c == 1:
+                    c -= 1e-8
+
+                theta = arccos(c)
+                dphidr[k] = self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
+
+        # z array case
+        elif R.size == 1 and z.size > 1:
+            dphidr = zeros(z.size)
+            for j in range(z.size):
+                r = sqrt(z[j] * z[j] + R * R)
+                if r < self.ar[0]:
+                    r = self.ar[0]
+
+                s, c = R / r, z[j] / r
+                if c == 1:
+                    c -= 1e-8
+
+                theta = arccos(c)
+                dphidr[j] = self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
+
+        # [R, z] array case
+        elif R.size > 1 and z.size > 1:
+            dphidr = zeros((R.size, z.size))
+            for k in range(R.size):
+                for j in range(z.size):
+                    r = sqrt(z[j] * z[j] + R[k] * R[k])
+                    if r < self.ar[0]:
+                        r = self.ar[0]
+
+                    s, c = R[k] / r, z[j] / r
+                    if c == 1:
+                        c -= 1e-8
+
+                    theta = arccos(c)
+                    dphidr[k, j] = self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
+        else:
+            raise IndexError("Cannot determine size of R and/or z in dPhi/dR")
+
+        return dphidr
 
     def dz(self, R, z):
+        """
+        Compute the radial derivative dPhi/dR of Phi in cylindrical coordinates
+        :param R: cylindrical radius (array type)
+        :param z: cylindrical height (array type)
+        :return: dPhi/dR (array type)
+        """
+        R, z = asarray(R), asarray(z)
 
-        r = sqrt(z * z + R * R)
-        if r < self.ar[0]:
-            r = self.ar[0]
+        # scalar case
+        if R.size == 1 and z.size == 1:
+            r = sqrt(z * z + R * R)
+            if r < self.ar[0]:
+                r = self.ar[0]
 
-        s, c = R / r, z / r
-        if c == 1:
-            c -= 1e-8
+            s, c = R / r, z / r
+            if c == 1:
+                c -= 1e-8
 
-        theta = arccos(c)
-        return self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
+            theta = arccos(c)
+            dphidz = self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
+
+        # R array case
+        elif R.size > 1 and z.size == 1:
+            dphidz = zeros(R.size)
+            for k in range(R.size):
+                r = sqrt(z * z + R[k] * R[k])
+                if r < self.ar[0]:
+                    r = self.ar[0]
+
+                s, c = R[k] / r, z / r
+                if c == 1:
+                    c -= 1e-8
+
+                theta = arccos(c)
+                dphidz[k] = self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
+
+        # z array case
+        elif R.size == 1 and z.size > 1:
+            dphidz = zeros(z.size)
+            for j in range(z.size):
+                r = sqrt(z[j] * z[j] + R * R)
+                if r < self.ar[0]:
+                    r = self.ar[0]
+
+                s, c = R / r, z[j] / r
+                if c == 1:
+                    c -= 1e-8
+
+                theta = arccos(c)
+                dphidz[j] = self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
+
+        # [R, z] array case
+        elif R.size > 1 and z.size > 1:
+            dphidz = zeros((R.size, z.size))
+            for k in range(R.size):
+                for j in range(z.size):
+                    r = sqrt(z[j] * z[j] + R[k] * R[k])
+                    if r < self.ar[0]:
+                        r = self.ar[0]
+
+                    s, c = R[k] / r, z[j] / r
+                    if c == 1:
+                        c -= 1e-8
+
+                    theta = arccos(c)
+                    dphidz[k, j] = self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
+        else:
+            raise IndexError("Cannot determine size of R and/or z in dPhi/dz")
+
+        return dphidz
 
     def _dr(self, r, theta):
+        """
+        Private method: compute derivative w.r.t. spherical r, i.e., dPhi/dr
+        :param r: spherical radius (scalar)
+        :param theta: angle (scalar)
+        :return: dPhi/dr (scalar)
+        """
         pol = FJmodel.even_Legendre(cos(theta), self.npoly)
         phip, dphip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly,
-                                                    Pr=self.fJ.Pr, nr=self.nr)
+                                                    Pr=self.Pr)
 
         dr = 0.
         for i in range(self.npoly):
@@ -498,9 +718,14 @@ class Potential(object):
         return dr
 
     def _dtheta(self, r, c):
-
+        """
+        Private method: compute derivative w.r.t. spherical theta, i.e., dPhi/dtheta
+        :param r: spherical radius (scalar)
+        :param c: cos(theta) (scalar)
+        :return: dPhi/dtheta (scalar)
+        """
         dtheta, dpol = 0, zeros(self.npoly)
-        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly, nr=self.nr)
+        phip = FJmodel.interpolate_potential(r, self.phil, self.ar, self.npoly)
 
         for i in range(self.npoly):
             dpol[i] = self.dlegend(c, 2 * i)
