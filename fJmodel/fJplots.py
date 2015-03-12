@@ -63,14 +63,22 @@ class PlotInterface(object):
         else:
             return self.ax[self.idplot].loglog(xdata, ydata, **kwargs)
 
-    def plotFigure(self, name=None):
+    def plotFigure(self, name=None, legend=False):
 
         if self.nplots == 1:
+
+            # x-y labels if condition
             if self.xlabel is not None:
                 self.ax.set_xlabel(self.xlabel, fontsize=self.fontsize)
             if self.ylabel is not None:
                 self.ax.set_ylabel(self.ylabel, fontsize=self.fontsize)
+
+            # Legend if condition
+            if legend:
+                self.ax.legend(loc='best')
+                
         else:
+            # x-y labels if condition
             if type(self.xlabel) is list:
                 for i in range(self.nplots):
                     if self.xlabel[i] is not None:
@@ -88,6 +96,12 @@ class PlotInterface(object):
                 for i in range(self.nplots):
                     if self.ylabel is not None:
                         self.ax[i].set_ylabel(self.ylabel, fontsize=self.fontsize)
+
+            # Legend if condition
+            if legend:
+                for i in range(self.nplots):
+                    self.ax[i].legend(loc='best')
+
         if self.idplot >= 0:
             if name is not None:
                 plt.savefig(name, bbox_inches='tight')

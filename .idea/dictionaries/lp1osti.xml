@@ -17,6 +17,8 @@
       <w>jmodel</w>
       <w>ndarray</w>
       <w>npot</w>
+      <w>sigp</w>
+      <w>sigz</w>
       <w>virial</w>
       <w>vrot</w>
       <w>ylabels</w>
