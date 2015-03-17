@@ -11,7 +11,8 @@ __author__ = 'lposti'
 
 from os.path import isfile
 from linecache import getline
-from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, pi, arccos
+from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, pi, arccos, inf, trapz
+from scipy.integrate import tplquad
 
 
 class FJmodel(object):
@@ -45,6 +46,9 @@ class FJmodel(object):
             self.phil = self._getLeg()
             self.Pr = self._getLeg()
             self.Pr2 = self._getLeg()
+
+            # compute spherically averaged Mass
+            self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
 
         except AssertionError:
             print "Assert Error: file does not exist!!"
@@ -150,11 +154,22 @@ class FJmodel(object):
         pot *= 4 * pi
 
         print "  Virial statistic: "
-        print "  Mass(%3.1f): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0],
-                                        sum(4 * pi * self.ar * self.ar * self.rho(self.ar, 0)))
+        print "  Mass(%3.1f): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0], self.mass)
         print "  KE, PE, W/K = %f %f %f " % (KRR + Kzz, pot, pot / (KRR + Kzz))
         print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
         print "  Kzz, Wzz, Wzz/Kzz = %f %f %f" % (Kzz, Wzz, Wzz / Kzz)
+
+    def compareMass(self, alpha=1.667, beta=5., M0=1., r0=1., dphih=.55, dzh=.55, dphig=.55, dzg=.55):
+
+        J0 = sqrt(M0 * r0)
+        h = lambda Jr, Jphi, Jz: Jr + dphih * Jphi + dzh * Jz
+        g = lambda Jr, Jphi, Jz: Jr + dphig * Jphi + dzg * Jz
+        DF = lambda Jr, Jphi, Jz: M0 / pow(J0, 3) * pow(1. + J0 / h(Jr, Jphi, Jz), alpha) /\
+            (pow(1 + g(Jr, Jphi, Jz) / J0, beta))
+        massfJ = tplquad(DF, 0, inf, lambda x: 0, lambda x: inf,
+                         lambda x, y: 0, lambda x, y: inf)[0]
+
+        print "Mass: f(J) model = %f, eq. (37)=%f" % (self.mass, massfJ)
 
     def _getq(self, R, z, ql, npot=True):
         """

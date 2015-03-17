@@ -76,7 +76,7 @@ class PlotInterface(object):
             # Legend if condition
             if legend:
                 self.ax.legend(loc='best')
-                
+
         else:
             # x-y labels if condition
             if type(self.xlabel) is list:
