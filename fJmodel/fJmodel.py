@@ -11,7 +11,7 @@ __author__ = 'lposti'
 
 from os.path import isfile
 from linecache import getline
-from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, pi, arccos, inf, trapz
+from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, pi, arccos, inf, trapz, power
 from scipy.integrate import tplquad
 
 
@@ -33,8 +33,23 @@ class FJmodel(object):
             while getline(self.fname, self._line)[0] == '#':
                 self._line += 1
 
+            #
+            # get header (was recently modified)
+            #
             self.nr, self.npoly, self.ngauss = fromstring(getline(self.fname, self._line), dtype=int, sep=' ')
             self._line += 1
+
+            self.dphi_h, self.dz_h, self.dphi_g, self.dz_g =\
+                fromstring(getline(self.fname, self._line), dtype=float, sep=' ')
+            self._line += 1
+
+            self.chi, self.M0, self.r0 = fromstring(getline(self.fname, self._line), dtype=float, sep=' ')
+            self._line += 1
+
+            self.alpha, self.beta = fromstring(getline(self.fname, self._line), dtype=float, sep=' ')
+            self._line += 1
+            # header ended
+            #####################################
 
             self.ar = self._getr()
             self.rhl = self._getLeg()
@@ -164,8 +179,8 @@ class FJmodel(object):
         J0 = sqrt(M0 * r0)
         h = lambda Jr, Jphi, Jz: Jr + dphih * Jphi + dzh * Jz
         g = lambda Jr, Jphi, Jz: Jr + dphig * Jphi + dzg * Jz
-        DF = lambda Jr, Jphi, Jz: M0 / pow(J0, 3) * pow(1. + J0 / h(Jr, Jphi, Jz), alpha) /\
-            (pow(1 + g(Jr, Jphi, Jz) / J0, beta))
+        DF = lambda Jr, Jphi, Jz: M0 / power(J0, 3) * power(1. + J0 / h(Jr, Jphi, Jz), alpha) /\
+            (power(1 + g(Jr, Jphi, Jz) / J0, beta))
         massfJ = tplquad(DF, 0, inf, lambda x: 0, lambda x: inf,
                          lambda x, y: 0, lambda x, y: inf)[0]
 

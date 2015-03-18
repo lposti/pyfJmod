@@ -8,7 +8,7 @@
 __author__ = 'lposti'
 
 
-from numpy import log10
+from numpy import log10, meshgrid, linspace, zeros
 import matplotlib.pylab as plt
 from fJmodel import FJmodel
 
@@ -39,7 +39,7 @@ class PlotInterface(object):
             self.ylabel = ylabel
 
         self.fontsize = fontsize
-        self.nplots = nrow*ncols
+        self.nplots = nrow * ncols
         self.idplot = -1
         self.fig, self.ax = plt.subplots(nrow, ncols, sharex=sharex, sharey=sharey, **fig_kw)
 
@@ -62,6 +62,41 @@ class PlotInterface(object):
             return self.ax.loglog(xdata, ydata, **kwargs)
         else:
             return self.ax[self.idplot].loglog(xdata, ydata, **kwargs)
+
+    def contourf(self, x, y, z, samefig=False, **kwargs):
+
+        if not samefig or self.idplot < 0:
+            self.idplot += 1
+
+        # here I transpose the rho matrix...
+        # is there any other fix with this matplotlib issue?
+        if self.nplots == 1:
+            return self.ax.contourf(x, y, z.T, **kwargs)
+        else:
+            return self.ax[self.idplot].contourf(x, y, z.T, **kwargs)
+
+    def imshow(self, f, xmin, xmax, ymin, ymax, num=100, samefig=False, **kwargs):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if not samefig or self.idplot < 0:
+            self.idplot += 1
+
+        m = zeros((num, num))
+        x = linspace(xmin, xmax, num=num)
+        y = linspace(ymin, ymax, num=num)
+
+        for i in range(num):
+            for j in range(num):
+                m[i, j] = f(x[i], y[j])
+
+        # here I transpose the rho matrix...
+        # is there any other fix with this matplotlib issue?
+        if self.nplots == 1:
+            return self.ax.imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
+        else:
+            return self.ax[self.idplot].imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
 
     def plotFigure(self, name=None, legend=False):
 
@@ -140,55 +175,132 @@ class FJmodelPlot(PlotInterface):
 
     def plotRho(self, R=None, z=None, show=True):
 
-        if R is None:
-            R = self.fJ.ar
-        if z is None:
-            z = 0
-
-        self.loglog(R, self.fJ.rho(R, z))
-        if show:
-            self.plotFigure()
+        self._pltloglog(self.fJ.rho, R, z, show)
 
     def plotSigR(self, R=None, z=None, show=True):
 
-        if R is None:
-            R = self.fJ.ar
-        if z is None:
-            z = 0
-
-        self.plot(log10(R), self.fJ.sigR(R, z))
-        if show:
-            self.plotFigure()
+        self._pltsemilog(self.fJ.sigR, R, z, show)
 
     def plotSigz(self, R=None, z=None, show=True):
 
-        if R is None:
-            R = self.fJ.ar
-        if z is None:
-            z = 0
-
-        self.plot(log10(R), self.fJ.sigz(R, z))
-        if show:
-            self.plotFigure()
+        self._pltsemilog(self.fJ.sigz, R, z, show)
 
     def plotSigp(self, R=None, z=None, show=True):
 
-        if R is None:
-            R = self.fJ.ar
-        if z is None:
-            z = 0
-
-        self.plot(log10(R), self.fJ.sigp(R, z))
-        if show:
-            self.plotFigure()
+        self._pltsemilog(self.fJ.sigp, R, z, show)
 
     def plotPhi(self, R=None, z=None, show=True):
 
+        self._pltloglog(lambda x, y: -self.fJ.phi(x, y), R, z, show)
+
+    def _pltloglog(self, f, R=None, z=None, show=True):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
         if R is None:
             R = self.fJ.ar
         if z is None:
             z = 0
 
-        self.loglog(R, -self.fJ.phi(R, z))
+        self.loglog(R, f(R, z))
+        if show:
+            self.plotFigure()
+
+    def _pltsemilog(self, f, R=None, z=None, show=True):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = 0
+
+        self.plot(log10(R), f(R, z))
+        if show:
+            self.plotFigure()
+
+    def contourfRho(self, R=None, z=None, show=True):
+
+        self._logcontourf(self.fJ.rho, R, z, show)
+
+    def contourfVrot(self, R=None, z=None, show=True):
+
+        self._pltcontourf(self.fJ.vrot, R, z, show)
+
+    def imshowRho(self, Rmin=None, Rmax=None, zmin=None, zmax=None, show=True):
+
+        self._logimshow(self.fJ.rho, Rmin, Rmax, zmin, zmax, show)
+
+    def imshowVrot(self, Rmin=None, Rmax=None, zmin=None, zmax=None, show=True):
+
+        self._pltimshow(self.fJ.vrot, Rmin, Rmax, zmin, zmax, show)
+
+    def _logcontourf(self, f, R=None, z=None, show=True):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = self.fJ.ar
+
+        X, Y = meshgrid(R, z)
+
+        self.contourf(X, Y, log10(f(R, z)))
+        if show:
+            self.plotFigure()
+
+    def _pltcontourf(self, f, R=None, z=None, show=True):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = self.fJ.ar
+
+        X, Y = meshgrid(R, z)
+
+        self.contourf(X, Y, f(R, z))
+        if show:
+            self.plotFigure()
+
+    def _logimshow(self, f, Rmin=None, Rmax=None, zmin=None, zmax=None, show=True):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if Rmin is None:
+            Rmin = self.fJ.ar[0]
+        if Rmax is None:
+            Rmax = self.fJ.ar[-1]
+        if zmin is None:
+            zmin = self.fJ.ar[0]
+        if zmax is None:
+            zmax = self.fJ.ar[-1]
+
+        self.imshow(lambda x, y: log10(f(x, y)), Rmin, Rmax, zmin, zmax)
+        if show:
+            self.plotFigure()
+
+    def _pltimshow(self, f, Rmin=None, Rmax=None, zmin=None, zmax=None, show=True):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if Rmin is None:
+            Rmin = self.fJ.ar[0]
+        if Rmax is None:
+            Rmax = self.fJ.ar[-1]
+        if zmin is None:
+            zmin = self.fJ.ar[0]
+        if zmax is None:
+            zmax = self.fJ.ar[-1]
+
+        self.imshow(lambda x, y: f(x, y), Rmin, Rmax, zmin, zmax)
         if show:
             self.plotFigure()
