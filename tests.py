@@ -6,7 +6,7 @@ from numpy import array, ones
 from numpy.testing import assert_almost_equal, assert_equal
 
 # define global FJmodel
-f = FJmodel("fJmodel/examples/Hernq_0.55_0.55_1.00_1.00_0.out")
+f = FJmodel("fJmodel/examples/Hernq_1.00_2.00_1.00_2.00_0.flt.out")
 
 
 class MyTests(unittest.TestCase):

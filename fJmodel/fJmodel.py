@@ -194,13 +194,22 @@ class FJmodel(object):
         print "Mass: f(J) model = %f, eq. (37)=%f" % (self.mass, massfJ)
     """
 
-    def project(self, incl, nx=80, npsi=31, b=1., Rmax=None):
+    def project(self, inclination, nx=80, npsi=31, b=1., Rmax=None):
+        """
+        Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
+        :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
+        :param nx: number of grid points
+        :param npsi: number of angular subdivisions (for projection)
+        :param b:
+        :param Rmax: maximum extent of radial grid
+        :return: x, y (ndarray) [-Rmax,Rmax] to be passed to contour
+        """
 
         if Rmax is None:
             Rmax = self.ar[-1]
 
         # nx, npsi = 60, 81
-        self.dlos, self.slos, self.vlos = self.projection(incl=incl, b=b, Rmax=Rmax, nx=nx, npsi=npsi,
+        self.dlos, self.slos, self.vlos = self.projection(incl=inclination, b=b, Rmax=Rmax, nx=nx, npsi=npsi,
                                                           Fast_evaluate_moments=self._fast_evaluate_moments)
 
         x = linspace(-Rmax, Rmax, num=2 * nx)
@@ -211,6 +220,21 @@ class FJmodel(object):
     @staticmethod
     def projection(incl, b, Rmax, nx, npsi, Fast_evaluate_moments=None, rho=None, vrot=None, sigR=None,
                    sigp=None, sigz=None):
+        """
+        Static method: projects the given model
+        :param incl: inclination angle of the line-of-sight
+        :param b:
+        :param Rmax: maximum extent of radial grid
+        :param nx: number of grid points
+        :param npsi: number of angular subdivisions (for projection)
+        :param Fast_evaluate_moments: function to eval. moments
+        :param rho: rho function
+        :param vrot: vrot function
+        :param sigR: sigR function
+        :param sigp: sigp function
+        :param sigz: sigz function
+        :return: three maps of density, velocity and velocity dispersion along line-of-sight
+        """
 
         # check if functions are callable
         if Fast_evaluate_moments is not None:
