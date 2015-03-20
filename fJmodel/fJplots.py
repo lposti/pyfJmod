@@ -71,9 +71,13 @@ class PlotInterface(object):
         # here I transpose the rho matrix...
         # is there any other fix with this matplotlib issue?
         if self.nplots == 1:
-            return self.ax.contourf(x, y, z.T, **kwargs)
+            contour = self.ax.contourf(x, y, z.T, **kwargs)
+            plt.colorbar(contour, ax=self.ax)
+            return contour
         else:
-            return self.ax[self.idplot].contourf(x, y, z.T, **kwargs)
+            contour = self.ax[self.idplot].contourf(x, y, z.T, **kwargs)
+            plt.colorbar(contour, ax=self.ax[self.idplot])
+            return contour
 
     def imshow(self, f, xmin, xmax, ymin, ymax, num=100, samefig=False, **kwargs):
 
@@ -94,9 +98,13 @@ class PlotInterface(object):
         # here I transpose the rho matrix...
         # is there any other fix with this matplotlib issue?
         if self.nplots == 1:
-            return self.ax.imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
+            image = self.ax.imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
+            plt.colorbar(image, ax=self.ax)
+            return image
         else:
-            return self.ax[self.idplot].imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
+            image = self.ax[self.idplot].imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
+            plt.colorbar(image, ax=self.ax[self.idplot])
+            return image
 
     def plotFigure(self, name=None, legend=False):
 

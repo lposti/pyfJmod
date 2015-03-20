@@ -3,8 +3,11 @@
     <words>
       <w>allpol</w>
       <w>coeffs</w>
+      <w>colorbar</w>
       <w>contourf</w>
+      <w>cphi</w>
       <w>dlegend</w>
+      <w>dlos</w>
       <w>dphi</w>
       <w>dphidr</w>
       <w>dphidz</w>
@@ -12,6 +15,7 @@
       <w>dphih</w>
       <w>dphip</w>
       <w>dpol</w>
+      <w>dpsi</w>
       <w>dtheta</w>
       <w>fontsize</w>
       <w>gauleg</w>
@@ -26,19 +30,31 @@
       <w>logimshow</w>
       <w>massf</w>
       <w>ndarray</w>
+      <w>npmax</w>
       <w>npot</w>
+      <w>npsi</w>
+      <w>pbar</w>
       <w>pltcontourf</w>
       <w>pltimshow</w>
       <w>pltloglog</w>
       <w>pltsemilog</w>
       <w>posti</w>
+      <w>rhop</w>
       <w>rmax</w>
       <w>rmin</w>
       <w>scipy</w>
       <w>sigp</w>
+      <w>sigpp</w>
       <w>sigz</w>
+      <w>sigzp</w>
+      <w>slos</w>
+      <w>sphi</w>
+      <w>symmetrize</w>
       <w>virial</w>
+      <w>vlos</w>
       <w>vrot</w>
+      <w>vrotp</w>
+      <w>wdgt</w>
       <w>xmax</w>
       <w>xmin</w>
       <w>ylabels</w>

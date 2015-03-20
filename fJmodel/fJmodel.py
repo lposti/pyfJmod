@@ -11,8 +11,11 @@ __author__ = 'lposti'
 
 from os.path import isfile
 from linecache import getline
-from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, pi, arccos, inf, trapz, power
-from scipy.integrate import tplquad
+# from numpy import max as npmax
+from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
+    cosh, sinh, arctan2, power, log10, linspace, seterr
+from progressbar import ProgressBar, widgets
+# from scipy.integrate import tplquad
 
 
 class FJmodel(object):
@@ -61,6 +64,9 @@ class FJmodel(object):
             self.phil = self._getLeg()
             self.Pr = self._getLeg()
             self.Pr2 = self._getLeg()
+
+            # initialize to empty lists
+            self.dlos, self.slos, self.vlos = [], [], []
 
             # compute spherically averaged Mass
             self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
@@ -174,6 +180,7 @@ class FJmodel(object):
         print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
         print "  Kzz, Wzz, Wzz/Kzz = %f %f %f" % (Kzz, Wzz, Wzz / Kzz)
 
+    """
     def compareMass(self, alpha=1.667, beta=5., M0=1., r0=1., dphih=.55, dzh=.55, dphig=.55, dzg=.55):
 
         J0 = sqrt(M0 * r0)
@@ -185,6 +192,98 @@ class FJmodel(object):
                          lambda x, y: 0, lambda x, y: inf)[0]
 
         print "Mass: f(J) model = %f, eq. (37)=%f" % (self.mass, massfJ)
+    """
+
+    def project(self, incl, nx=80, npsi=31, b=1., Rmax=None):
+
+        if Rmax is None:
+            Rmax = self.ar[-1]
+
+        # nx, npsi = 60, 81
+        self.dlos, self.slos, self.vlos = self.projection(incl=incl, b=b, Rmax=Rmax, nx=nx, npsi=npsi,
+                                                          Fast_evaluate_moments=self._fast_evaluate_moments)
+
+        x = linspace(-Rmax, Rmax, num=2 * nx)
+        y = linspace(-Rmax, Rmax, num=2 * nx)
+
+        return x, y
+
+    @staticmethod
+    def projection(incl, b, Rmax, nx, npsi, Fast_evaluate_moments=None, rho=None, vrot=None, sigR=None,
+                   sigp=None, sigz=None):
+
+        # check if functions are callable
+        if Fast_evaluate_moments is not None:
+            assert hasattr(Fast_evaluate_moments, '__call__')
+        if rho is not None:
+            assert hasattr(rho, '__call__')
+        if vrot is not None:
+            assert hasattr(vrot, '__call__')
+        if sigR is not None:
+            assert hasattr(sigR, '__call__')
+        if sigp is not None:
+            assert hasattr(sigp, '__call__')
+        if sigz is not None:
+            assert hasattr(sigz, '__call__')
+
+        # set numpy errors: Ignore invalid values, so that no Warning is raised by sqrt(I2/I1)
+        seterr(invalid='ignore')
+
+        ymax, zmax, psi_max = Rmax, Rmax, 3.
+        to_radians = pi / 180.
+        sin_incl, cos_incl = sin(incl * to_radians), cos(incl * to_radians)
+
+        dpsi = 2 * psi_max / float(npsi - 1)
+        lam_top, lam_bot = 0., 0.
+        dlos, slos, vlos = zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx))
+
+        wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
+                ' ', widgets.ETA()]
+        pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
+        for i in range(nx):
+            yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
+
+            for j in range(2 * nx):
+
+                zp = (-1. + 2. * j / float(2 * nx - 1)) * zmax
+                rp = sqrt(yp * yp + zp * zp)
+                a, I1, I2, I3 = max(sqrt(yp * yp + zp * zp), .1 * b), 0., 0., 0.
+                for k in range(npsi):
+                    # update ProgressBar
+                    pbar.update((i * 2 * nx + j) * npsi + k)
+                    psi = -psi_max + k * dpsi
+                    ch, sh, = cosh(psi), sinh(psi)
+                    xp = a * sh
+                    x, y, z = xp * sin_incl - zp * cos_incl, yp, zp * sin_incl + xp * cos_incl
+                    R, phi, abs_z = sqrt(x * x + y * y), arctan2(y, x), abs(z)
+                    cphi, sphi = cos(phi), sin(phi)
+
+                    if Fast_evaluate_moments is not None:
+                        dens, Vrot, SigR, Sigp, Sigz = Fast_evaluate_moments(R, abs_z)
+                    else:
+                        dens, Vrot = rho(R, abs_z), vrot(R, abs_z)
+                        SigR, Sigp, Sigz = sigR(R, abs_z), sigp(R, abs_z), sigz(R, abs_z)
+
+                    I1 += ch * dens
+                    I2 += ch * dens * ((power(SigR * cphi * sin_incl, 2)
+                                        + (Sigp * Sigp - Vrot * Vrot) * power(sphi * sin_incl, 2))
+                                       + power(Sigz * cos_incl, 2))   # +2*SigRz*sin_incl*cos_incl
+                    I3 += ch * dens * Vrot * sphi * sin_incl
+
+                dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j] = log10(max(a * dpsi * I1, 1e-10)), \
+                    sqrt(I2 / I1), I3 / I1
+
+                # symmetrize arrays
+                dlos[nx - 1 - i, j], slos[nx - 1 - i, j], vlos[nx - 1 - i, j] = \
+                    dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j]
+                if rp < 3:
+                    lam_top += abs(I3) * rp
+                    lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
+
+        pbar.finish()
+        # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
+
+        return dlos, slos, vlos
 
     def _getq(self, R, z, ql, npot=True):
         """
@@ -369,6 +468,60 @@ class FJmodel(object):
                 intp[i] = f * ql[top][i] + (1 - f) * ql[bot][i]
 
         return intp
+
+    def _fast_evaluate_moments(self, R, z):
+
+        assert R.size is 1
+        assert z.size is 1
+
+        r = sqrt(R * R + z * z)
+        c = z / r
+
+        pol = self._evenlegend(c)
+        rhop, vrotp, sigRp, sigpp, sigzp = self._fast_interpolate_moments(r)
+
+        Rho, Vrot, SigR, Sigp, Sigz = .5 * rhop[0], .5 * vrotp[0], .5 * sigRp[0], .5 * sigpp[0], .5 * sigzp[0]
+        for i in range(1, self.npoly):
+            f = .5 * (4 * i + 1)
+            Rho += f * rhop[i] * pol[i]
+            Vrot += f * vrotp[i] * pol[i]
+            SigR += f * sigRp[i] * pol[i]
+            Sigp += f * sigpp[i] * pol[i]
+            Sigz += f * sigzp[i] * pol[i]
+
+        return Rho, Vrot, SigR, Sigp, Sigz
+
+    def _fast_interpolate_moments(self, r):
+        """
+        Private method: assumes r is scalar
+        :param r:
+        :return:
+        """
+
+        # check r is a scalar
+        assert r.size is 1
+
+        rhop = zeros(self.npoly, dtype=float)
+        vrotp = zeros(self.npoly, dtype=float)
+        sigRp = zeros(self.npoly, dtype=float)
+        sigpp = zeros(self.npoly, dtype=float)
+        sigzp = zeros(self.npoly, dtype=float)
+
+        if r > self.ar[-1]:
+            pass
+        else:
+            bot = searchsorted(self.ar, r, side='left') - 1
+            top = bot + 1
+
+            f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])
+            for i in range(self.npoly):
+                rhop[i] = f * self.rhl[top][i] + (1 - f) * self.rhl[bot][i]
+                vrotp[i] = f * self.vrotl[top][i] + (1 - f) * self.vrotl[bot][i]
+                sigRp[i] = f * self.sigRl[top][i] + (1 - f) * self.sigRl[bot][i]
+                sigpp[i] = f * self.sigpl[top][i] + (1 - f) * self.sigpl[bot][i]
+                sigzp[i] = f * self.sigzl[top][i] + (1 - f) * self.sigzl[bot][i]
+
+        return rhop, vrotp, sigRp, sigpp, sigzp
 
     def _interp_pot(self, r, phil):
         """
