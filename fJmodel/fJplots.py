@@ -41,7 +41,16 @@ class PlotInterface(object):
         self.fontsize = fontsize
         self.nplots = nrow * ncols
         self.idplot = -1
+        self.nrow, self.ncols = nrow, ncols
+        self.sharex, self.sharey = sharex, sharey
+
+        self.fig, self.ax = None, None
+        self._init_fig()
+
+    def _init_fig(self):
         self.fig, self.ax = plt.subplots(nrow, ncols, sharex=sharex, sharey=sharey, **fig_kw)
+
+
 
     def plot(self, xdata, ydata, samefig=False, **kwargs):
 
