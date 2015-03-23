@@ -1,14 +1,14 @@
 language: python
+# only versions 2.7 and 3.2 support virtualenv
 python:
-  - "2.6"
   - "2.7"
-  - "3.2"
+#  - "3.2"
 # command to import packages from the global site packages directory
 virtualenv:
   system_site_packages: true
 # use apt-get
 before_install:
- - sudo apt-get install -qq python-numpy python-scipy python-matplotlib
+ - sudo apt-get install -qq python-numpy python-scipy python-matplotlib python-nose
 # command to install dependencies
 install:
   - "pip install ."
