@@ -43,14 +43,19 @@ class PlotInterface(object):
         self.idplot = -1
         self.nrow, self.ncols = nrow, ncols
         self.sharex, self.sharey = sharex, sharey
+        self.fig_kw = fig_kw
 
-        self.fig, self.ax = None, None
-        self._init_fig()
+        # init figure and axes
+        self.fig, self.ax = self._init_fig(**self.fig_kw)
 
-    def _init_fig(self):
-        self.fig, self.ax = plt.subplots(nrow, ncols, sharex=sharex, sharey=sharey, **fig_kw)
-
-
+    def _init_fig(self, **fig_kw):
+        """
+        Private method: initialize Figure and Axes instances for the class.
+        Used both at the beginning (constructor) and at the end (after plotFigure)
+        :return: handles to Figure and Axes instances
+        """
+        fig, ax = plt.subplots(self.nrow, self.ncols, sharex=self.sharex, sharey=self.sharey, **fig_kw)
+        return fig, ax
 
     def plot(self, xdata, ydata, samefig=False, **kwargs):
 
@@ -161,6 +166,9 @@ class PlotInterface(object):
                 plt.show()
         else:
             raise ValueError("No Plot to show!!")
+
+        # now reset the fig. and axes to the init values
+        self.fig, self.ax = self._init_fig(**self.fig_kw)
 
 
 class FJmodelPlot(PlotInterface):
