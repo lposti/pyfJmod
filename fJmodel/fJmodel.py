@@ -15,7 +15,8 @@ from linecache import getline
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
     cosh, sinh, arctan2, power, log10, linspace, seterr
 from progressbar import ProgressBar, widgets
-# from scipy.integrate import tplquad
+from scipy.integrate import tplquad
+from numpy import inf
 
 
 class FJmodel(object):
@@ -180,7 +181,6 @@ class FJmodel(object):
         print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
         print "  Kzz, Wzz, Wzz/Kzz = %f %f %f" % (Kzz, Wzz, Wzz / Kzz)
 
-    """
     def compareMass(self, alpha=1.667, beta=5., M0=1., r0=1., dphih=.55, dzh=.55, dphig=.55, dzg=.55):
 
         J0 = sqrt(M0 * r0)
@@ -192,7 +192,6 @@ class FJmodel(object):
                          lambda x, y: 0, lambda x, y: inf)[0]
 
         print "Mass: f(J) model = %f, eq. (37)=%f" % (self.mass, massfJ)
-    """
 
     def project(self, inclination, nx=80, npsi=31, b=1., Rmax=None):
         """
