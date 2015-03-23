@@ -275,13 +275,14 @@ class FJmodel(object):
             yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
 
             for j in range(2 * nx):
-
                 zp = (-1. + 2. * j / float(2 * nx - 1)) * zmax
                 rp = sqrt(yp * yp + zp * zp)
                 a, I1, I2, I3 = max(sqrt(yp * yp + zp * zp), .1 * b), 0., 0., 0.
+
                 for k in range(npsi):
                     # update ProgressBar
                     pbar.update((i * 2 * nx + j) * npsi + k)
+
                     psi = -psi_max + k * dpsi
                     ch, sh, = cosh(psi), sinh(psi)
                     xp = a * sh
