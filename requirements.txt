@@ -1,1 +1,4 @@
+numpy
+-e git+http://github.com/scipy/scipy/#egg=scipy
+matplotlib
 progressbar
