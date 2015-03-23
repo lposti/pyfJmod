@@ -47,8 +47,7 @@ class MyTests(unittest.TestCase):
 
         p = Potential(f)
 
-        for np in range(p.npoly):
-            assert [x for x in p.phil[:, np] if x <= 0]
+        assert [x for x in p.phil[:, 0] if x <= 0]
         assert [x for x in p.ar if x > 0]
         assert [y for y in p(p.ar, p.ar[0]) if y < 0]
         assert [y for y in p(p.ar[0], p.ar) if y < 0]
