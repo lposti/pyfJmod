@@ -13,10 +13,10 @@ from os.path import isfile
 from linecache import getline
 # from numpy import max as npmax
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
-from numpy import inf
+from scipy.optimize import brentq
 
 
 class FJmodel(object):
@@ -55,6 +55,9 @@ class FJmodel(object):
             # header ended
             #####################################
 
+            #
+            # start reading the input file
+            #
             self.ar = self._getr()
             self.rhl = self._getLeg()
             self.vrotl = self._getLeg()
@@ -65,12 +68,17 @@ class FJmodel(object):
             self.phil = self._getLeg()
             self.Pr = self._getLeg()
             self.Pr2 = self._getLeg()
+            # end of file
+            #####################################
 
             # initialize to empty lists
             self.dlos, self.slos, self.vlos = [], [], []
 
             # compute spherically averaged Mass
             self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
+
+            # compute intrinsic ellipticity
+            self.eps = self._get_ellipticity()
 
         except AssertionError:
             print "Assert Error: file does not exist!!"
@@ -307,6 +315,24 @@ class FJmodel(object):
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
 
         return dlos, slos, vlos
+
+    def _get_ellipticity(self):
+        """
+        Private method: gets the ellipticity profile along the radial grid.
+        The ellipticity is defined as e=1-z/R, where z is the position along the minor axis where the
+        (intrinsic) density is equal to that along the major axis at position R.
+        :return: ellipticity profile (array type)
+        """
+
+        eps = zeros(self.nr)
+        minR, maxR = self.ar[0] / 2, self.ar[-1] * 2
+
+        for i in range(self.nr):
+            f = lambda z: self.rho(self.ar[i], 0.) - self.rho(0., z)
+            # ellipticity defined as eps = 1-z/R
+            eps[i] = 1. - brentq(f, minR, maxR) / self.ar[i]
+
+        return eps
 
     def _getq(self, R, z, ql, npot=True):
         """
