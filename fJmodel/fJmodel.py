@@ -294,6 +294,7 @@ class FJmodel(object):
         dlos, slos, vlos = zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx))
 
         # initialize Progressbar if verbose==True
+        pbar = None
         if verbose:
             wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
                     ' ', widgets.ETA()]

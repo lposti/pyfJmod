@@ -23,8 +23,10 @@ class MyTests(unittest.TestCase):
         assert [x for x in f.sigpl[:, 0] if x > 0]
         assert [x for x in f.sigzl[:, 0] if x > 0]
         assert [x for x in f.sigRzl[:, 0] if x > 0]
+
         for x in f.ar:
             assert f.rho(x, 0) > 0
+
         assert [y for y in f.rho(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigR(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigp(f.ar, f.ar[0]) if y > 0]
@@ -37,6 +39,10 @@ class MyTests(unittest.TestCase):
         assert [y for y in f.sigz(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.sigRz(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.vrot(f.ar[0], f.ar) if y > 0]
+
+        density_slice = f.rho(f.ar, f.ar)
+        for d in density_slice:
+            assert d > 0
 
     def testFJ_Legendre(self):
 
@@ -76,8 +82,16 @@ class MyTests(unittest.TestCase):
 
         assert [x for x in p.phil[:, 0] if x <= 0]
         assert [x for x in p.ar if x > 0]
+
+        for x in p.ar:
+            assert p(x, 0) < 0
+
         assert [y for y in p(p.ar, p.ar[0]) if y < 0]
         assert [y for y in p(p.ar[0], p.ar) if y < 0]
+
+        potential_slice = p(p.ar, p.ar)
+        for p in potential_slice:
+            assert p < 0
 
     def testPot_init(self):
 
