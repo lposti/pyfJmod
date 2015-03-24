@@ -41,8 +41,9 @@ class MyTests(unittest.TestCase):
         assert [y for y in f.vrot(f.ar[0], f.ar) if y > 0]
 
         density_slice = f.rho(f.ar, f.ar)
-        for d in density_slice:
-            assert d > 0
+        for dd in density_slice:
+            for d in dd:
+                assert d >= 0
 
     def testFJ_Legendre(self):
 
@@ -90,8 +91,9 @@ class MyTests(unittest.TestCase):
         assert [y for y in p(p.ar[0], p.ar) if y < 0]
 
         potential_slice = p(p.ar, p.ar)
-        for p in potential_slice:
-            assert p < 0
+        for pp in potential_slice:
+            for p in pp:
+                assert p <= 0
 
     def testPot_init(self):
 
