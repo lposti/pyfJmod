@@ -5,7 +5,7 @@ __author__ = 'lposti'
 from distutils.core import setup
 
 setup(name='pyfJmod',
-      version='0.2.1',
+      version='0.2.2',
       description='Python package for f(J) models analysis',
       author='Lorenzo Posti',
       author_email='lorenzo.posti@gmail.com',
@@ -19,7 +19,7 @@ setup(name='pyfJmod',
                    'Environment :: MacOS X',
                    'Intended Audience :: End Users/Desktop',
                    'Intended Audience :: Developers',
-                   'License :: OSI Approved :: GNU General Public License (GPL)',
+                   'License :: OSI Approved :: BSD License',
                    'Operating System :: POSIX :: Linux',
                    'Operating System :: MacOS :: MacOS X',
                    'Programming Language :: Python',
