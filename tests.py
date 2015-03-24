@@ -2,11 +2,11 @@ __author__ = 'lposti'
 
 import unittest
 from fJmodel.fJmodel import FJmodel, Potential
-from numpy import array, ones
+from numpy import array, ones, zeros
 from numpy.testing import assert_almost_equal, assert_equal
 
 # define global FJmodel
-f = FJmodel("fJmodel/examples/Hernq_1.00_2.00_1.00_2.00_0.flt.out")
+f = FJmodel("fJmodel/examples/Hernq_0.55_0.55_1.00_1.00_4.out")
 
 
 class MyTests(unittest.TestCase):
@@ -18,17 +18,23 @@ class MyTests(unittest.TestCase):
         assert f.nr > 0 and f.npoly > 0 and f.ngauss > 0
         assert [x for x in f.ar if x > 0]
         assert [x for x in f.rhl[:, 0] if x > 0]
+        assert [x for x in f.vrotl[:, 0] if x > 0]
         assert [x for x in f.sigRl[:, 0] if x > 0]
         assert [x for x in f.sigpl[:, 0] if x > 0]
         assert [x for x in f.sigzl[:, 0] if x > 0]
+        assert [x for x in f.sigRzl[:, 0] if x > 0]
         assert [y for y in f.rho(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigR(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigp(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigz(f.ar, f.ar[0]) if y > 0]
+        assert [y for y in f.sigRz(f.ar, f.ar[0]) if y > 0]
+        assert [y for y in f.vrot(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.rho(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.sigR(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.sigp(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.sigz(f.ar[0], f.ar) if y > 0]
+        assert [y for y in f.sigRz(f.ar[0], f.ar) if y > 0]
+        assert [y for y in f.vrot(f.ar[0], f.ar) if y > 0]
 
     def testFJ_Legendre(self):
 
@@ -42,6 +48,25 @@ class MyTests(unittest.TestCase):
         assert_equal(f._interp_pot(f.ar[0], f.phil),
                      FJmodel.interpolate_potential(f.ar[0], f.phil, f.ar, f.npoly))
         assert_equal(f._gaussLeg(0, 1), FJmodel.gauleg(0, 1, f.ngauss))
+
+    def test_virialized_output(self):
+
+        assert_almost_equal(f.virial(verbose=False, ret=True), (-2., -2., -2.), decimal=0)
+
+    def test_final_mass(self):
+
+        assert_almost_equal(f.compare_mass(), 1., decimal=1)
+
+    def test_ellipticity_spherical_model(self):
+
+        assert_almost_equal(f.eps, zeros(len(f.eps), dtype=float), decimal=1)
+
+    def test_project_spherical_model(self):
+
+        f.project(inclination=90, nx=31, npsi=31, verbose=False)
+        half = f.nr / 2
+        delta = f.dlos[half, half:] - f.dlos[half:, half]
+        assert_almost_equal(delta, zeros(len(delta), dtype=float), decimal=1)
 
     def testPot_sanity(self):
 

@@ -12,6 +12,7 @@ __author__ = 'lposti'
 from os.path import isfile
 from linecache import getline
 # from numpy import max as npmax
+from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
     cosh, sinh, arctan2, power, log10, linspace, seterr, inf
 from progressbar import ProgressBar, widgets
@@ -153,12 +154,15 @@ class FJmodel(object):
         R, z = asarray(R), asarray(z)
         return self._getq(R, z, self.sigRzl)
 
-    def virial(self):
+    def virial(self, verbose=True, ret=False):
         """
         Computes and prints the quantity involved in the tensor virial theorem.
         We judge a system to be relaxed to self-consistency if the ratios of the potential over
         kinetic energies (diagonal and off diagonal tensor terms) are reasonably close to 2
-        :return: Prints the statistic for the tensor virial theorem
+        :param verbose: bool, if True prints the virial statistic
+        :param ret: bool, if True returns the diagonal terms of the virial tensor
+        :return: Prints the statistic for the tensor virial theorem. If ret=True, returns the diagonal
+                 terms of the virial tensor as floats
         """
         p = Potential(fJ=self)
         ci, wi = self._gaussLeg(0, 1)
@@ -183,25 +187,42 @@ class FJmodel(object):
         Wzz *= 4 * pi
         pot *= 4 * pi
 
-        print "  Virial statistic: "
-        print "  Mass(%3.1f): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0], self.mass)
-        print "  KE, PE, W/K = %f %f %f " % (KRR + Kzz, pot, pot / (KRR + Kzz))
-        print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
-        print "  Kzz, Wzz, Wzz/Kzz = %f %f %f" % (Kzz, Wzz, Wzz / Kzz)
+        if verbose:
+            print "  Virial statistic: "
+            print "  Mass(%3.1f): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0], self.mass)
+            print "  KE, PE, W/K = %f %f %f " % (KRR + Kzz, pot, pot / (KRR + Kzz))
+            print "  Kxx, Wxx, Wxx/Kxx = %f %f %f" % (KRR, WRR, WRR / KRR)
+            print "  Kzz, Wzz, Wzz/Kzz = %f %f %f" % (Kzz, Wzz, Wzz / Kzz)
 
-    def compareMass(self, alpha=1.667, beta=5., M0=1., r0=1., dphih=.55, dzh=.55, dphig=.55, dzg=.55):
+        if ret:
+            return pot / (KRR + Kzz), WRR / KRR, Wzz / Kzz
 
-        J0 = sqrt(M0 * r0)
-        h = lambda Jr, Jphi, Jz: Jr + dphih * Jphi + dzh * Jz
-        g = lambda Jr, Jphi, Jz: Jr + dphig * Jphi + dzg * Jz
-        DF = lambda Jr, Jphi, Jz: M0 / power(J0, 3) * power(1. + J0 / h(Jr, Jphi, Jz), alpha) /\
-            (power(1 + g(Jr, Jphi, Jz) / J0, beta))
-        massfJ = tplquad(DF, 0, inf, lambda x: 0, lambda x: inf,
-                         lambda x, y: 0, lambda x, y: inf)[0]
+    def compare_mass(self):
 
-        print "Mass: f(J) model = %f, eq. (37)=%f" % (self.mass, massfJ)
+        massfJ = self.computeMassIntegral(alpha=self.alpha, beta=self.beta, M0=self.M0, r0=self.r0,
+                                          dphih=self.dphi_h, dzh=self.dz_h, dphig=self.dphi_g, dzg=self.dz_g)
+        print "Mass: f(J) model = %f, eq. (37)=%f, ratio=%f" % (self.mass, massfJ, self.mass / massfJ)
+        return self.mass / massfJ
 
-    def project(self, inclination, nx=80, npsi=31, b=1., Rmax=None):
+    @staticmethod
+    def computeMassIntegral(alpha, beta, M0, r0, dphih, dzh, dphig, dzg):
+
+        J0 = msqrt(M0 * r0)
+        h = lambda Jr, Jphi, Jz: Jr + dphih * abs(Jphi) + dzh * Jz
+        g = lambda Jr, Jphi, Jz: Jr + dphig * abs(Jphi) + dzg * Jz
+        DF = lambda Jr, Jphi, Jz: M0 / pow(J0, 3) * pow(1. + J0 / h(Jr, Jphi, Jz), alpha) /\
+            pow(1 + g(Jr, Jphi, Jz) / J0, beta)
+
+        if beta > 3:
+            # integral is doubled since -inf< Jphi <inf
+            massfJ = 2. * tplquad(DF, 0, inf, lambda x: 0, lambda x: inf,
+                                  lambda x, y: 0, lambda x, y: inf)[0]
+        else:
+            raise NotImplementedError("The mass integral diverges and can't be computed in action space.")
+
+        return massfJ
+
+    def project(self, inclination, nx=80, npsi=31, b=1., Rmax=None, verbose=True):
         """
         Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
         :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
@@ -209,6 +230,7 @@ class FJmodel(object):
         :param npsi: number of angular subdivisions (for projection)
         :param b:
         :param Rmax: maximum extent of radial grid
+        :param verbose: if True, prints progressbar
         :return: x, y (ndarray) [-Rmax,Rmax] to be passed to contour
         """
 
@@ -217,7 +239,8 @@ class FJmodel(object):
 
         # nx, npsi = 60, 81
         self.dlos, self.slos, self.vlos = self.projection(incl=inclination, b=b, Rmax=Rmax, nx=nx, npsi=npsi,
-                                                          Fast_evaluate_moments=self._fast_evaluate_moments)
+                                                          Fast_evaluate_moments=self._fast_evaluate_moments,
+                                                          verbose=verbose)
 
         x = linspace(-Rmax, Rmax, num=2 * nx)
         y = linspace(-Rmax, Rmax, num=2 * nx)
@@ -226,7 +249,7 @@ class FJmodel(object):
 
     @staticmethod
     def projection(incl, b, Rmax, nx, npsi, Fast_evaluate_moments=None, rho=None, vrot=None, sigR=None,
-                   sigp=None, sigz=None):
+                   sigp=None, sigz=None, verbose=True):
         """
         Static method: projects the given model
         :param incl: inclination angle of the line-of-sight
@@ -240,6 +263,7 @@ class FJmodel(object):
         :param sigR: sigR function
         :param sigp: sigp function
         :param sigz: sigz function
+        :param verbose: if True, prints Progressbar
         :return: three maps of density, velocity and velocity dispersion along line-of-sight
         """
 
@@ -268,9 +292,12 @@ class FJmodel(object):
         lam_top, lam_bot = 0., 0.
         dlos, slos, vlos = zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx))
 
-        wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
-                ' ', widgets.ETA()]
-        pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
+        # initialize Progressbar if verbose==True
+        if verbose:
+            wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
+                    ' ', widgets.ETA()]
+            pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
+
         for i in range(nx):
             yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
 
@@ -281,7 +308,8 @@ class FJmodel(object):
 
                 for k in range(npsi):
                     # update ProgressBar
-                    pbar.update((i * 2 * nx + j) * npsi + k)
+                    if verbose:
+                        pbar.update((i * 2 * nx + j) * npsi + k)
 
                     psi = -psi_max + k * dpsi
                     ch, sh, = cosh(psi), sinh(psi)
@@ -312,7 +340,8 @@ class FJmodel(object):
                     lam_top += abs(I3) * rp
                     lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
 
-        pbar.finish()
+        if verbose:
+            pbar.finish()
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
 
         return dlos, slos, vlos
