@@ -23,6 +23,8 @@ class MyTests(unittest.TestCase):
         assert [x for x in f.sigpl[:, 0] if x > 0]
         assert [x for x in f.sigzl[:, 0] if x > 0]
         assert [x for x in f.sigRzl[:, 0] if x > 0]
+        for x in f.ar:
+            assert f.rho(x, 0) > 0
         assert [y for y in f.rho(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigR(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigp(f.ar, f.ar[0]) if y > 0]
@@ -55,7 +57,7 @@ class MyTests(unittest.TestCase):
 
     def test_final_mass(self):
 
-        assert_almost_equal(f.compare_mass(), 1., decimal=1)
+        assert_almost_equal(f.compare_mass(verbose=False), 1., decimal=1)
 
     def test_ellipticity_spherical_model(self):
 

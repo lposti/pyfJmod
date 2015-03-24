@@ -13,5 +13,9 @@ before_install:
 install:
   - "pip install ."
   - "pip install -r requirements.txt"
+  - "pip install coverage"
 # command to run tests
-script: nosetests
+script: coverage run tests.py
+# after success run coverage tool
+after_success:
+  - coveralls

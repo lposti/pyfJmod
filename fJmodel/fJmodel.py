@@ -197,11 +197,12 @@ class FJmodel(object):
         if ret:
             return pot / (KRR + Kzz), WRR / KRR, Wzz / Kzz
 
-    def compare_mass(self):
+    def compare_mass(self, verbose=True):
 
         massfJ = self.computeMassIntegral(alpha=self.alpha, beta=self.beta, M0=self.M0, r0=self.r0,
                                           dphih=self.dphi_h, dzh=self.dz_h, dphig=self.dphi_g, dzg=self.dz_g)
-        print "Mass: f(J) model = %f, eq. (37)=%f, ratio=%f" % (self.mass, massfJ, self.mass / massfJ)
+        if verbose:
+            print "Mass: f(J) model = %f, eq. (37)=%f, ratio=%f" % (self.mass, massfJ, self.mass / massfJ)
         return self.mass / massfJ
 
     @staticmethod
