@@ -81,7 +81,7 @@ class FJmodel(object):
             # compute intrinsic ellipticity
             self.eps = self._get_ellipticity()
 
-        except AssertionError:
+        except AssertionError:  # pragma: no cover
             print "Assert Error: file does not exist!!"
 
     def phi(self, R, z):
@@ -187,7 +187,7 @@ class FJmodel(object):
         Wzz *= 4 * pi
         pot *= 4 * pi
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print "  Virial statistic: "
             print "  Mass(%3.1f): %f %f" % (self.ar[-1], pow(self.ar[-1], 2) * self.Pr[-1, 0], self.mass)
             print "  KE, PE, W/K = %f %f %f " % (KRR + Kzz, pot, pot / (KRR + Kzz))
@@ -201,7 +201,8 @@ class FJmodel(object):
 
         massfJ = self.computeMassIntegral(alpha=self.alpha, beta=self.beta, M0=self.M0, r0=self.r0,
                                           dphih=self.dphi_h, dzh=self.dz_h, dphig=self.dphi_g, dzg=self.dz_g)
-        if verbose:
+
+        if verbose:  # pragma: no cover
             print "Mass: f(J) model = %f, eq. (37)=%f, ratio=%f" % (self.mass, massfJ, self.mass / massfJ)
         return self.mass / massfJ
 
@@ -218,7 +219,8 @@ class FJmodel(object):
             # integral is doubled since -inf< Jphi <inf
             massfJ = 2. * tplquad(DF, 0, inf, lambda x: 0, lambda x: inf,
                                   lambda x, y: 0, lambda x, y: inf)[0]
-        else:
+
+        else:  # pragma: no cover
             raise NotImplementedError("The mass integral diverges and can't be computed in action space.")
 
         return massfJ
@@ -235,7 +237,7 @@ class FJmodel(object):
         :return: x, y (ndarray) [-Rmax,Rmax] to be passed to contour
         """
 
-        if Rmax is None:
+        if Rmax is None:  # pragma: no cover
             Rmax = self.ar[-1]
 
         # nx, npsi = 60, 81
@@ -269,17 +271,17 @@ class FJmodel(object):
         """
 
         # check if functions are callable
-        if Fast_evaluate_moments is not None:
+        if Fast_evaluate_moments is not None:  # pragma: no cover
             assert hasattr(Fast_evaluate_moments, '__call__')
-        if rho is not None:
+        if rho is not None:  # pragma: no cover
             assert hasattr(rho, '__call__')
-        if vrot is not None:
+        if vrot is not None:  # pragma: no cover
             assert hasattr(vrot, '__call__')
-        if sigR is not None:
+        if sigR is not None:  # pragma: no cover
             assert hasattr(sigR, '__call__')
-        if sigp is not None:
+        if sigp is not None:  # pragma: no cover
             assert hasattr(sigp, '__call__')
-        if sigz is not None:
+        if sigz is not None:  # pragma: no cover
             assert hasattr(sigz, '__call__')
 
         # set numpy errors: Ignore invalid values, so that no Warning is raised by sqrt(I2/I1)
@@ -295,7 +297,7 @@ class FJmodel(object):
 
         # initialize Progressbar if verbose==True
         pbar = None
-        if verbose:
+        if verbose:  # pragma: no cover
             wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
                     ' ', widgets.ETA()]
             pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
@@ -310,7 +312,7 @@ class FJmodel(object):
 
                 for k in range(npsi):
                     # update ProgressBar
-                    if verbose:
+                    if verbose:  # pragma: no cover
                         pbar.update((i * 2 * nx + j) * npsi + k)
 
                     psi = -psi_max + k * dpsi
@@ -322,7 +324,7 @@ class FJmodel(object):
 
                     if Fast_evaluate_moments is not None:
                         dens, Vrot, SigR, Sigp, Sigz = Fast_evaluate_moments(R, abs_z)
-                    else:
+                    else:  # pragma: no cover
                         dens, Vrot = rho(R, abs_z), vrot(R, abs_z)
                         SigR, Sigp, Sigz = sigR(R, abs_z), sigp(R, abs_z), sigz(R, abs_z)
 
@@ -342,7 +344,7 @@ class FJmodel(object):
                     lam_top += abs(I3) * rp
                     lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
 
-        if verbose:
+        if verbose:  # pragma: no cover
             pbar.finish()
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
 
@@ -466,7 +468,7 @@ class FJmodel(object):
                                 q[k, j] += qp[i] * pol[i]
 
                 return q
-        except AssertionError:
+        except AssertionError:  # pragma: no cover
             print "ERROR assertion of ndarray"
 
     def _getr(self):
@@ -636,7 +638,7 @@ class FJmodel(object):
                 phip[k] = phil[-1, k] * pow(ar[-1] / r, 2 * k + 1)
                 if Pr is not None and nr is not None:
                     dphip[k] = - (2 * k + 1) * phil[nr - 1, k] * pow(ar[nr - 1] / r, 2 * k + 1) / r
-                if Pr2 is not None and nr is not None:
+                if Pr2 is not None and nr is not None:  # pragma: no cover
                     d2phip[k] = (2 * k + 2) * (2 * k + 1) * phil[nr - 1, k] * pow(ar[nr - 1] / r, 2 * k + 1) / r / r
 
         else:
@@ -650,7 +652,7 @@ class FJmodel(object):
                 phip[k] = f1 * phil[top, k] + (1 - f1) * phil[bot, k]
                 if Pr is not None and nr is not None:
                     dphip[k] = f1 * Pr[top, k] + (1 - f1) * Pr[bot, k]
-                if Pr2 is not None and nr is not None:
+                if Pr2 is not None and nr is not None:  # pragma: no cover
                     d2phip[k] = f1 * Pr2[top, k] + (1 - f1) * Pr2[bot, k]
 
             if top < 10:
@@ -667,10 +669,10 @@ class FJmodel(object):
                     phip[k] += f2 * (phil[thr, k] - phil[bot, k] - f3 * (phil[top, k] - phil[bot, k]))
                     if Pr is not None and nr is not None:
                         dphip[k] += f2 * (Pr[thr, k] - Pr[bot, k] - f3 * (Pr[top, k] - Pr[bot, k]))
-                    if Pr2 is not None and nr is not None:
+                    if Pr2 is not None and nr is not None:  # pragma: no cover
                         d2phip[k] += f2 * (Pr2[thr, k] - Pr2[bot, k] - f3 * (Pr2[top, k] - Pr2[bot, k]))
 
-        if Pr is not None:
+        if Pr is not None:  # pragma: no cover
             if Pr2 is not None:
                 return phip, dphip, d2phip
             else:
@@ -751,13 +753,13 @@ class Potential(object):
             ar is not None and \
             nr is not None and \
             npoly is not None and \
-            ngauss is not None:
+            ngauss is not None:  # pragma: no cover
 
                 self.phil, self.Pr, self.Pr2 = phil, Pr, Pr2
                 self.ar = ar
                 self.nr, self.npoly, self.ngauss = nr, npoly, ngauss
 
-        else:
+        else:  # pragma: no cover
             raise ValueError("Call constructor either with FJmodel object or with phil, ar, nr, npoly, ngauss!")
 
     def __call__(self, R, z):
@@ -815,7 +817,8 @@ class Potential(object):
                     phi[k, j] = phip[0]
                     for i in range(1, self.npoly):
                         phi[k, j] += phip[i] * pol[i]
-        else:
+
+        else:  # pragma: no cover
             raise IndexError("Cannot determine size of R and/or z in Phi")
 
         return phi
@@ -832,11 +835,11 @@ class Potential(object):
         # scalar case
         if R.size == 1 and z.size == 1:
             r = sqrt(z * z + R * R)
-            if r < self.ar[0]:
+            if r < self.ar[0]:  # pragma: no cover
                 r = self.ar[0]
 
             s, c = R / r, z / r
-            if c == 1:
+            if c == 1:  # pragma: no cover
                 c -= 1e-8
 
             theta = arccos(c)
@@ -847,11 +850,11 @@ class Potential(object):
             dphidr = zeros(R.size)
             for k in range(R.size):
                 r = sqrt(z * z + R[k] * R[k])
-                if r < self.ar[0]:
+                if r < self.ar[0]:  # pragma: no cover
                     r = self.ar[0]
 
                 s, c = R[k] / r, z / r
-                if c == 1:
+                if c == 1:  # pragma: no cover
                     c -= 1e-8
 
                 theta = arccos(c)
@@ -862,11 +865,11 @@ class Potential(object):
             dphidr = zeros(z.size)
             for j in range(z.size):
                 r = sqrt(z[j] * z[j] + R * R)
-                if r < self.ar[0]:
+                if r < self.ar[0]:  # pragma: no cover
                     r = self.ar[0]
 
                 s, c = R / r, z[j] / r
-                if c == 1:
+                if c == 1:  # pragma: no cover
                     c -= 1e-8
 
                 theta = arccos(c)
@@ -878,16 +881,17 @@ class Potential(object):
             for k in range(R.size):
                 for j in range(z.size):
                     r = sqrt(z[j] * z[j] + R[k] * R[k])
-                    if r < self.ar[0]:
+                    if r < self.ar[0]:  # pragma: no cover
                         r = self.ar[0]
 
                     s, c = R[k] / r, z[j] / r
-                    if c == 1:
+                    if c == 1:  # pragma: no cover
                         c -= 1e-8
 
                     theta = arccos(c)
                     dphidr[k, j] = self._dtheta(r, c) * (c / r) + self._dr(r, theta) * s
-        else:
+
+        else:  # pragma: no cover
             raise IndexError("Cannot determine size of R and/or z in dPhi/dR")
 
         return dphidr
@@ -904,11 +908,11 @@ class Potential(object):
         # scalar case
         if R.size == 1 and z.size == 1:
             r = sqrt(z * z + R * R)
-            if r < self.ar[0]:
+            if r < self.ar[0]:  # pragma: no cover
                 r = self.ar[0]
 
             s, c = R / r, z / r
-            if c == 1:
+            if c == 1:  # pragma: no cover
                 c -= 1e-8
 
             theta = arccos(c)
@@ -919,11 +923,11 @@ class Potential(object):
             dphidz = zeros(R.size)
             for k in range(R.size):
                 r = sqrt(z * z + R[k] * R[k])
-                if r < self.ar[0]:
+                if r < self.ar[0]:  # pragma: no cover
                     r = self.ar[0]
 
                 s, c = R[k] / r, z / r
-                if c == 1:
+                if c == 1:  # pragma: no cover
                     c -= 1e-8
 
                 theta = arccos(c)
@@ -934,11 +938,11 @@ class Potential(object):
             dphidz = zeros(z.size)
             for j in range(z.size):
                 r = sqrt(z[j] * z[j] + R * R)
-                if r < self.ar[0]:
+                if r < self.ar[0]:  # pragma: no cover
                     r = self.ar[0]
 
                 s, c = R / r, z[j] / r
-                if c == 1:
+                if c == 1:  # pragma: no cover
                     c -= 1e-8
 
                 theta = arccos(c)
@@ -950,16 +954,17 @@ class Potential(object):
             for k in range(R.size):
                 for j in range(z.size):
                     r = sqrt(z[j] * z[j] + R[k] * R[k])
-                    if r < self.ar[0]:
+                    if r < self.ar[0]:  # pragma: no cover
                         r = self.ar[0]
 
                     s, c = R[k] / r, z[j] / r
-                    if c == 1:
+                    if c == 1:  # pragma: no cover
                         c -= 1e-8
 
                     theta = arccos(c)
                     dphidz[k, j] = self._dtheta(r, c) * (-s / r) + self._dr(r, theta) * c
-        else:
+
+        else:  # pragma: no cover
             raise IndexError("Cannot determine size of R and/or z in dPhi/dz")
 
         return dphidz
@@ -1005,7 +1010,7 @@ class Potential(object):
 
         npoly += 1
         allpol[0] = 1
-        if npoly < 2:
+        if npoly < 2:  # pragma: no cover
             raise ValueError("Found npoly <2!")
 
         allpol[1] = c

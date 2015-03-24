@@ -5,4 +5,5 @@ branch = True
 omit = *numpy*
        *scipy*
        *progressbar*
+       pragma: no cover
 

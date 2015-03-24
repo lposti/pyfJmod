@@ -4,6 +4,7 @@ import unittest
 from fJmodel.fJmodel import FJmodel, Potential
 from numpy import array, ones, zeros
 from numpy.testing import assert_almost_equal, assert_equal
+from math import isnan
 
 # define global FJmodel
 f = FJmodel("fJmodel/examples/Hernq_0.55_0.55_1.00_1.00_4.out")
@@ -18,6 +19,7 @@ class MyTests(unittest.TestCase):
         assert f.nr > 0 and f.npoly > 0 and f.ngauss > 0
         assert [x for x in f.ar if x > 0]
         assert [x for x in f.rhl[:, 0] if x > 0]
+        assert [x for x in f.phil[:, 0] if x < 0]
         assert [x for x in f.vrotl[:, 0] if x > 0]
         assert [x for x in f.sigRl[:, 0] if x > 0]
         assert [x for x in f.sigpl[:, 0] if x > 0]
@@ -25,15 +27,18 @@ class MyTests(unittest.TestCase):
         assert [x for x in f.sigRzl[:, 0] if x > 0]
 
         for x in f.ar:
-            assert f.rho(x, 0) > 0
+            assert f.rho(x, 0) >= 0.
+            assert f.phi(x, 0) <= 0.
 
         assert [y for y in f.rho(f.ar, f.ar[0]) if y > 0]
+        assert [y for y in f.phi(f.ar, f.ar[0]) if y < 0]
         assert [y for y in f.sigR(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigp(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigz(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.sigRz(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.vrot(f.ar, f.ar[0]) if y > 0]
         assert [y for y in f.rho(f.ar[0], f.ar) if y > 0]
+        assert [y for y in f.phi(f.ar[0], f.ar) if y < 0]
         assert [y for y in f.sigR(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.sigp(f.ar[0], f.ar) if y > 0]
         assert [y for y in f.sigz(f.ar[0], f.ar) if y > 0]
@@ -44,6 +49,11 @@ class MyTests(unittest.TestCase):
         for dd in density_slice:
             for d in dd:
                 assert d >= 0
+
+        potential_slice = f.phi(f.ar, f.ar)
+        for pp in potential_slice:
+            for p in pp:
+                assert p <= 0
 
     def testFJ_Legendre(self):
 
@@ -90,10 +100,29 @@ class MyTests(unittest.TestCase):
         assert [y for y in p(p.ar, p.ar[0]) if y < 0]
         assert [y for y in p(p.ar[0], p.ar) if y < 0]
 
+        for x in p.ar:
+            assert isnan(p.dR(x, 0)) is False
+            assert isnan(p.dR(0, x)) is False
+
+        assert [y for y in p.dR(p.ar, 0) if isnan(y) is False]
+        assert [y for y in p.dz(p.ar, 0) if isnan(y) is False]
+        assert [y for y in p.dR(0, p.ar) if isnan(y) is False]
+        assert [y for y in p.dz(0, p.ar) if isnan(y) is False]
+
         potential_slice = p(p.ar, p.ar)
         for pp in potential_slice:
-            for p in pp:
-                assert p <= 0
+            for po in pp:
+                assert po <= 0
+
+        force_slice = p.dR(p.ar, p.ar)
+        for ff in force_slice:
+            for fo in ff:
+                assert isnan(fo) is False
+
+        force_slice = p.dz(p.ar, p.ar)
+        for ff in force_slice:
+            for fo in ff:
+                assert isnan(fo) is False
 
     def testPot_init(self):
 
