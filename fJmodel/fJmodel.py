@@ -11,10 +11,10 @@ __author__ = 'lposti'
 
 from os.path import isfile
 from linecache import getline
-# from numpy import max as npmax
+from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr, inf
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
@@ -72,8 +72,13 @@ class FJmodel(object):
             # end of file
             #####################################
 
-            # initialize to empty lists
-            self.dlos, self.slos, self.vlos = [], [], []
+            # initialize to None
+            self.dlos, self.slos, self.vlos = None, None, None
+            self.xmap, self.ymap = None, None
+
+            # initialize to None
+            self.binNum, self.xNode, self.yNode, self.xBar, self.yBar, self.sn, self.nPixels, self.scale = \
+                None, None, None, None, None, None, None, None
 
             # compute spherically averaged Mass
             self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
@@ -112,7 +117,22 @@ class FJmodel(object):
         :return:  Rotation velocity of the model at location in meridional plane (array type)
         """
         R, z = asarray(R), asarray(z)
-        return self._getq(R, z, self.vrotl)
+
+        # check if R<0: in that case we need to symmetrize the field
+
+        if R.size > 1:
+            index = searchsorted(R, 0.)
+            if index > 0:
+                vrot_map = self._getq(R, z, self.vrotl)
+                vrot_map[0:index, :] = -vrot_map[0:index, :]
+                return vrot_map
+            else:
+                return self._getq(R, z, self.vrotl)
+        else:
+            if R > 0:
+                return self._getq(R, z, self.vrotl)
+            else:
+                return -self._getq(R, z, self.vrotl)
 
     def sigR(self, R, z):
         """
@@ -245,10 +265,18 @@ class FJmodel(object):
                                                           Fast_evaluate_moments=self._fast_evaluate_moments,
                                                           verbose=verbose)
 
-        x = linspace(-Rmax, Rmax, num=2 * nx)
-        y = linspace(-Rmax, Rmax, num=2 * nx)
+        # remove nans in the maps
+        for j in range(2 * nx):
+            for k in range(2 * nx):
+                if isnan(self.slos[j, k]):
+                    self.slos[j, k] = 1e-10
+                if isnan(self.vlos[j, k]):
+                    self.vlos[j, k] = 1e-10
 
-        return x, y
+        self.xmap = linspace(-Rmax, Rmax, num=2 * nx)
+        self.ymap = linspace(-Rmax, Rmax, num=2 * nx)
+
+        return self.xmap, self.ymap
 
     @staticmethod
     def projection(incl, b, Rmax, nx, npsi, Fast_evaluate_moments=None, rho=None, vrot=None, sigR=None,
@@ -337,9 +365,9 @@ class FJmodel(object):
                 dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j] = log10(max(a * dpsi * I1, 1e-10)), \
                     sqrt(I2 / I1), I3 / I1
 
-                # symmetrize arrays
+                # symmetrize arrays (the velocity field gets negative for R<0)
                 dlos[nx - 1 - i, j], slos[nx - 1 - i, j], vlos[nx - 1 - i, j] = \
-                    dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j]
+                    dlos[nx + i, j], slos[nx + i, j], -vlos[nx + i, j]
                 if rp < 3:
                     lam_top += abs(I3) * rp
                     lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
@@ -349,6 +377,37 @@ class FJmodel(object):
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
 
         return dlos, slos, vlos
+
+    def voronoiBin(self, **kwargs):
+
+        if self.dlos is None or self.slos is None or self.vlos is None:  # pragma: no cover
+            if kwargs == {}:
+                x, y = self.project(90, nx=30, npsi=31)
+            else:
+                x, y = self.project(**kwargs)
+        else:
+            x, y = self.xmap, self.ymap
+
+        Y, X = meshgrid(x, y)
+
+        if self.dlos is not None:  # pragma: no cover
+            density = self.dlos
+        else:
+            raise TypeError(" -- Critical ERROR: dlos is still None Type!")
+
+        # reshape arrays for voronoi binning
+        X1 = X.reshape(len(x) * len(x))
+        Y1 = Y.reshape(len(y) * len(y))
+        D = power(10., reshape(density, len(x) * len(x)))
+
+        # create noise proportional to sqrt(signal)
+        N = sqrt(D)
+
+        # apply Cappellari's Voronoi binning procedure
+        self.binNum, self.xNode, self.yNode, self.xBar, self.yBar, self.sn, self.nPixels, self.scale =\
+            voronoi_2d_binning(X1, Y1, D, N, targetSN=0.01)
+
+        return X1, Y1
 
     def _get_ellipticity(self):
         """
@@ -518,7 +577,7 @@ class FJmodel(object):
         pol = zeros(npoly, dtype=float)
 
         pol[0] = 1
-        if npoly < 2:
+        if npoly < 2:  # pragma: no cover
             return
 
         pol[1] = 1.5 * c2 - .5

@@ -4,3 +4,6 @@ fJmodel/__init__.py
 fJmodel/fJmodel.py
 fJmodel/fJplots.py
 fJmodel/examples/Hernq_0.55_0.55_1.00_1.00_0.out
+fJmodel/examples/Hernq_0.55_0.55_1.00_1.00_4.out
+fJmodel/examples/Hernq_1.00_2.00_1.00_2.00_0.flt.out
+fJmodel/examples/Hernq_1.00_2.00_1.00_2.00_4.flt.out

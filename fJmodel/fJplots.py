@@ -8,9 +8,12 @@
 __author__ = 'lposti'
 
 
-from numpy import log10, meshgrid, linspace, zeros
+from numpy import log10, meshgrid, linspace, zeros, reshape
+from numpy import max as npmax
+from numpy import min as npmin
 import matplotlib.pylab as plt
 from fJmodel import FJmodel
+from voronoi import displayBinnedMap
 
 
 class PlotInterface(object):
@@ -77,6 +80,18 @@ class PlotInterface(object):
         else:
             return self.ax[self.idplot].loglog(xdata, ydata, **kwargs)
 
+    def contour(self, x, y, z, samefig=False, **kwargs):
+
+        if not samefig or self.idplot < 0:
+            self.idplot += 1
+
+        # here I transpose the rho matrix...
+        # is there any other fix with this matplotlib issue?
+        if self.nplots == 1:
+            return self.ax.contour(x, y, z.T, **kwargs)
+        else:
+            return self.ax[self.idplot].contour(x, y, z.T, **kwargs)
+
     def contourf(self, x, y, z, samefig=False, **kwargs):
 
         if not samefig or self.idplot < 0:
@@ -119,6 +134,20 @@ class PlotInterface(object):
             image = self.ax[self.idplot].imshow(m.T, extent=[xmin, xmax, ymin, ymax], origin='lower', **kwargs)
             plt.colorbar(image, ax=self.ax[self.idplot])
             return image
+
+    def displayBinMap(self, samefig=False, **kwargs):
+
+        if not samefig or self.idplot < 0:
+            self.idplot += 1
+
+        if self.nplots == 1:
+            img = displayBinnedMap(subax=self.ax, **kwargs)
+            plt.colorbar(img, ax=self.ax)
+            return img
+        else:
+            img = displayBinnedMap(subax=self.ax[self.idplot], **kwargs)
+            plt.colorbar(img, ax=self.ax[self.idplot])
+            return img
 
     def plotFigure(self, name=None, legend=False):
 
@@ -262,23 +291,42 @@ class FJmodelPlot(PlotInterface):
 
         self._pltimshow(self.fJ.vrot, Rmin, Rmax, zmin, zmax, show)
 
-    def _logcontourf(self, f, R=None, z=None, show=True):
+    def contourRho(self, R=None, z=None, show=True, **kwargs):
 
-        # check if f is callable
-        assert hasattr(f, '__call__')
+        self._logcontour(self.fJ.rho, R, z, show, **kwargs)
 
-        if R is None:
-            R = self.fJ.ar
-        if z is None:
-            z = self.fJ.ar
+    def contourVrot(self, R=None, z=None, show=True, **kwargs):
 
-        X, Y = meshgrid(R, z)
+        self._pltcontour(self.fJ.vrot, R, z, show, **kwargs)
 
-        self.contourf(X, Y, log10(f(R, z)))
+    def displayRhoBinnedMap(self, show=True):
+
+        X, Y = self.fJ.voronoiBin()
+        self._displayBinnedMap(self.fJ.dlos, X, Y)
         if show:
             self.plotFigure()
 
-    def _pltcontourf(self, f, R=None, z=None, show=True):
+    def displaySigBinnedMap(self, show=True):
+
+        self.contourRho(R=linspace(-npmax(self.fJ.ar), npmax(self.fJ.ar)),
+                        z=linspace(-npmax(self.fJ.ar), npmax(self.fJ.ar)), show=False, colors='w', linewidths=2)
+
+        X, Y = self.fJ.voronoiBin()
+        self._displayBinnedMap(self.fJ.slos, X, Y)
+        if show:
+            self.plotFigure()
+
+    def displayVrotBinnedMap(self, show=True):
+
+        self.contourRho(R=linspace(-npmax(self.fJ.ar), npmax(self.fJ.ar)),
+                        z=linspace(-npmax(self.fJ.ar), npmax(self.fJ.ar)), show=False, colors='k', linewidths=2)
+
+        X, Y = self.fJ.voronoiBin()
+        self._displayBinnedMap(self.fJ.vlos, X, Y)
+        if show:
+            self.plotFigure()
+
+    def _logcontourf(self, f, R=None, z=None, show=True, **kwargs):
 
         # check if f is callable
         assert hasattr(f, '__call__')
@@ -290,7 +338,55 @@ class FJmodelPlot(PlotInterface):
 
         X, Y = meshgrid(R, z)
 
-        self.contourf(X, Y, f(R, z))
+        self.contourf(X, Y, log10(f(R, z)), **kwargs)
+        if show:
+            self.plotFigure()
+
+    def _pltcontourf(self, f, R=None, z=None, show=True, **kwargs):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = self.fJ.ar
+
+        X, Y = meshgrid(R, z)
+
+        self.contourf(X, Y, f(R, z), **kwargs)
+        if show:
+            self.plotFigure()
+
+    def _logcontour(self, f, R=None, z=None, show=True, **kwargs):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = self.fJ.ar
+
+        X, Y = meshgrid(R, z)
+
+        self.contour(X, Y, log10(f(R, z)), **kwargs)
+        if show:
+            self.plotFigure()
+
+    def _pltcontour(self, f, R=None, z=None, show=True, **kwargs):
+
+        # check if f is callable
+        assert hasattr(f, '__call__')
+
+        if R is None:
+            R = self.fJ.ar
+        if z is None:
+            z = self.fJ.ar
+
+        X, Y = meshgrid(R, z)
+
+        self.contour(X, Y, f(R, z), **kwargs)
         if show:
             self.plotFigure()
 
@@ -329,3 +425,7 @@ class FJmodelPlot(PlotInterface):
         self.imshow(lambda x, y: f(x, y), Rmin, Rmax, zmin, zmax)
         if show:
             self.plotFigure()
+
+    def _displayBinnedMap(self, quantity_map, X, Y):
+
+        self.displayBinMap(binNum=self.fJ.binNum, signal=reshape(quantity_map, len(X)), x_sig=X, y_sig=Y)

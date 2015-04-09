@@ -2,6 +2,8 @@
   <dictionary name="lp1osti">
     <words>
       <w>allpol</w>
+      <w>cappellari's</w>
+      <w>classe</w>
       <w>coeffs</w>
       <w>colorbar</w>
       <w>contourf</w>
@@ -24,19 +26,27 @@
       <w>getq</w>
       <w>getr</w>
       <w>gmail</w>
+      <w>hernq</w>
       <w>imshow</w>
       <w>intp</w>
       <w>jmod</w>
       <w>jmodel</w>
       <w>jphi</w>
+      <w>jplots</w>
+      <w>logcontour</w>
       <w>logcontourf</w>
       <w>logimshow</w>
       <w>massf</w>
+      <w>maxnum</w>
+      <w>msqrt</w>
       <w>ndarray</w>
+      <w>npix</w>
       <w>npmax</w>
       <w>npot</w>
       <w>npsi</w>
       <w>pbar</w>
+      <w>pixelsize</w>
+      <w>pltcontour</w>
       <w>pltcontourf</w>
       <w>pltimshow</w>
       <w>pltloglog</w>
@@ -45,6 +55,7 @@
       <w>rhop</w>
       <w>rmax</w>
       <w>rmin</w>
+      <w>sauron</w>
       <w>scipy</w>
       <w>sigp</w>
       <w>sigpp</w>
@@ -52,18 +63,26 @@
       <w>sigzp</w>
       <w>slos</w>
       <w>sphi</w>
+      <w>subax</w>
       <w>symmetrize</w>
       <w>virial</w>
       <w>virialized</w>
       <w>vlos</w>
+      <w>voronoi</w>
       <w>vrot</w>
       <w>vrotp</w>
       <w>wdgt</w>
+      <w>xbar</w>
+      <w>xmap</w>
       <w>xmax</w>
       <w>xmin</w>
+      <w>xnode</w>
+      <w>ybar</w>
       <w>ylabels</w>
+      <w>ymap</w>
       <w>ymax</w>
       <w>ymin</w>
+      <w>ynode</w>
       <w>zmax</w>
       <w>zmin</w>
     </words>

@@ -7,12 +7,12 @@ import matplotlib.pylab as plt
 
 def hernq(x, m):
     x = np.asarray(x)
-    return m/x/pow(.1+x, 3)
+    return m / x / pow(.1 + x, 3)
 
 
 def nfw(x, m):
     x = np.asarray(x)
-    return m/x/pow(2.5+x, 2)
+    return m / x / pow(2.5 + x, 2)
 
 
 def plot():

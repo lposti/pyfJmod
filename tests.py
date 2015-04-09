@@ -2,7 +2,8 @@ __author__ = 'lposti'
 
 import unittest
 from fJmodel.fJmodel import FJmodel, Potential
-from numpy import array, ones, zeros
+from fJmodel.voronoi import displayBinnedMap
+from numpy import array, ones, zeros, meshgrid, sqrt, reshape
 from numpy.testing import assert_almost_equal, assert_equal
 from math import isnan
 
@@ -86,6 +87,20 @@ class MyTests(unittest.TestCase):
         half = f.nr / 2
         delta = f.dlos[half, half:] - f.dlos[half:, half]
         assert_almost_equal(delta, zeros(len(delta), dtype=float), decimal=1)
+
+    def test_voronoi_binning(self):
+
+        X1, Y1 = f.voronoiBin(inclination=90, nx=20, npsi=21, verbose=False)
+
+        Y, X = meshgrid(f.xmap, f.ymap)
+
+        assert_equal(X1, X.reshape(len(f.xmap) * len(f.xmap)))
+        assert_equal(Y1, Y.reshape(len(f.ymap) * len(f.ymap)))
+
+    def test_display_binning(self):
+
+        X, Y = f.voronoiBin(inclination=90, nx=20, npsi=21, verbose=False)
+        displayBinnedMap(f.binNum, reshape(f.dlos, len(X)), x_sig=X, y_sig=Y)
 
     def testPot_sanity(self):
 
