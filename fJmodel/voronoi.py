@@ -291,7 +291,7 @@ def _accretion(x, y, signal, noise, targetSN, pixelSize, quiet):
     # For each point, find the distance to all other points and select the minimum.
     # This is a robust but slow way of determining the pixel size of unbinned data.
     #
-    if pixelSize is None:
+    if pixelSize is None:  # pragma: no cover
         pixelSize = np.min(distance.pdist(np.column_stack([x, y])))
 
     currentBin = np.argmax(signal / noise)  # Start from the pixel with highest S/N
@@ -510,7 +510,7 @@ def _compute_useful_bin_quantities(x, y, signal, noise, xnode, ynode, scale):
 # -----------------------------------------------------------------------
 
 
-def _display_pixels(x, y, counts, pixelSize):
+def _display_pixels(x, y, counts, pixelSize):  # pragma: no cover
     """
     Display pixels at coordinates (x, y) coloured with "counts".
     This routine is fast but not fully general as it assumes the spaxels

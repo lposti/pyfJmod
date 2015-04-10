@@ -7,5 +7,6 @@ omit = *numpy*
        *progressbar*
        *matplotlib*
        *pyshared*
+       *distutils*
        pragma: no cover
 
