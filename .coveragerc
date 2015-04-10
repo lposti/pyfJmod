@@ -6,5 +6,6 @@ omit = *numpy*
        *scipy*
        *progressbar*
        *matplotlib*
+       *pyshared*
        pragma: no cover
 

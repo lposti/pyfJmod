@@ -562,20 +562,20 @@ def voronoi_2d_binning(x, y, signal, noise, targetSN, cvt=True,
     # and optionally plots the results at the end of the calculation.
 
     npix = x.size
-    if (y.size != npix) or (signal.size != npix) or (noise.size != npix):
+    if (y.size != npix) or (signal.size != npix) or (noise.size != npix):  # pragma: no cover
             raise ValueError('Input vectors (x, y, signal, noise) must have the same size')
     if not np.all((noise > 0) & np.isfinite(noise)):
         raise ValueError('NOISE must be a positive vector')
 
     # Perform basic tests to catch common input errors
     #
-    if np.sum(signal) / np.sqrt(np.sum(noise ** 2)) < targetSN:
+    if np.sum(signal) / np.sqrt(np.sum(noise ** 2)) < targetSN:  # pragma: no cover
         raise ValueError("""Not enough S/N in the whole set of pixels.
             Many pixels may have noise but virtually no signal.
             They should not be included in the set to bin,
             or the pixels should be optimally weighted.
             See Cappellari & Copin (2003, Sec.2.1) and README file.""")
-    if np.min(signal / noise) > targetSN:
+    if np.min(signal / noise) > targetSN:  # pragma: no cover
         raise ValueError('All pixels have enough S/N and binning is not needed')
 
     # Prevent division by zero for pixels with signal=0 and
@@ -606,7 +606,7 @@ def voronoi_2d_binning(x, y, signal, noise, targetSN, cvt=True,
         print('Unbinned pixels: ', np.sum(w), ' / ', npix)
         print('Fractional S/N scatter (%):', np.std(sn[~w] - targetSN, ddof=1) / targetSN * 100)
 
-    if plot:
+    if plot:  # pragma: no cover
         plt.clf()
         plt.subplot(211)
         rnd = np.argsort(np.random.random(xNode.size))  # Randomize bin colors
