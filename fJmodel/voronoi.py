@@ -639,7 +639,8 @@ def voronoi_2d_binning(x, y, signal, noise, targetSN, cvt=True,
 
 
 def displayBinnedMap(binNum, signal, x_sig=None, y_sig=None,
-                     size=None, ext=None, clim=None, subax=None, **kwargs):
+                     size=None, ext=None, clim=None, subax=None,
+                     noplot=False, **kwargs):
     """
     Input: x_sig and y_sig are arrays n*n long. As input for Cappellari's routines
            It assumes that x_sig={ x[0],x[0],...,x[0],x[1],x[1],...x[1],...,x[n],...x[n] }
@@ -672,12 +673,16 @@ def displayBinnedMap(binNum, signal, x_sig=None, y_sig=None,
     if ext is None:
         ext = [xmin, xmax, ymin, ymax]
 
-    if subax is None:
-        img = plt.imshow(sigBinnedMap.T, interpolation='nearest', cmap=sauron, extent=ext, **kwargs)
+    if not noplot:  # pragma: no cover
+        if subax is None:
+            img = plt.imshow(sigBinnedMap.T, interpolation='nearest', cmap=sauron, extent=ext, **kwargs)
+        else:
+            img = subax.imshow(sigBinnedMap.T, interpolation='nearest', cmap=sauron, extent=ext, **kwargs)
+
+        if clim is not None:
+            img.set_clim(clim)
+
+        return img
+
     else:
-        img = subax.imshow(sigBinnedMap.T, interpolation='nearest', cmap=sauron, extent=ext, **kwargs)
-
-    if clim is not None:
-        img.set_clim(clim)
-
-    return img
+        return 0

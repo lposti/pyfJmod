@@ -100,7 +100,7 @@ class MyTests(unittest.TestCase):
     def test_display_binning(self):
 
         X, Y = f.voronoiBin(inclination=90, nx=20, npsi=21, verbose=False)
-        displayBinnedMap(f.binNum, reshape(f.dlos, len(X)), x_sig=X, y_sig=Y)
+        displayBinnedMap(f.binNum, reshape(f.dlos, len(X)), x_sig=X, y_sig=Y, noplot=True)
 
     def testPot_sanity(self):
 
