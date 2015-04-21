@@ -2,6 +2,7 @@
   <dictionary name="lp1osti">
     <words>
       <w>allpol</w>
+      <w>arcsec</w>
       <w>cappellari's</w>
       <w>classe</w>
       <w>coeffs</w>
@@ -37,12 +38,14 @@
       <w>logcontourf</w>
       <w>logimshow</w>
       <w>massf</w>
+      <w>maxgrid</w>
       <w>maxnum</w>
       <w>msqrt</w>
       <w>ndarray</w>
       <w>noplot</w>
       <w>npix</w>
       <w>npmax</w>
+      <w>npmin</w>
       <w>npot</w>
       <w>npsi</w>
       <w>pbar</w>
@@ -63,12 +66,16 @@
       <w>sigz</w>
       <w>sigzp</w>
       <w>slos</w>
+      <w>smax</w>
+      <w>smin</w>
       <w>sphi</w>
       <w>subax</w>
       <w>symmetrize</w>
       <w>virial</w>
       <w>virialized</w>
       <w>vlos</w>
+      <w>vmax</w>
+      <w>vmin</w>
       <w>voronoi</w>
       <w>vrot</w>
       <w>vrotp</w>

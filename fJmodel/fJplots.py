@@ -10,7 +10,6 @@ __author__ = 'lposti'
 
 from numpy import log10, meshgrid, linspace, zeros, reshape
 from numpy import max as npmax
-from numpy import min as npmin
 import matplotlib.pylab as plt
 from fJmodel import FJmodel
 from voronoi import displayBinnedMap
