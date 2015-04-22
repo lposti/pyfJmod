@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dd95a18b-d3ec-4387-b8e7-cb079b0d9bb2" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fJmodel/kindata.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJmodel/fJplots.py" afterPath="$PROJECT_DIR$/fJmodel/fJplots.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/lp1osti.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/lp1osti.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJmodel/fJmodel.py" afterPath="$PROJECT_DIR$/fJmodel/fJmodel.py" />
     </list>
     <ignored path="pyfJmod.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -85,10 +82,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="kindata.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="kindata.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fJmodel/kindata.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="3.0350666" vertical-offset="325" max-vertical-offset="5730">
+            <state vertical-scroll-proportion="0.0" vertical-offset="325" max-vertical-offset="5730">
               <caret line="189" column="79" selection-start-line="189" selection-start-column="79" selection-end-line="189" selection-end-column="79" />
               <folding>
                 <element signature="e#23#50#0" expanded="true" />
@@ -97,11 +94,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="fJmodel.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="fJmodel.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="16380">
-              <caret line="291" column="28" selection-start-line="291" selection-start-column="28" selection-end-line="291" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.5828295" vertical-offset="5818" max-vertical-offset="16380">
+              <caret line="420" column="44" selection-start-line="420" selection-start-column="44" selection-end-line="420" selection-end-column="44" />
               <folding>
                 <element signature="e#231#257#0" expanded="true" />
               </folding>
@@ -143,13 +140,13 @@
         <option value="$PROJECT_DIR$/distutlis.cmds" />
         <option value="$PROJECT_DIR$/plot.py" />
         <option value="$PROJECT_DIR$/fJmodel/sauron.py" />
-        <option value="$PROJECT_DIR$/fJmodel/fJmodel.py" />
         <option value="$PROJECT_DIR$/tests.py" />
         <option value="$PROJECT_DIR$/.coveragerc" />
         <option value="$PROJECT_DIR$/fJmodel/voronoi.py" />
         <option value="$PROJECT_DIR$/kindata.py" />
         <option value="$PROJECT_DIR$/fJmodel/fJplots.py" />
         <option value="$PROJECT_DIR$/fJmodel/kindata.py" />
+        <option value="$PROJECT_DIR$/fJmodel/fJmodel.py" />
       </list>
     </option>
   </component>
@@ -955,22 +952,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
+    <entry file="file://$PROJECT_DIR$/fJmodel/kindata.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="16380">
-          <caret line="291" column="28" selection-start-line="291" selection-start-column="28" selection-end-line="291" selection-end-column="28" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="325" max-vertical-offset="5730">
+          <caret line="189" column="79" selection-start-line="189" selection-start-column="79" selection-end-line="189" selection-end-column="79" />
           <folding>
-            <element signature="e#231#257#0" expanded="true" />
+            <element signature="e#23#50#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fJmodel/kindata.py">
+    <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.0350666" vertical-offset="325" max-vertical-offset="5730">
-          <caret line="189" column="79" selection-start-line="189" selection-start-column="79" selection-end-line="189" selection-end-column="79" />
+        <state vertical-scroll-proportion="0.5828295" vertical-offset="5818" max-vertical-offset="16380">
+          <caret line="420" column="44" selection-start-line="420" selection-start-column="44" selection-end-line="420" selection-end-column="44" />
           <folding>
-            <element signature="e#23#50#0" expanded="true" />
+            <element signature="e#231#257#0" expanded="true" />
           </folding>
         </state>
       </provider>
