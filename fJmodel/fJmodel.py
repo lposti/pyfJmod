@@ -84,7 +84,11 @@ class FJmodel(object):
             self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
 
             # compute intrinsic ellipticity
-            self.eps = self._get_ellipticity()
+            try:
+                self.eps = self._get_ellipticity()
+            except ValueError:
+                self.eps = zeros(self.nr)
+                print " -- WARNING: ellipticity not properly computed!!"
 
         except AssertionError:  # pragma: no cover
             print "Assert Error: file does not exist!!"
@@ -418,7 +422,7 @@ class FJmodel(object):
         """
 
         eps = zeros(self.nr)
-        minR, maxR = self.ar[0] / 10., self.ar[-1] * 2
+        minR, maxR = self.ar[0] / 2, self.ar[-1] * 2
 
         for i in range(self.nr):
             f = lambda z: self.rho(self.ar[i], 0.) - self.rho(0., z)
