@@ -179,15 +179,15 @@ class KinData(object):
         sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=2 * dx)
 
         # peaks of velocity moments, used for re-scaling the model
-        data_scale = npmax(sig[bins[s]])
-        model_scale = npmax(sig_model[bins[s]])
+        data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
+        model_scale = npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])
 
         # colour scales of the velocity and velocity dispersion plots
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])
         smin, smax = npmin(sig[bins[s]]), npmax(sig[bins[s]])
 
-        data_contour_levels = linspace(float((log10(mge)).min())*.5, 0, num=6)
-        model_contour_levels = linspace(float(density_model.min())*.7, 0, num=6)
+        data_contour_levels = linspace(float((log10(mge)).min()) * .5, 0, num=6)
+        model_contour_levels = linspace(float(density_model.min()) * .7, 0, num=6)
 
         # plotting
         fig = plt.figure(figsize=(12, 10))
@@ -220,7 +220,7 @@ class KinData(object):
         ax3 = fig.add_subplot(223)
         ax3.set_xlabel("RA [arcsec]")
         ax3.set_ylabel("DEC [arcsec]")
-        image3 = plt.imshow(vel_image_mod / model_scale * data_scale, cmap=sauron, interpolation='nearest',
+        image3 = plt.imshow(vel_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
@@ -233,7 +233,7 @@ class KinData(object):
         ax4 = fig.add_subplot(224)
         ax4.set_xlabel("RA [arcsec]")
         ax4.set_ylabel("DEC [arcsec]")
-        image4 = plt.imshow(sig_image_mod / model_scale * data_scale, cmap=sauron, interpolation='nearest',
+        image4 = plt.imshow(sig_image_mod / model_scale[1] * data_scale[1], cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
         image4.set_clim(vmin=smin, vmax=smax)
