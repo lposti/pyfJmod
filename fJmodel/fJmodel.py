@@ -418,7 +418,7 @@ class FJmodel(object):
         """
 
         eps = zeros(self.nr)
-        minR, maxR = self.ar[0], self.ar[-1]
+        minR, maxR = 0., self.ar[-1] * 2
 
         for i in range(self.nr):
             f = lambda z: self.rho(self.ar[i], 0.) - self.rho(0., z)
