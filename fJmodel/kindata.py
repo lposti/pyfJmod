@@ -68,7 +68,7 @@ class KinData(object):
                     image[i, j] += sb[k] * exp(-(pow(x_rotated, 2) + pow(y_rotated, 2) / pow(q[k], 2))
                                                / (2. * pow(sigma[k], 2)))
 
-        image /= npmax(image)
+        # image /= npmax(image)
 
         if xt is None and yt is None:
             return image, x, y
@@ -84,7 +84,7 @@ class KinData(object):
         ax.set_ylabel("DEC [arcsec]")
         im = plt.imshow(log10(image.T), extent=(npmin(x), npmax(x), npmin(y), npmax(y)))
         colorbar = fig.colorbar(im)
-        colorbar.set_label(r'$\log\Sigma/\Sigma_0$')
+        colorbar.set_label(r'$\log\Sigma/M_\odot * {\rm pc}^2$')
         plt.show()
 
     def plot_data_kinematics(self, **kwargs):
