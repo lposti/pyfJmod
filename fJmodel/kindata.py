@@ -117,7 +117,7 @@ class KinData(object):
         colorbar.set_label(r'$\sigma$ [km/s]')
         plt.show()
 
-    def plot_comparison_model(self, model, inclination=90, one_figure=True, **kwargs):
+    def plot_comparison_model(self, model, inclination=90, one_figure=True, save_fig=False, **kwargs):
 
         if isinstance(model, FJmodel):
             f = model
@@ -266,6 +266,15 @@ class KinData(object):
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
         ax4.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+
+        if save_fig:
+            if one_figure:
+                fig.savefig("figure1.eps", bbox_inches='tight')
+            else:
+                fig.savefig("figure1.eps", bbox_inches='tight')
+                fig2.savefig("figure2.eps", bbox_inches='tight')
+                fig3.savefig("figure3.eps", bbox_inches='tight')
+                fig4.savefig("figure4.eps", bbox_inches='tight')
 
         plt.tight_layout()
         plt.show()
