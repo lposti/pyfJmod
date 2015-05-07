@@ -129,8 +129,8 @@ class KinData(object):
         # get data
         vel, sig, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt = self._get_kinematic_data(full_output=True)
 
-        vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=2 * dx)
-        sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=2 * dx)
+        vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=dx)
+        sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=dx)
 
         # get MGE data
         mge = self._get_mge(xt=xt, yt=yt, angle=self.angle)
@@ -175,8 +175,8 @@ class KinData(object):
             sig_model[i] = average(sigma_model[w] / npmax(sigma_model))
             vel_model[i] = average(velocity_model[w] / npmax(velocity_model))
 
-        vel_image_mod = self.display_pixels(X[s], Y[s], vel_model[bins[s]], pixelsize=2 * dx)
-        sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=2 * dx)
+        vel_image_mod = self.display_pixels(X[s], Y[s], vel_model[bins[s]], pixelsize=dx)
+        sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
 
         # peaks of velocity moments, used for re-scaling the model
         data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
