@@ -220,7 +220,10 @@ class KinData(object):
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
         image2.set_clim(vmin=smin, vmax=smax)
-        colorbar = fig.colorbar(image2)
+        if one_figure:
+            colorbar = fig.colorbar(image2)
+        else:
+            colorbar = fig2.colorbar(image2)
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
         ax2.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
@@ -237,7 +240,10 @@ class KinData(object):
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
         image3.set_clim(vmin=vmin, vmax=vmax)
-        colorbar = fig.colorbar(image3)
+        if one_figure:
+            colorbar = fig.colorbar(image3)
+        else:
+            colorbar = fig3.colorbar(image3)
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
         ax3.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
@@ -253,7 +259,10 @@ class KinData(object):
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
         image4.set_clim(vmin=smin, vmax=smax)
-        colorbar = fig.colorbar(image4)
+        if one_figure:
+            colorbar = fig.colorbar(image4)
+        else:
+            colorbar = fig4.colorbar(image4)
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
         ax4.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
