@@ -3,7 +3,7 @@ __author__ = 'lposti'
 from fJmodel import FJmodel
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
-    meshgrid, radians, ones_like, where, average
+    meshgrid, radians, ones_like, where, average, sqrt, gradient, power
 from numpy.ma import masked_array
 from linecache import getline
 from math import sin, cos
@@ -68,7 +68,7 @@ class KinData(object):
                     image[i, j] += sb[k] * exp(-(pow(x_rotated, 2) + pow(y_rotated, 2) / pow(q[k], 2))
                                                / (2. * pow(sigma[k], 2)))
 
-        # image /= npmax(image)
+        image /= npmax(image)
 
         if xt is None and yt is None:
             return image, x, y
@@ -84,7 +84,7 @@ class KinData(object):
         ax.set_ylabel("DEC [arcsec]")
         im = plt.imshow(log10(image.T), extent=(npmin(x), npmax(x), npmin(y), npmax(y)))
         colorbar = fig.colorbar(im)
-        colorbar.set_label(r'$\log\Sigma/M_\odot * {\rm pc}^2$')
+        colorbar.set_label(r'$\log\Sigma/L_\odot * \,{\rm pc}^2$')
         plt.show()
 
     def plot_data_kinematics(self, **kwargs):
@@ -117,7 +117,7 @@ class KinData(object):
         colorbar.set_label(r'$\sigma$ [km/s]')
         plt.show()
 
-    def plot_comparison_model(self, model, inclination=90, **kwargs):
+    def plot_comparison_model(self, model, inclination=90, one_figure=True, **kwargs):
 
         if isinstance(model, FJmodel):
             f = model
@@ -190,8 +190,12 @@ class KinData(object):
         model_contour_levels = linspace(float(density_model.min()) * .7, 0, num=6)
 
         # plotting
-        fig = plt.figure(figsize=(12, 10))
-        ax = fig.add_subplot(221)
+        if one_figure:
+            fig = plt.figure(figsize=(12, 10))
+            ax = fig.add_subplot(221)
+        else:
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
         ax.set_xlabel("RA [arcsec]")
         ax.set_ylabel("DEC [arcsec]")
         image = plt.imshow(vel_image, cmap=sauron, interpolation='nearest',
@@ -204,7 +208,11 @@ class KinData(object):
         # add density contours
         ax.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
 
-        ax2 = fig.add_subplot(222)
+        if one_figure:
+            ax2 = fig.add_subplot(222)
+        else:
+            fig2 = plt.figure()
+            ax2 = fig2.add_subplot(111)
         ax2.set_xlabel("RA [arcsec]")
         ax2.set_ylabel("DEC [arcsec]")
         image2 = plt.imshow(sig_image, cmap=sauron, interpolation='nearest',
@@ -217,7 +225,11 @@ class KinData(object):
         # add density contours
         ax2.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
 
-        ax3 = fig.add_subplot(223)
+        if one_figure:
+            ax3 = fig.add_subplot(223)
+        else:
+            fig3 = plt.figure()
+            ax3 = fig3.add_subplot(111)
         ax3.set_xlabel("RA [arcsec]")
         ax3.set_ylabel("DEC [arcsec]")
         image3 = plt.imshow(vel_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
@@ -230,7 +242,11 @@ class KinData(object):
         # add density contours
         ax3.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
 
-        ax4 = fig.add_subplot(224)
+        if one_figure:
+            ax4 = fig.add_subplot(224)
+        else:
+            fig4 = plt.figure()
+            ax4 = fig4.add_subplot(111)
         ax4.set_xlabel("RA [arcsec]")
         ax4.set_ylabel("DEC [arcsec]")
         image4 = plt.imshow(sig_image_mod / model_scale[1] * data_scale[1], cmap=sauron, interpolation='nearest',
@@ -300,6 +316,26 @@ class KinData(object):
 
             # f = ax.pcolormesh(x, y, img, cmap=sauron, **kwargs)
             # ax.axis('image')
+
+    def _get_vu(self, X, Y, vel, sig):
+
+        # get MGE data
+        dat = genfromtxt(self.mge_file)
+        sb = dat[:, 0]
+        sigma = dat[:, 1]
+        q = dat[:, 2]
+
+
+        R = sqrt(power(X, 2) + power(Y, 2))
+        dR = gradient(R)
+        vu = 0.
+        for i in range(len(vel)):
+            """
+            do a proper Sigma(R) Vrms(R) RdR integral...
+            """
+
+            v_rms = sqrt(vel[i] ** 2 + sig[2] ** 2)
+            vu += R[i] * v_rms * dR
 
     def _get_kinematic_data(self, full_output=False):
 
