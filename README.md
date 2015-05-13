@@ -66,3 +66,40 @@ Then `cd` to the cloned `pyfJmod` directory and type:
 nosetests
 ```
 Please notice that it'll take a few minutes to complete.
+
+
+## Examples
+
+The following example will show how to plot a density profile (along the major axis) for an f(**J**) model:
+
+```python
+from fJmodel.fJmodel import *
+from fJmodel.fJplots import *
+
+# load the f(J) model data
+f = FJmodel("/full/path/to/file/fJmodel_file.out")
+
+# create the matplotlib interface to directly plot the data
+p0 = FJmodelPlot(f, xlabel=r"$\log\, r$", ylabel=r"$\rho$", fontsize=18)
+
+# make & show the density profile plot
+p0.plotRho()
+```
+
+The following example will show how to plot the radial, vertical and azimuthal velocity dispersion profiles (along the major axis) for an f(**J**) model:
+
+```python
+from fJmodel.fJmodel import *
+from fJmodel.fJplots import *
+
+# load the f(J) model data
+f = FJmodel("/full/path/to/file/fJmodel_file.out")
+
+# create the matplotlib interface to directly plot the data
+p1 = FJmodelPlot(f, xlabel=r"$\log\, r$", ylabel=r"$\sigma$", fontsize=18)
+
+# make the sigma profiles, show only on the last one
+p1.plotSigmaR(show=False)
+p1.plotSigmaz(show=False)
+p1.plotSigmap()
+```
