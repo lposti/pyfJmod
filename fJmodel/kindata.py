@@ -92,8 +92,8 @@ class KinData(object):
         # get data
         vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
 
-        vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=2 * dx)
-        sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=2 * dx)
+        vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=dx)
+        sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=dx)
 
         # plotting
         fig = plt.figure(figsize=(14, 7.5))
