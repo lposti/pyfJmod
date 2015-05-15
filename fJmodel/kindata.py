@@ -187,8 +187,8 @@ class KinData(object):
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])
         smin, smax = npmin(sig[bins[s]]), npmax(sig[bins[s]])
 
-        data_contour_levels = linspace(float((log10(mge)).min()) * .7, 0, num=6)
-        model_contour_levels = linspace(float(density_model.min()) * .7, 0, num=6)
+        data_contour_levels = linspace(float((log10(mge)).min()) * .6, 0, num=6)
+        model_contour_levels = linspace(float(density_model.min()) * .75, 0, num=6)
 
         # do I have to reverse the Velocity field?
         if reverse_v_field:
