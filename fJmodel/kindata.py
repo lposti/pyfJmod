@@ -117,7 +117,8 @@ class KinData(object):
         colorbar.set_label(r'$\sigma$ [km/s]')
         plt.show()
 
-    def plot_comparison_model(self, model, inclination=90, one_figure=True, save_fig=False, **kwargs):
+    def plot_comparison_model(self, model, inclination=90, one_figure=True, save_fig=False,
+                              reverse_v_field=False, **kwargs):
 
         if isinstance(model, FJmodel):
             f = model
@@ -186,8 +187,12 @@ class KinData(object):
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])
         smin, smax = npmin(sig[bins[s]]), npmax(sig[bins[s]])
 
-        data_contour_levels = linspace(float((log10(mge)).min()) * .5, 0, num=6)
+        data_contour_levels = linspace(float((log10(mge)).min()) * .7, 0, num=6)
         model_contour_levels = linspace(float(density_model.min()) * .7, 0, num=6)
+
+        # do I have to reverse the Velocity field?
+        if reverse_v_field:
+            vel_image = -vel_image
 
         # plotting
         if one_figure:
