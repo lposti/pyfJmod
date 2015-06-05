@@ -43,6 +43,7 @@
       <w>msqrt</w>
       <w>ndarray</w>
       <w>noplot</w>
+      <w>npabs</w>
       <w>npix</w>
       <w>npmax</w>
       <w>npmin</w>

@@ -3,7 +3,7 @@ __author__ = 'lposti'
 from fJmodel import FJmodel
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
-    meshgrid, radians, ones_like, where, average, sqrt, gradient, power
+    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack
 from numpy.ma import masked_array
 from linecache import getline
 from math import sin, cos
@@ -11,8 +11,9 @@ from numpy import sin as numpy_sin
 from numpy import cos as numpy_cos
 from numpy import max as npmax
 from numpy import min as npmin
+from numpy import abs as npabs
 from numpy import reshape as numpy_reshape
-from scipy.spatial import distance
+from scipy.spatial import distance, cKDTree
 from scipy.interpolate import RectBivariateSpline
 import matplotlib.pylab as plt
 
@@ -283,6 +284,80 @@ class KinData(object):
 
         plt.tight_layout()
         plt.show()
+
+    def plot_vel_profiles(self, **kwargs):
+
+        # get data
+        vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
+
+        vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=dx)
+        sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=dx)
+
+        plot = 1
+        if plot:
+            # plotting
+            fig = plt.figure(figsize=(14, 7.5))
+            ax = fig.add_subplot(111)
+            ax.set_xlabel("RA [arcsec]")
+            ax.set_ylabel("DEC [arcsec]")
+            image = plt.imshow(vel_image, cmap=sauron, interpolation='nearest',
+                               extent=[X[s].min() - dx, X[s].max() + dx,
+                                       Y[s].min() - dx, Y[s].max() + dx],
+                               **kwargs)
+
+            colorbar = fig.colorbar(image)
+            colorbar.set_label(r'$v$ [km/s]')
+
+        xmin, xmax, ymin, ymax = X[s].min() - dx, X[s].max() + dx, Y[s].min() - dx, Y[s].max() + dx
+
+        # plot velocity map with major axis line
+        x = linspace(xmin, xmax, num=vel_image.shape[0] * 2)
+        y = x * ((ymax - ymin) / (xmax - xmin)) * 1.2
+        y = y[::-1]
+        plt.plot(x, y, 'ko')
+        plt.show()
+
+        # compute distance of each spaxel from the major axis line
+        dist = (distance.cdist(dstack([y, x])[0], dstack([Y[s], X[s]])[0]))
+        xd = []
+        for i in range(len(dist)):
+            xd.append(dist[i].argmin())
+
+        # compute distance (with sign) from centre of map
+        X_pv, X_xd_pv = [], []
+        d_pv, d_xd_pv = distance.cdist([(0., 0.)], dstack([Y[s], X[s]])[0])[0],\
+            distance.cdist([(0., 0.)], dstack([(Y[s])[xd], (X[s])[xd]])[0])[0]
+
+        for i in range(len(d_pv)):
+            if (vel[bins[s]])[i] > 0.:
+                X_pv.append(d_pv[i])
+            else:
+                X_pv.append(-d_pv[i])
+
+        for i in range(len(d_xd_pv)):
+            if ((vel[bins[s]])[xd])[i] > 0.:
+                X_xd_pv.append(d_xd_pv[i])
+            else:
+                X_xd_pv.append(-d_xd_pv[i])
+
+        # plot position-velocity diagrams
+        fig = plt.figure(figsize=(14, 7.5))
+        ax = fig.add_subplot(121)
+        ax.set_xlabel("semi-major axis [arcsec]")
+        ax.set_ylabel("velocity [km/s]")
+        ax.plot(X_pv, vel[bins[s]], 'b.')
+        ax.plot(X_xd_pv, (vel[bins[s]])[xd], 'ro')
+
+        ax2 = fig.add_subplot(122)
+        ax2.set_xlabel("semi-major axis [arcsec]")
+        ax2.set_ylabel("velocity dispersion [km/s]")
+        ax2.plot(X_pv, sig[bins[s]], 'b.')
+        ax2.plot(X_xd_pv, (sig[bins[s]])[xd], 'ro')
+        plt.show()
+
+    @staticmethod
+    def find_nearest(array, value):
+        return (npabs(array - value)).argmin()
 
     @staticmethod
     def display_pixels(x, y, val, pixelsize=None, angle=None):
