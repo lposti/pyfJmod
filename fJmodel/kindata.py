@@ -358,12 +358,14 @@ class KinData(object):
         ax.set_xlabel("semi-major axis [arcsec]")
         ax.set_ylabel("velocity [km/s]")
         ax.plot(x / npmax(x) * npmax(X_xd_pv), f.vlos[:, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
+        ax.plot(x / npmax(x) * npmax(X_xd_pv), f.vlos[len(f.vlos) / 2, :] / model_scale[0] * data_scale[0], 'g-')
         ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r')
 
         ax2 = fig.add_subplot(122)
         ax2.set_xlabel("semi-major axis [arcsec]")
         ax2.set_ylabel("velocity dispersion [km/s]")
         ax2.plot(x / npmax(x) * npmax(X_xd_pv), f.slos[:, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
+        ax2.plot(x / npmax(x) * npmax(X_xd_pv), f.slos[len(f.slos) / 2, :] / model_scale[1] * data_scale[1], 'g-')
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
