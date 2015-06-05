@@ -28,6 +28,12 @@ class KinData(object):
             self.aperture_file = directory + "/aperture.dat"
             self.bins_file = directory + "/bins.dat"
 
+            if directory[-1] == '/':
+                self.gal_name = directory[-8:-1]
+            else:
+                self.gal_name = directory[-7:]
+            print "Galaxy:", self.gal_name
+
         elif mge_file is not None and kin_data_file is not None and \
                 aperture_file is not None and bins_file is not None:
             self.mge_file = mge_file
@@ -329,7 +335,7 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    def plot_comparison_model_vel_profiles(self, model, inclination=90):
+    def plot_comparison_model_vel_profiles(self, model, inclination=90, savefig=False):
 
         if isinstance(model, FJmodel):
             f = model
@@ -355,16 +361,20 @@ class KinData(object):
         # plot position-velocity diagrams
         fig = plt.figure(figsize=(14, 7.5))
         ax = fig.add_subplot(121)
-        ax.set_xlabel("semi-major axis [arcsec]")
-        ax.set_ylabel("velocity [km/s]")
+        ax.set_xlabel("semi-major axis [arcsec]", fontsize=18)
+        ax.set_ylabel("velocity [km/s]", fontsize=18)
         ax.plot(x / npmax(x) * npmax(X_xd_pv), f.vlos[:, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
-        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r')
+        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
         ax2 = fig.add_subplot(122)
-        ax2.set_xlabel("semi-major axis [arcsec]")
-        ax2.set_ylabel("velocity dispersion [km/s]")
+        ax2.set_xlabel("semi-major axis [arcsec]", fontsize=18)
+        ax2.set_ylabel("velocity dispersion [km/s]", fontsize=18)
         ax2.plot(x / npmax(x) * npmax(X_xd_pv), f.slos[:, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
-        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
+        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
+
+        if savefig:
+            plt.legend(loc='best')
+            plt.savefig('vprof_mod_comp.eps', bbox_inches='tight')
         plt.show()
 
     @staticmethod
