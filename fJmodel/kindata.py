@@ -129,7 +129,8 @@ class KinData(object):
             raise NotImplementedError(" -- ERROR: either pass an FJmodel instance or full qualified path")
 
         # get data
-        vel, sig, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt = self._get_kinematic_data(full_output=True)
+        vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
+            self._get_kinematic_data(full_output=True)
 
         vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=dx)
         sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=dx)
@@ -288,10 +289,10 @@ class KinData(object):
     def plot_vel_profiles(self, **kwargs):
 
         # get data
-        vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
+        vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
+            self._get_kinematic_data(full_output=True)
 
         vel_image = self.display_pixels(X[s], Y[s], vel[bins[s]], pixelsize=dx)
-        sig_image = self.display_pixels(X[s], Y[s], sig[bins[s]], pixelsize=dx)
 
         plot = 1
         if plot:
@@ -308,37 +309,10 @@ class KinData(object):
             colorbar = fig.colorbar(image)
             colorbar.set_label(r'$v$ [km/s]')
 
-        xmin, xmax, ymin, ymax = X[s].min() - dx, X[s].max() + dx, Y[s].min() - dx, Y[s].max() + dx
+        xd, X_pv, X_xd_pv, x, y = self._get_vel_curve_idx(X, Y, s, dx, bins, vel, full_output=True)
 
-        # plot velocity map with major axis line
-        x = linspace(xmin, xmax, num=vel_image.shape[0] * 2)
-        y = x * ((ymax - ymin) / (xmax - xmin)) * 1.2
-        y = y[::-1]
         plt.plot(x, y, 'ko')
         plt.show()
-
-        # compute distance of each spaxel from the major axis line
-        dist = (distance.cdist(dstack([y, x])[0], dstack([Y[s], X[s]])[0]))
-        xd = []
-        for i in range(len(dist)):
-            xd.append(dist[i].argmin())
-
-        # compute distance (with sign) from centre of map
-        X_pv, X_xd_pv = [], []
-        d_pv, d_xd_pv = distance.cdist([(0., 0.)], dstack([Y[s], X[s]])[0])[0],\
-            distance.cdist([(0., 0.)], dstack([(Y[s])[xd], (X[s])[xd]])[0])[0]
-
-        for i in range(len(d_pv)):
-            if (vel[bins[s]])[i] > 0.:
-                X_pv.append(d_pv[i])
-            else:
-                X_pv.append(-d_pv[i])
-
-        for i in range(len(d_xd_pv)):
-            if ((vel[bins[s]])[xd])[i] > 0.:
-                X_xd_pv.append(d_xd_pv[i])
-            else:
-                X_xd_pv.append(-d_xd_pv[i])
 
         # plot position-velocity diagrams
         fig = plt.figure(figsize=(14, 7.5))
@@ -346,18 +320,52 @@ class KinData(object):
         ax.set_xlabel("semi-major axis [arcsec]")
         ax.set_ylabel("velocity [km/s]")
         ax.plot(X_pv, vel[bins[s]], 'b.')
-        ax.plot(X_xd_pv, (vel[bins[s]])[xd], 'ro')
+        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r')
 
         ax2 = fig.add_subplot(122)
         ax2.set_xlabel("semi-major axis [arcsec]")
         ax2.set_ylabel("velocity dispersion [km/s]")
         ax2.plot(X_pv, sig[bins[s]], 'b.')
-        ax2.plot(X_xd_pv, (sig[bins[s]])[xd], 'ro')
+        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    @staticmethod
-    def find_nearest(array, value):
-        return (npabs(array - value)).argmin()
+    def plot_comparison_model_vel_profiles(self, model, inclination=90):
+
+        if isinstance(model, FJmodel):
+            f = model
+        elif isinstance(model, basestring):
+            f = FJmodel(model)
+        else:
+            raise NotImplementedError(" -- ERROR: either pass an FJmodel instance or full qualified path")
+
+        # get data
+        vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
+            self._get_kinematic_data(full_output=True)
+
+        xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, dx, bins, vel)
+
+        # get model
+        Rmax = 20.  # f.ar[-1]
+        x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+
+        # peaks of velocity moments, used for re-scaling the model
+        data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
+        model_scale = npmax(f.vlos), npmax(f.slos)
+
+        # plot position-velocity diagrams
+        fig = plt.figure(figsize=(14, 7.5))
+        ax = fig.add_subplot(121)
+        ax.set_xlabel("semi-major axis [arcsec]")
+        ax.set_ylabel("velocity [km/s]")
+        ax.plot(x / npmax(x) * npmax(X_xd_pv), f.vlos[:, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
+        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r')
+
+        ax2 = fig.add_subplot(122)
+        ax2.set_xlabel("semi-major axis [arcsec]")
+        ax2.set_ylabel("velocity dispersion [km/s]")
+        ax2.plot(x / npmax(x) * npmax(X_xd_pv), f.slos[:, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
+        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
+        plt.show()
 
     @staticmethod
     def display_pixels(x, y, val, pixelsize=None, angle=None):
@@ -415,6 +423,43 @@ class KinData(object):
             # f = ax.pcolormesh(x, y, img, cmap=sauron, **kwargs)
             # ax.axis('image')
 
+    def _get_vel_curve_idx(self, X, Y, s, dx, bins, vel, full_output=False):
+
+        xmin, xmax, ymin, ymax = X[s].min() - dx, X[s].max() + dx, Y[s].min() - dx, Y[s].max() + dx
+
+        # plot velocity map with major axis line
+        x = linspace(xmin, xmax, num=120)
+        y = x * ((ymax - ymin) / (xmax - xmin)) * 1.2
+        y = y[::-1]
+
+        # compute distance of each spaxel from the major axis line
+        dist = (distance.cdist(dstack([y, x])[0], dstack([Y[s], X[s]])[0]))
+        xd = []
+        for i in range(len(dist)):
+            xd.append(dist[i].argmin())
+
+        # compute distance (with sign) from centre of map
+        X_pv, X_xd_pv = [], []
+        d_pv, d_xd_pv = distance.cdist([(0., 0.)], dstack([Y[s], X[s]])[0])[0],\
+            distance.cdist([(0., 0.)], dstack([(Y[s])[xd], (X[s])[xd]])[0])[0]
+
+        for i in range(len(d_pv)):
+            if (vel[bins[s]])[i] > 0.:
+                X_pv.append(d_pv[i])
+            else:
+                X_pv.append(-d_pv[i])
+
+        for i in range(len(d_xd_pv)):
+            if ((vel[bins[s]])[xd])[i] > 0.:
+                X_xd_pv.append(d_xd_pv[i])
+            else:
+                X_xd_pv.append(-d_xd_pv[i])
+
+        if full_output:
+            return xd, X_pv, X_xd_pv, x, y
+        else:
+            return xd, X_pv, X_xd_pv
+
     def _get_vu(self, X, Y, vel, sig):
 
         # get MGE data
@@ -422,7 +467,6 @@ class KinData(object):
         sb = dat[:, 0]
         sigma = dat[:, 1]
         q = dat[:, 2]
-
 
         R = sqrt(power(X, 2) + power(Y, 2))
         dR = gradient(R)
@@ -454,9 +498,10 @@ class KinData(object):
         kin_data = genfromtxt(self.kin_data_file, skip_header=1)
 
         vel, sig = kin_data[:, 1], kin_data[:, 3]
+        vel_err, sig_err = kin_data[:, 2], kin_data[:, 4]
 
         if full_output:
-            return vel, sig, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt
+            return vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt
         else:
             return vel, sig, X, Y, bins, s, dx
 
