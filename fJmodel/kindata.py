@@ -373,7 +373,8 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
         if savefig:
-            plt.legend(loc='best')
+            ax.legend(loc='best')
+            ax2.legend(loc='best')
             plt.savefig('vprof_mod_comp.eps', bbox_inches='tight')
         plt.show()
 
