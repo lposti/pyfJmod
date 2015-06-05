@@ -426,11 +426,14 @@ class KinData(object):
     def _get_vel_curve_idx(self, X, Y, s, dx, bins, vel, full_output=False):
 
         xmin, xmax, ymin, ymax = X[s].min() - dx, X[s].max() + dx, Y[s].min() - dx, Y[s].max() + dx
+        # use max and min of velocity curve to determine kinematic axis
+        id_max, id_min = vel[bins[s]].argmax(), vel[bins[s]].argmin()
 
         # plot velocity map with major axis line
         x = linspace(xmin, xmax, num=120)
-        y = x * ((ymax - ymin) / (xmax - xmin)) * 1.2
-        y = y[::-1]
+        y = x * (((Y[s])[id_max] - (Y[s])[id_min]) / ((X[s])[id_max] - (X[s])[id_min])) * 1.2
+
+        # plt.plot([(X[s])[id_max], (X[s])[id_min]], [(Y[s])[id_max], (Y[s])[id_min]], 'ms')
 
         # compute distance of each spaxel from the major axis line
         dist = (distance.cdist(dstack([y, x])[0], dstack([Y[s], X[s]])[0]))
