@@ -200,7 +200,7 @@ class KinData(object):
 
         # do I have to reverse the Velocity field?
         if reverse_v_field:
-            vel_image = -vel_image
+            vel_image_mod = -vel_image_mod
 
         # plotting
         if one_figure:
@@ -335,7 +335,7 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    def plot_comparison_model_vel_profiles(self, model, inclination=90, savefig=False):
+    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False):
 
         if isinstance(model, FJmodel):
             f = model
@@ -372,10 +372,10 @@ class KinData(object):
         ax2.plot(x / npmax(x) * npmax(X_xd_pv), f.slos[:, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
-        if savefig:
+        if save_fig:
             ax.legend(loc='best')
             ax2.legend(loc='best')
-            plt.savefig('vprof_mod_comp.eps', bbox_inches='tight')
+            plt.savefig('vprof_mod_comp' + self.gal_name + '.eps', bbox_inches='tight')
         plt.show()
 
     @staticmethod
