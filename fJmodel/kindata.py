@@ -398,8 +398,43 @@ class KinData(object):
         flux = array(flux)
 
         # get kinematic data
-        vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
+        # get data
+        vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
+            self._get_kinematic_data(full_output=True)
         flux_image = self.display_pixels(X[s], Y[s], flux[s], pixelsize=dx)
+
+        # maxgrid: max value of the observed grid. Used to rescale the model image
+        maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
+
+        f = model
+        # get model
+        Rmax = 20.  # f.ar[-1]
+        x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+
+        sigma, velocity, density = RectBivariateSpline(x, y, f.slos), RectBivariateSpline(x, y, f.vlos),\
+            RectBivariateSpline(x, y, power(10., f.dlos))
+        sigma_model, velocity_model = zeros(nx * ny), zeros(nx * ny)
+        sig_model, vel_model = zeros(npmax(bins[s]) + 1), zeros(npmax(bins[s]) + 1)
+        density_model = zeros(nx * ny)
+
+        for i in range(nx):
+            for j in range(ny):
+                x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[ny - 1 - j]) \
+                    * Rmax / maxgrid
+                y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[ny - 1 - j]) \
+                    * Rmax / maxgrid
+                density_model[i * ny + j] = density.ev(x_rotated, y_rotated)
+
+        bins2 = numpy_reshape(bins, (ny, nx))
+        bins_img = rot90(rot90(rot90(bins2)))
+        bins2 = bins_img.reshape(bins_img.shape[0] * bins_img.shape[1])
+
+        for i in range(max(bins[s]) + 1):
+            w = where(bins2 == i)
+            sig_model[i] = average(density_model[w] / npmax(density_model))
+
+        den_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
+
 
         plot = 1
         if plot:
@@ -408,7 +443,7 @@ class KinData(object):
             ax = fig.add_subplot(111)
             ax.set_xlabel("RA [arcsec]")
             ax.set_ylabel("DEC [arcsec]")
-            image = plt.imshow(flux_image, cmap=sauron, interpolation='nearest',
+            image = plt.imshow(den_image_mod, cmap=sauron, interpolation='nearest',
                                extent=[X[s].min() - dx, X[s].max() + dx,
                                        Y[s].min() - dx, Y[s].max() + dx])
 
