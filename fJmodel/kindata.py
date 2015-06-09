@@ -408,7 +408,7 @@ class KinData(object):
 
         f = model
         # get model
-        Rmax = 20.  # f.ar[-1]
+        Rmax = 5.  # f.ar[-1]
         x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
         sigma, velocity, density = RectBivariateSpline(x, y, f.slos), RectBivariateSpline(x, y, f.vlos),\
