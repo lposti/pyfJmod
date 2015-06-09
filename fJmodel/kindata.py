@@ -429,11 +429,13 @@ class KinData(object):
             Rmax = 20.  # f.ar[-1]
             x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
+            model_density = power(10., f.dlos)
             # peaks of velocity moments, used for re-scaling the model
             data_scale = npmax(flux[s])
-            model_scale = npmax(f.dlos)
+            model_scale = npmax(model_density)
 
-            plt.plot(x / npmax(x) * npmax(X_xd_pv), f.dlos[:, len(f.dlos) / 2] / model_scale * data_scale, 'b-')
+            plt.plot(x / npmax(x) * npmax(X_xd_pv), model_density[:, len(model_density) / 2] /
+                     model_scale * data_scale, 'b-')
 
         else:
             plt.plot(X_pv, flux[s], 'b.')
