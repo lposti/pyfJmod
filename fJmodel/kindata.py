@@ -151,7 +151,7 @@ class KinData(object):
         mge = self._get_mge(xt=xt, yt=yt, angle=self.angle)
 
         # get model
-        Rmax = 20.  # f.ar[-1]
+        Rmax = 5.  # f.ar[-1]
         x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
         # maxgrid: max value of the observed grid. Used to rescale the model image
