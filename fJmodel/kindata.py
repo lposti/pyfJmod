@@ -3,24 +3,26 @@ __author__ = 'lposti'
 from fJmodel import FJmodel
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
-    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack
+    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array
 from numpy.ma import masked_array
 from linecache import getline
-from math import sin, cos
+from math import sin, cos, tan, pi
 from numpy import sin as numpy_sin
 from numpy import cos as numpy_cos
 from numpy import max as npmax
 from numpy import min as npmin
 from numpy import abs as npabs
 from numpy import reshape as numpy_reshape
-from scipy.spatial import distance, cKDTree
+from scipy.spatial import distance
 from scipy.interpolate import RectBivariateSpline
 import matplotlib.pylab as plt
+import pyfits
 
 
 class KinData(object):
 
-    def __init__(self, directory=None, mge_file=None, kin_data_file=None, aperture_file=None, bins_file=None):
+    def __init__(self, directory=None, mge_file=None, kin_data_file=None, aperture_file=None, bins_file=None,
+                 fits_file=None):
 
         if directory is not None:
             self.mge_file = directory + "/MGE_rband.txt"
@@ -34,12 +36,16 @@ class KinData(object):
                 self.gal_name = directory[-7:]
             print "Galaxy:", self.gal_name
 
+            self.fits_file = directory + '/' + self.gal_name + '.V1200.rscube_INDOUSv2_SN20_stellar_kin.fits'
+
         elif mge_file is not None and kin_data_file is not None and \
-                aperture_file is not None and bins_file is not None:
+                aperture_file is not None and bins_file is not None and \
+                fits_file is not None:
             self.mge_file = mge_file
             self.kin_data_file = kin_data_file
             self.aperture_file = aperture_file
             self.bins_file = bins_file
+            self.fits_file = fits_file
 
         else:
             raise ValueError("ERROR: either pass the directory where the MGE, kinematic"
@@ -378,6 +384,63 @@ class KinData(object):
             plt.savefig('vprof_mod_comp' + self.gal_name + '.eps', bbox_inches='tight')
         plt.show()
 
+    def plot_light_profile(self, model=None, inclination=90):
+
+        # read flux data from fits file
+        hdu = pyfits.open(self.fits_file)
+        d = hdu[1].data
+
+        flux = []
+
+        for i in range(len(d)):
+            flux.append(d[i][3])
+
+        flux = array(flux)
+
+        # get kinematic data
+        vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
+        flux_image = self.display_pixels(X[s], Y[s], flux[s], pixelsize=dx)
+
+        plot = 1
+        if plot:
+            # plotting
+            fig = plt.figure(figsize=(14, 7.5))
+            ax = fig.add_subplot(111)
+            ax.set_xlabel("RA [arcsec]")
+            ax.set_ylabel("DEC [arcsec]")
+            image = plt.imshow(flux_image, cmap=sauron, interpolation='nearest',
+                               extent=[X[s].min() - dx, X[s].max() + dx,
+                                       Y[s].min() - dx, Y[s].max() + dx])
+
+            colorbar = fig.colorbar(image)
+            colorbar.set_label(r'Flux')
+
+        xd, X_pv, X_xd_pv, x, y = self._get_vel_curve_idx(X, Y, s, dx, bins, vel, full_output=True)
+
+        plt.plot(x, y, 'wo')
+        plt.show()
+
+        fig = plt.figure()
+        if model is not None and isinstance(model, FJmodel):
+
+            f = model
+
+            # get model
+            Rmax = 20.  # f.ar[-1]
+            x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+
+            # peaks of velocity moments, used for re-scaling the model
+            data_scale = npmax(flux[s])
+            model_scale = npmax(f.dlos)
+
+            plt.plot(x / npmax(x) * npmax(X_xd_pv), f.dlos[:, len(f.dlos) / 2] / model_scale * data_scale, 'b-')
+
+        else:
+            plt.plot(X_pv, flux[s], 'b.')
+
+        plt.plot(X_xd_pv, (flux[s])[xd], 'ro')
+        plt.show()
+
     @staticmethod
     def display_pixels(x, y, val, pixelsize=None, angle=None):
         """
@@ -436,13 +499,7 @@ class KinData(object):
 
     def _get_vel_curve_idx(self, X, Y, s, dx, bins, vel, full_output=False):
 
-        xmin, xmax, ymin, ymax = X[s].min() - dx, X[s].max() + dx, Y[s].min() - dx, Y[s].max() + dx
-        # use max and min of velocity curve to determine kinematic axis
-        id_max, id_min = vel[bins[s]].argmax(), vel[bins[s]].argmin()
-
-        # plot velocity map with major axis line
-        x = linspace(xmin, xmax, num=120)
-        y = x * (((Y[s])[id_max] - (Y[s])[id_min]) / ((X[s])[id_max] - (X[s])[id_min])) * 1.2
+        theta, x, y = self.get_major_axis(X[s], Y[s], vel[bins[s]])
 
         # plt.plot([(X[s])[id_max], (X[s])[id_min]], [(Y[s])[id_max], (Y[s])[id_min]], 'ms')
 
@@ -473,6 +530,30 @@ class KinData(object):
             return xd, X_pv, X_xd_pv, x, y
         else:
             return xd, X_pv, X_xd_pv
+
+    @staticmethod
+    def get_major_axis(X, Y, v):
+
+        xmin, xmax = X.min(), X.max()
+        thetas, x = linspace(-pi / 3., pi / 3., num=100), linspace(xmin, xmax, num=100)
+
+        dv, theta_out = 0., 0.
+        for theta in thetas:
+            m = tan(theta)
+            y = m * x
+
+            # compute distance of each spaxel from the major axis line
+            dist = (distance.cdist(dstack([y, x])[0], dstack([Y, X])[0]))
+            xd = []
+            for i in range(len(dist)):
+                xd.append(dist[i].argmin())
+
+            delta = npabs((v[xd])[0:len(xd) / 2 - 1] - (v[xd])[len(xd) / 2:-1])
+            if delta.mean() > dv:
+                dv = delta.mean()
+                theta_out = theta
+
+        return theta_out, x, tan(theta_out) * x
 
     def _get_vu(self, X, Y, vel, sig):
 
