@@ -17,7 +17,7 @@ from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, 
     cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, where
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
-from scipy.optimize import brentq, minimize
+from scipy.optimize import brentq
 
 
 class FJmodel(object):
