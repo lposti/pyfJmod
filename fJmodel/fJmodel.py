@@ -14,10 +14,10 @@ from linecache import getline
 from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, where
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
-from scipy.optimize import brentq
+from scipy.optimize import brentq, minimize
 
 
 class FJmodel(object):
@@ -75,6 +75,7 @@ class FJmodel(object):
             # initialize to None
             self.dlos, self.slos, self.vlos = None, None, None
             self.xmap, self.ymap = None, None
+            self.r_eff = None
 
             # initialize to None
             self.binNum, self.xNode, self.yNode, self.xBar, self.yBar, self.sn, self.nPixels, self.scale = \
@@ -279,6 +280,29 @@ class FJmodel(object):
 
         self.xmap = linspace(-Rmax, Rmax, num=2 * nx)
         self.ymap = linspace(-Rmax, Rmax, num=2 * nx)
+
+        #
+        # find the projected half mass radius
+        #
+
+        # grid density
+        dd = linspace((self.dlos[self.dlos > -9]).min(), self.dlos.max(), num=nx)
+
+        # compute projected mass array
+        mm = []
+        for i in range(len(dd)):
+            w = self.dlos > dd[i]
+            mm.append(pow(Rmax / nx, 2) * power(10., self.dlos[w]).sum())
+
+        # compute semi-major axis at each density level
+        RR = []
+        for i in range(len(mm)):
+            idx = abs(self.dlos[:, len(self.dlos) / 2] - dd[i]).argmin()
+            RR.append(abs(self.xmap[idx]))
+
+        # minimize to get the effective radius
+        self.r_eff = RR[abs(mm - mm[0] / 2).argmin()]
+        print "Effective radius:", self.r_eff
 
         return self.xmap, self.ymap
 
