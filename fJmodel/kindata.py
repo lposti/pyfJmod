@@ -195,7 +195,9 @@ class KinData(object):
 
         # peaks of velocity moments, used for re-scaling the model
         data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
-        model_scale = npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])
+        model_scale = npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2)),\
+                      npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2))
+                      # npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])
 
         # colour scales of the velocity and velocity dispersion plots
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])

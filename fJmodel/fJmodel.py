@@ -285,7 +285,7 @@ class FJmodel(object):
         # find the projected half mass radius
         #
 
-        # grid density
+        # grid density (exclude minimum at -10)
         dd = linspace((self.dlos[self.dlos > -9]).min(), self.dlos.max(), num=nx)
 
         # compute projected mass array
@@ -308,6 +308,7 @@ class FJmodel(object):
         #
         # compute scale velocity
         #
+
         w = self.dlos > dd[id_r_eff]
 
         self.v_scale = (power(10., self.dlos[w]) * sqrt(self.vlos[w] ** 2 + self.slos[w] ** 2)).sum() /\
