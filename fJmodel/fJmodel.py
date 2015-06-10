@@ -302,7 +302,7 @@ class FJmodel(object):
 
         # minimize to get the effective radius
         self.r_eff = RR[abs(mm - mm[0] / 2).argmin()]
-        print "Effective radius:", self.r_eff
+        print "Effective radius:", self.r_eff, "[M/2-M(Re)]/M=", abs(mm - mm[0] / 2).min() / mm[0]
 
         return self.xmap, self.ymap
 
