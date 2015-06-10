@@ -14,7 +14,7 @@ from linecache import getline
 from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, where
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
@@ -75,7 +75,7 @@ class FJmodel(object):
             # initialize to None
             self.dlos, self.slos, self.vlos = None, None, None
             self.xmap, self.ymap = None, None
-            self.r_eff = None
+            self.r_eff, self.v_scale = None, None
 
             # initialize to None
             self.binNum, self.xNode, self.yNode, self.xBar, self.yBar, self.sn, self.nPixels, self.scale = \
@@ -301,8 +301,19 @@ class FJmodel(object):
             RR.append(abs(self.xmap[idx]))
 
         # minimize to get the effective radius
-        self.r_eff = RR[abs(mm - mm[0] / 2).argmin()]
+        id_r_eff = abs(mm - mm[0] / 2).argmin()
+        self.r_eff = RR[id_r_eff]
         print "Effective radius:", self.r_eff, "[M/2-M(Re)]/M=", abs(mm - mm[0] / 2).min() / mm[0]
+
+        #
+        # compute scale velocity
+        #
+        w = self.dlos > dd[id_r_eff]
+
+        self.v_scale = (power(10., self.dlos[w]) * sqrt(self.vlos[w] ** 2 + self.slos[w] ** 2)).sum() /\
+            power(10., self.dlos[w]).sum()
+
+        print "Velocity scale:", self.v_scale
 
         return self.xmap, self.ymap
 

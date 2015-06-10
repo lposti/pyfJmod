@@ -87,8 +87,8 @@
       <file leaf-file-name="fJmodel.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3437877" vertical-offset="0" max-vertical-offset="16800">
-              <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.74185765" vertical-offset="4110" max-vertical-offset="16965">
+              <caret line="315" column="45" selection-start-line="315" selection-start-column="45" selection-end-line="315" selection-end-column="45" />
               <folding>
                 <element signature="e#231#257#0" expanded="true" />
               </folding>
@@ -949,8 +949,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3437877" vertical-offset="0" max-vertical-offset="16800">
-          <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.74185765" vertical-offset="4110" max-vertical-offset="16965">
+          <caret line="315" column="45" selection-start-line="315" selection-start-column="45" selection-end-line="315" selection-end-column="45" />
           <folding>
             <element signature="e#231#257#0" expanded="true" />
           </folding>
