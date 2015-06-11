@@ -474,8 +474,8 @@ class KinData(object):
             data_scale = npmax(flux[s])
             model_scale = npmax(f.dlos)
 
-            plt.plot(x / npmax(x) * npmax(X_xd_pv), f.dlos[:, len(f.dlos) / 2] /
-                     model_scale * data_scale, 'b-')
+            plt.plot(x / npmax(x) * npmax(X_xd_pv), f.dlos[:, len(f.dlos) / 2] -
+                     model_scale + data_scale, 'b-')
 
         else:
             plt.plot(X_pv, flux[s], 'b.')
