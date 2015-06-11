@@ -467,7 +467,7 @@ class KinData(object):
             f = model
 
             # get model
-            Rmax = 6.  # f.ar[-1]
+            Rmax = 14.  # f.ar[-1]
             x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
             model_density = power(10., f.dlos)
