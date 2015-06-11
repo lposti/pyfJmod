@@ -388,7 +388,7 @@ class KinData(object):
             plt.savefig('vprof_mod_comp' + self.gal_name + '.eps', bbox_inches='tight')
         plt.show()
 
-    def plot_light_profile(self, model=None, inclination=90):
+    def _get_flux_bin(self):
 
         # read flux data from fits file
         hdu = pyfits.open(self.fits_file)
@@ -401,9 +401,14 @@ class KinData(object):
 
         flux = -2.5 * array(flux)
 
+        return flux
+
+    def _get_flux_contour(self):
+
+        flux = self._get_flux_bin()
+
         # get kinematic data
         vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
-        flux_image = self.display_pixels(X[s], Y[s], flux[s], pixelsize=dx)
 
         minx, miny, step_x, step_y, nx, ny, dx = self._read_aperture_file()
         xx = linspace(X[s].min(), X[s].max(), num=int(X[s].max() - X[s].min()) + 1)
@@ -421,6 +426,19 @@ class KinData(object):
                     pass
                 else:
                     flux_contour[i, j] = (flux[s])[ww]
+
+        return flux_contour
+
+    def plot_light_profile(self, model=None, inclination=90):
+
+        flux = self._get_flux_bin()
+
+        # get kinematic data
+        vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
+        flux_image = self.display_pixels(X[s], Y[s], flux[s], pixelsize=dx)
+
+        # get flux contour
+        flux_contour = self._get_flux_contour()
         plt.contourf(flux_contour)
         plt.show()
 
@@ -443,7 +461,6 @@ class KinData(object):
         plt.plot(x, y, 'wo')
         plt.show()
 
-        print j[2]
         fig = plt.figure()
         if model is not None and isinstance(model, FJmodel):
 
@@ -464,7 +481,7 @@ class KinData(object):
         else:
             plt.plot(X_pv, flux[s], 'b.')
 
-        plt.plot(X_xd_pv, log10((flux[s])[xd]), 'ro')
+        plt.plot(X_xd_pv, (flux[s])[xd], 'ro')
         plt.show()
 
     @staticmethod
