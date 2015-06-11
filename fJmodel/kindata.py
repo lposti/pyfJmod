@@ -3,7 +3,7 @@ __author__ = 'lposti'
 from fJmodel import FJmodel
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
-    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array
+    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array, full, around
 from numpy.ma import masked_array
 from linecache import getline
 from math import sin, cos, tan, pi
@@ -397,13 +397,32 @@ class KinData(object):
         flux = []
 
         for i in range(len(d)):
-            flux.append(d[i][3])
+            flux.append(d[i][7])
 
-        flux = array(flux)
+        flux = -2.5 * array(flux)
 
         # get kinematic data
         vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
         flux_image = self.display_pixels(X[s], Y[s], flux[s], pixelsize=dx)
+
+        minx, miny, step_x, step_y, nx, ny, dx = self._read_aperture_file()
+        xx = linspace(X[s].min(), X[s].max(), num=int(X[s].max() - X[s].min()) + 1)
+        yy = linspace(Y[s].min(), Y[s].max(), num=int(Y[s].max() - Y[s].min()) + 1)
+
+        flux_contour = full((nx, ny), nan)
+        for i in range(len(xx)):
+            for j in range(len(yy)):
+
+                ww = ((npabs(around(array(X[s]) - xx[i], decimals=3)) < 0.01) &
+                      (npabs(around(array(Y[s]) - yy[j], decimals=3)) < 0.01))
+
+                # if list is empty
+                if not (flux[s])[ww]:
+                    pass
+                else:
+                    flux_contour[i, j] = (flux[s])[ww]
+        plt.contourf(flux_contour)
+        plt.show()
 
         plot = 1
         if plot:
@@ -424,6 +443,7 @@ class KinData(object):
         plt.plot(x, y, 'wo')
         plt.show()
 
+        print j[2]
         fig = plt.figure()
         if model is not None and isinstance(model, FJmodel):
 
@@ -612,7 +632,7 @@ class KinData(object):
         bins = genfromtxt(self.bins_file, dtype=int)
 
         bins -= 1  # ATTENTION: here the bin number is shifted by -1 because of Fortran/C different index conventions
-        s = where(bins > 0)[0]
+        s = where(bins > -0.5)[0]
 
         return bins, s
 
