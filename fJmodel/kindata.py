@@ -399,7 +399,8 @@ class KinData(object):
         for i in range(len(d)):
             flux.append(d[i][7])
 
-        flux = -1. / 2.5 * array(flux)
+        # flux = -1. / 2.5 * array(flux)
+        flux = array(flux)
 
         return flux
 
@@ -467,15 +468,15 @@ class KinData(object):
             f = model
 
             # get model
-            Rmax = 14.  # f.ar[-1]
+            Rmax = 8.  # f.ar[-1]
             x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
             model_density = power(10., f.dlos)
             # peaks of velocity moments, used for re-scaling the model
-            data_scale = npmax(10. ** (flux[s])[xd])
+            data_scale = npmax(10. ** (-1. / 2.5 * flux[s])[xd])
             model_scale = npmax(model_density)
 
-            plt.plot(x / npmax(x) * npmax(X_xd_pv), log10(model_density[:, len(model_density) / 2] /
+            plt.plot(x / npmax(x) * npmax(X_xd_pv), -2.5 * log10(model_density[:, len(model_density) / 2] /
                      model_scale * data_scale), 'b-')
 
         else:
