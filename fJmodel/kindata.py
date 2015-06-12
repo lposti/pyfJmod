@@ -348,7 +348,7 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False):
+    def plot_comparison_model_vel_profiles(self, model, inclination=90, Rmax_model=None, save_fig=False):
 
         if isinstance(model, FJmodel):
             f = model
@@ -364,7 +364,10 @@ class KinData(object):
         xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, dx, bins, vel)
 
         # get model
-        Rmax = 20.  # f.ar[-1]
+        if Rmax_model is None:
+            Rmax = 20.  # f.ar[-1]
+        else:
+            Rmax = Rmax_model
         x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
         # peaks of velocity moments, used for re-scaling the model
@@ -433,7 +436,7 @@ class KinData(object):
 
         return flux_contour
 
-    def plot_light_profile(self, model=None, inclination=90):
+    def plot_light_profile(self, model=None, inclination=90, Rmax_model=None):
 
         flux = self._get_flux_bin()
 
@@ -471,7 +474,10 @@ class KinData(object):
             f = model
 
             # get model
-            Rmax = 8.  # f.ar[-1]
+            if Rmax_model is None:
+                Rmax = 20.  # f.ar[-1]
+            else:
+                Rmax = Rmax_model
             x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
 
             model_density = power(10., f.dlos)
