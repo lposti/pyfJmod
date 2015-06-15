@@ -274,7 +274,7 @@ class KinData(object):
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        # image3.set_clim(vmin=vmin, vmax=vmax)
+        image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
             colorbar = fig.colorbar(image3)
         else:
@@ -297,7 +297,7 @@ class KinData(object):
         image4 = plt.imshow(sig_image_mod / model_scale[1] * data_scale[1], cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
-        # image4.set_clim(vmin=smin, vmax=smax)
+        image4.set_clim(vmin=smin, vmax=smax)
         if one_figure:
             colorbar = fig.colorbar(image4)
         else:
