@@ -197,14 +197,15 @@ class KinData(object):
         sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
 
         # peaks of velocity moments, used for re-scaling the model
+        '''
         data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
         model_scale = npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])
+        '''
 
         data_scale = npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2)),\
-                      npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2))
+            npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2))
         model_scale = npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2)),\
-                      npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2))
-
+            npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2))
 
         # colour scales of the velocity and velocity dispersion plots
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])
@@ -267,6 +268,8 @@ class KinData(object):
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
+        print "min, max:", npmin(vel_image_mod / model_scale[0] * data_scale[0]),\
+            npmax(vel_image_mod / model_scale[0] * data_scale[0])
         image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
             colorbar = fig.colorbar(image3)
