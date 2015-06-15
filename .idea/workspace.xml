@@ -75,8 +75,8 @@
       <file leaf-file-name="kindata.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fJmodel/kindata.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.78234583" vertical-offset="3403" max-vertical-offset="10680">
-              <caret line="270" column="10" selection-start-line="270" selection-start-column="10" selection-end-line="270" selection-end-column="10" />
+            <state vertical-scroll-proportion="0.4897219" vertical-offset="2685" max-vertical-offset="10665">
+              <caret line="206" column="74" selection-start-line="206" selection-start-column="74" selection-end-line="206" selection-end-column="74" />
               <folding>
                 <element signature="e#23#50#0" expanded="true" />
               </folding>
@@ -949,8 +949,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fJmodel/kindata.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.78234583" vertical-offset="3403" max-vertical-offset="10680">
-          <caret line="270" column="10" selection-start-line="270" selection-start-column="10" selection-end-line="270" selection-end-column="10" />
+        <state vertical-scroll-proportion="0.4897219" vertical-offset="2685" max-vertical-offset="10665">
+          <caret line="206" column="74" selection-start-line="206" selection-start-column="74" selection-end-line="206" selection-end-column="74" />
           <folding>
             <element signature="e#23#50#0" expanded="true" />
           </folding>

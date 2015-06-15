@@ -204,8 +204,7 @@ class KinData(object):
 
         data_scale = npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2)),\
             npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2))
-        model_scale = npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2)),\
-            npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2))
+        model_scale = npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])
 
         # colour scales of the velocity and velocity dispersion plots
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])
@@ -268,7 +267,7 @@ class KinData(object):
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        # image3.set_clim(vmin=vmin, vmax=vmax)
+        image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
             colorbar = fig.colorbar(image3)
         else:
