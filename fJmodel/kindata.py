@@ -268,9 +268,7 @@ class KinData(object):
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        print "min, max:", npmin(vel_image_mod / model_scale[0] * data_scale[0]),\
-            npmax(vel_image_mod / model_scale[0] * data_scale[0])
-        image3.set_clim(vmin=vmin, vmax=vmax)
+        # image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
             colorbar = fig.colorbar(image3)
         else:
