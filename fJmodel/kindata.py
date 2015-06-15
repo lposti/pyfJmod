@@ -283,6 +283,10 @@ class KinData(object):
         # add density contours
         ax3.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
 
+        print "scales:", f.vlos.max(), f.slos.max(), vel_model[bins[s]].max(), sig_model[bins[s]].max(),\
+            (vel_image_mod / model_scale[0] * data_scale[0]).max(),\
+            (sig_image_mod / model_scale[1] * data_scale[1]).max()
+
         if one_figure:
             ax4 = fig.add_subplot(224)
         else:
