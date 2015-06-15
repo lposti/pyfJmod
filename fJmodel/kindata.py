@@ -190,8 +190,8 @@ class KinData(object):
 
         for i in range(max(bins[s]) + 1):
             w = where(bins2 == i)
-            sig_model[i] = average(sigma_model[w] / npmax(sigma_model))
-            vel_model[i] = average(velocity_model[w] / npmax(velocity_model))
+            sig_model[i] = average(sigma_model[w])  # / npmax(sigma_model))
+            vel_model[i] = average(velocity_model[w])  # / npmax(velocity_model))
 
         vel_image_mod = self.display_pixels(X[s], Y[s], vel_model[bins[s]], pixelsize=dx)
         sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
