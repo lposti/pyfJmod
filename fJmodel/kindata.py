@@ -327,7 +327,7 @@ class KinData(object):
 
         ax2.set_xlabel("RA [arcsec]")
         ax2.set_ylabel("DEC [arcsec]")
-        image2 = plt.imshow(vrms_image_mod, cmap=sauron, interpolation='nearest',
+        image2 = plt.imshow(vrms_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
