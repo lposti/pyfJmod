@@ -224,8 +224,6 @@ class KinData(object):
         if reverse_v_field:
             vel_image_mod = -vel_image_mod
 
-        vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
-                                     sqrt(vel_image_mod ** 2 + sig_image_mod ** 2)
         # plotting
         if one_figure:
             fig = plt.figure(figsize=(12, 10))
@@ -235,11 +233,11 @@ class KinData(object):
             ax = fig.add_subplot(111)
         ax.set_xlabel("RA [arcsec]")
         ax.set_ylabel("DEC [arcsec]")
-        image = plt.imshow(vrms_image, cmap=sauron, interpolation='nearest',
+        image = plt.imshow(vel_image, cmap=sauron, interpolation='nearest',
                            extent=[X[s].min() - dx, X[s].max() + dx,
                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        #image.set_clim(vmin=vmin, vmax=vmax)
+        image.set_clim(vmin=vmin, vmax=vmax)
         colorbar = fig.colorbar(image)
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
@@ -272,11 +270,11 @@ class KinData(object):
             ax3 = fig3.add_subplot(111)
         ax3.set_xlabel("RA [arcsec]")
         ax3.set_ylabel("DEC [arcsec]")
-        image3 = plt.imshow(vrms_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
+        image3 = plt.imshow(vel_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        #image3.set_clim(vmin=vmin, vmax=vmax)
+        image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
             colorbar = fig.colorbar(image3)
         else:
@@ -303,6 +301,42 @@ class KinData(object):
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
         ax4.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+
+        # V_RMS Figure
+
+        vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
+            sqrt(vel_image_mod ** 2 + sig_image_mod ** 2)
+
+        if one_figure:
+            fig2 = plt.figure()
+            ax = fig2.add_subplot(121)
+
+        ax.set_xlabel("RA [arcsec]")
+        ax.set_ylabel("DEC [arcsec]")
+        image = plt.imshow(vrms_image, cmap=sauron, interpolation='nearest',
+                           extent=[X[s].min() - dx, X[s].max() + dx,
+                                   Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+
+        colorbar = fig2.colorbar(image)
+        colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
+        # add density contours
+        ax.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
+
+        if one_figure:
+            ax2 = fig2.add_subplot(122)
+
+        ax2.set_xlabel("RA [arcsec]")
+        ax2.set_ylabel("DEC [arcsec]")
+        image2 = plt.imshow(vrms_image_mod, cmap=sauron, interpolation='nearest',
+                            extent=[X[s].min() - dx, X[s].max() + dx,
+                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+
+        colorbar = fig2.colorbar(image2)
+        colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
+        # add density contours
+        ax2.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+
+        # Save figures
 
         if save_fig:
             if one_figure:
