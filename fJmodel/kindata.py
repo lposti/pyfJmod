@@ -305,7 +305,8 @@ class KinData(object):
         # V_RMS Figure
 
         vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
-            sqrt(vel_image_mod ** 2 + sig_image_mod ** 2)
+            sqrt((vel_image_mod / model_scale[0] * data_scale[0]) ** 2 +
+                 (sig_image_mod / model_scale[1] * data_scale[1]) ** 2)
 
         if one_figure:
             fig2 = plt.figure()
@@ -327,7 +328,7 @@ class KinData(object):
 
         ax2.set_xlabel("RA [arcsec]")
         ax2.set_ylabel("DEC [arcsec]")
-        image2 = plt.imshow(vrms_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
+        image2 = plt.imshow(vrms_image_mod, cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
