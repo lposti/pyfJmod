@@ -224,6 +224,8 @@ class KinData(object):
         if reverse_v_field:
             vel_image_mod = -vel_image_mod
 
+        vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
+                                     sqrt(vel_image_mod ** 2 + sig_image_mod ** 2)
         # plotting
         if one_figure:
             fig = plt.figure(figsize=(12, 10))
@@ -233,11 +235,11 @@ class KinData(object):
             ax = fig.add_subplot(111)
         ax.set_xlabel("RA [arcsec]")
         ax.set_ylabel("DEC [arcsec]")
-        image = plt.imshow(vel_image, cmap=sauron, interpolation='nearest',
+        image = plt.imshow(vrms_image, cmap=sauron, interpolation='nearest',
                            extent=[X[s].min() - dx, X[s].max() + dx,
                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        image.set_clim(vmin=vmin, vmax=vmax)
+        #image.set_clim(vmin=vmin, vmax=vmax)
         colorbar = fig.colorbar(image)
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
@@ -270,11 +272,11 @@ class KinData(object):
             ax3 = fig3.add_subplot(111)
         ax3.set_xlabel("RA [arcsec]")
         ax3.set_ylabel("DEC [arcsec]")
-        image3 = plt.imshow(vel_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
+        image3 = plt.imshow(vrms_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
                             extent=[X[s].min() - dx, X[s].max() + dx,
                                     Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        image3.set_clim(vmin=vmin, vmax=vmax)
+        #image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
             colorbar = fig.colorbar(image3)
         else:
@@ -282,10 +284,6 @@ class KinData(object):
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
         ax3.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
-
-        print "scales:", f.vlos.max(), f.slos.max(), vel_model[bins[s]].max(), sig_model[bins[s]].max(),\
-            (vel_image_mod / model_scale[0] * data_scale[0]).max(),\
-            (sig_image_mod / model_scale[1] * data_scale[1]).max()
 
         if one_figure:
             ax4 = fig.add_subplot(224)
