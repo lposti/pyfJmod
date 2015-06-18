@@ -265,39 +265,38 @@ class KinData(object):
         ax4.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
 
         # V_RMS Figure
-
-        vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
-            sqrt((vel_image_mod / model_scale[0] * data_scale[0]) ** 2 +
-                 (sig_image_mod / model_scale[1] * data_scale[1]) ** 2)
-
         if one_figure:
+            vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
+                sqrt((vel_image_mod / model_scale[0] * data_scale[0]) ** 2 +
+                     (sig_image_mod / model_scale[1] * data_scale[1]) ** 2)
+
+
             fig2 = plt.figure()
             ax = fig2.add_subplot(121)
 
-        ax.set_xlabel("RA [arcsec]")
-        ax.set_ylabel("DEC [arcsec]")
-        image = plt.imshow(vrms_image, cmap=sauron, interpolation='nearest',
-                           extent=[X[s].min() - dx, X[s].max() + dx,
-                                   Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+            ax.set_xlabel("RA [arcsec]")
+            ax.set_ylabel("DEC [arcsec]")
+            image = plt.imshow(vrms_image, cmap=sauron, interpolation='nearest',
+                               extent=[X[s].min() - dx, X[s].max() + dx,
+                                       Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        colorbar = fig2.colorbar(image)
-        colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
-        # add density contours
-        ax.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
+            colorbar = fig2.colorbar(image)
+            colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
+            # add density contours
+            ax.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
 
-        if one_figure:
             ax2 = fig2.add_subplot(122)
 
-        ax2.set_xlabel("RA [arcsec]")
-        ax2.set_ylabel("DEC [arcsec]")
-        image2 = plt.imshow(vrms_image_mod, cmap=sauron, interpolation='nearest',
-                            extent=[X[s].min() - dx, X[s].max() + dx,
-                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+            ax2.set_xlabel("RA [arcsec]")
+            ax2.set_ylabel("DEC [arcsec]")
+            image2 = plt.imshow(vrms_image_mod, cmap=sauron, interpolation='nearest',
+                                extent=[X[s].min() - dx, X[s].max() + dx,
+                                        Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-        colorbar = fig2.colorbar(image2)
-        colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
-        # add density contours
-        ax2.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+            colorbar = fig2.colorbar(image2)
+            colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
+            # add density contours
+            ax2.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
 
         # Save figures
 
