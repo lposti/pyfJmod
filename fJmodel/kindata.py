@@ -150,48 +150,10 @@ class KinData(object):
         # get MGE data
         mge = self._get_mge(xt=xt, yt=yt, angle=self.angle)
 
-        # get model
-        if Rmax_model is None:
-            Rmax = 20.  # f.ar[-1]
-        else:
-            Rmax = Rmax_model
-        x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+        # get model data
 
-        # maxgrid: max value of the observed grid. Used to rescale the model image
-        maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
-
-        sigma, velocity, density = RectBivariateSpline(x, y, f.slos), RectBivariateSpline(x, y, f.vlos),\
-            RectBivariateSpline(x, y, f.dlos)
-        sigma_model, velocity_model = zeros(nx * ny), zeros(nx * ny)
-        sig_model, vel_model = zeros(npmax(bins[s]) + 1), zeros(npmax(bins[s]) + 1)
-        density_model = zeros((nx, ny))
-
-        for i in range(nx):
-            for j in range(ny):
-                x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[ny - 1 - j]) \
-                    * Rmax / maxgrid
-                y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[ny - 1 - j]) \
-                    * Rmax / maxgrid
-                sigma_model[i * ny + j] = sigma.ev(x_rotated, y_rotated)
-                velocity_model[i * ny + j] = velocity.ev(x_rotated, y_rotated)
-
-                x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[j]) \
-                    * Rmax / maxgrid
-                y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[j]) \
-                    * Rmax / maxgrid
-                density_model[i, j] = density.ev(x_rotated, y_rotated)
-
-        # normalize density to its maximum
-        density_model -= npmax(density_model)
-
-        bins2 = numpy_reshape(bins, (ny, nx))
-        bins_img = rot90(rot90(rot90(bins2)))
-        bins2 = bins_img.reshape(bins_img.shape[0] * bins_img.shape[1])
-
-        for i in range(max(bins[s]) + 1):
-            w = where(bins2 == i)
-            sig_model[i] = average(sigma_model[w])  # / npmax(sigma_model))
-            vel_model[i] = average(velocity_model[w])  # / npmax(velocity_model))
+        vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination, Rmax_model,
+                                                                         s, bins, xt, yt, nx, ny)
 
         vel_image_mod = self.display_pixels(X[s], Y[s], vel_model[bins[s]], pixelsize=dx)
         sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
@@ -350,6 +312,53 @@ class KinData(object):
 
         plt.tight_layout()
         plt.show()
+
+    def _get_model_kinematics(self, f, inclination, Rmax_model, s, bins, xt, yt, nx, ny):
+
+        # get model
+        if Rmax_model is None:
+            Rmax = 20.  # f.ar[-1]
+        else:
+            Rmax = Rmax_model
+        x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+
+        # maxgrid: max value of the observed grid. Used to rescale the model image
+        maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
+
+        sigma, velocity, density = RectBivariateSpline(x, y, f.slos), RectBivariateSpline(x, y, f.vlos),\
+            RectBivariateSpline(x, y, f.dlos)
+        sigma_model, velocity_model = zeros(nx * ny), zeros(nx * ny)
+        sig_model, vel_model = zeros(npmax(bins[s]) + 1), zeros(npmax(bins[s]) + 1)
+        density_model = zeros((nx, ny))
+
+        for i in range(nx):
+            for j in range(ny):
+                x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[ny - 1 - j]) \
+                    * Rmax / maxgrid
+                y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[ny - 1 - j]) \
+                    * Rmax / maxgrid
+                sigma_model[i * ny + j] = sigma.ev(x_rotated, y_rotated)
+                velocity_model[i * ny + j] = velocity.ev(x_rotated, y_rotated)
+
+                x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[j]) \
+                    * Rmax / maxgrid
+                y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[j]) \
+                    * Rmax / maxgrid
+                density_model[i, j] = density.ev(x_rotated, y_rotated)
+
+        # normalize density to its maximum
+        density_model -= npmax(density_model)
+
+        bins2 = numpy_reshape(bins, (ny, nx))
+        bins_img = rot90(rot90(rot90(bins2)))
+        bins2 = bins_img.reshape(bins_img.shape[0] * bins_img.shape[1])
+
+        for i in range(max(bins[s]) + 1):
+            w = where(bins2 == i)
+            sig_model[i] = average(sigma_model[w])  # / npmax(sigma_model))
+            vel_model[i] = average(velocity_model[w])  # / npmax(velocity_model))
+
+        return vel_model, sig_model, density_model
 
     def plot_vel_profiles(self, **kwargs):
 
