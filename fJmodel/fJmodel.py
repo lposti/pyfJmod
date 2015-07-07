@@ -453,19 +453,10 @@ class FJmodel(object):
         R_arcsec = linspace(0.2, 250., num=200)
         R = R_arcsec * 5.08 / 26.
 
-        """
-        idx = []
-        Y, X = ogrid[-nx:nx, -nx:nx]
-
-        for i in range(len(R)):
-            idx.append(abs(x[len(x) / 2:] * 25. / 5.08 - R[i]).argmin())
-
-        for i in range(1, len(idx)):
-            m = (X ** 2 + Y ** 2 <= idx[i]) & (X ** 2 + Y ** 2 >= idx[i - 1])
-            print (10. ** self.dlos[m]).mean()
-        """
-
         # dpsf = gaussian_filter(self.dlos, 1., mode='nearest')
+
+        """
+        THIS IS THE RADIAL SURFACE BRIGHTNESS PROFILE
         s = []
         for i in range(len(x)):
             for j in range(len(y)):
@@ -481,8 +472,20 @@ class FJmodel(object):
                             (x[i] ** 2 + y[j] ** 2 > R[k - 1]):
                         s.append(10. ** self.dlos[i, j])
             light_profile.append(array(s).mean())
+        """
 
-        return R_arcsec, 2.5 * log10(light_profile)
+        # compute the growth curve for the model (i.e. integrated flux within circular apertures)
+
+        growth_curve = []
+        for k in range(0, len(R)):
+            s = []
+            for i in range(len(x)):
+                for j in range(len(y)):
+                    if x[i] ** 2 + y[j] ** 2 <= R[k]:
+                        s.append(10. ** self.dlos[i, j])
+            growth_curve.append(array(s).sum())
+
+        return R_arcsec, -2.5 * log10(growth_curve)
 
     def voronoiBin(self, **kwargs):
 

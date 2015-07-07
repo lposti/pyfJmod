@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="dd95a18b-d3ec-4387-b8e7-cb079b0d9bb2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJmodel/fJmodel.py" afterPath="$PROJECT_DIR$/fJmodel/fJmodel.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plot.py" afterPath="$PROJECT_DIR$/plot.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="pyfJmod.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -101,8 +99,8 @@
       <file leaf-file-name="fJmodel.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.78718257" vertical-offset="6549" max-vertical-offset="17970">
-              <caret line="480" column="46" selection-start-line="480" selection-start-column="46" selection-end-line="480" selection-end-column="46" />
+            <state vertical-scroll-proportion="0.12938331" vertical-offset="6598" max-vertical-offset="18015">
+              <caret line="447" column="0" selection-start-line="447" selection-start-column="0" selection-end-line="447" selection-end-column="0" />
               <folding>
                 <element signature="e#231#257#0" expanded="true" />
               </folding>
@@ -966,8 +964,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.78718257" vertical-offset="6549" max-vertical-offset="17970">
-          <caret line="480" column="46" selection-start-line="480" selection-start-column="46" selection-end-line="480" selection-end-column="46" />
+        <state vertical-scroll-proportion="0.12938331" vertical-offset="6598" max-vertical-offset="18015">
+          <caret line="447" column="0" selection-start-line="447" selection-start-column="0" selection-end-line="447" selection-end-column="0" />
           <folding>
             <element signature="e#231#257#0" expanded="true" />
           </folding>
