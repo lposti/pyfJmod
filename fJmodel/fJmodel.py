@@ -19,7 +19,7 @@ from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, 
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
-# from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage.filters import gaussian_filter
 
 
 class FJmodel(object):
@@ -451,9 +451,9 @@ class FJmodel(object):
         x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale, **kwargs)
 
         R_arcsec = linspace(0.2, 250., num=200)
-        R = R_arcsec * 5.08 / 26.
+        R = R_arcsec * .314 / 26.
 
-        # dpsf = gaussian_filter(self.dlos, 1., mode='nearest')
+        dpsf = gaussian_filter(self.dlos, 3., mode='nearest')
 
         """
         THIS IS THE RADIAL SURFACE BRIGHTNESS PROFILE
@@ -482,7 +482,8 @@ class FJmodel(object):
             for i in range(len(x)):
                 for j in range(len(y)):
                     if x[i] ** 2 + y[j] ** 2 <= R[k]:
-                        s.append(10. ** self.dlos[i, j])
+                        # s.append(10. ** self.dlos[i, j])
+                        s.append(10. ** dpsf[i, j])
             growth_curve.append(array(s).sum())
 
         return R_arcsec, -2.5 * log10(growth_curve)
