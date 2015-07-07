@@ -14,10 +14,12 @@ from linecache import getline
 from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, ogrid, logspace,\
+    concatenate, array
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
+# from scipy.ndimage.filters import gaussian_filter
 
 
 class FJmodel(object):
@@ -250,7 +252,7 @@ class FJmodel(object):
 
         return massfJ
 
-    def project(self, inclination, nx=80, npsi=31, b=1., Rmax=None, verbose=True):
+    def project(self, inclination, nx=80, npsi=31, b=1., scale='linear', Rmax=None, verbose=True):
         """
         Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
         :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
@@ -266,7 +268,8 @@ class FJmodel(object):
             Rmax = self.ar[-1]
 
         # nx, npsi = 60, 81
-        self.dlos, self.slos, self.vlos = self.projection(incl=inclination, b=b, Rmax=Rmax, nx=nx, npsi=npsi,
+        self.dlos, self.slos, self.vlos = self.projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
+                                                          npsi=npsi, scale=scale,
                                                           Fast_evaluate_moments=self._fast_evaluate_moments,
                                                           verbose=verbose)
 
@@ -278,8 +281,18 @@ class FJmodel(object):
                 if isnan(self.vlos[j, k]):
                     self.vlos[j, k] = 1e-10
 
-        self.xmap = linspace(-Rmax, Rmax, num=2 * nx)
-        self.ymap = linspace(-Rmax, Rmax, num=2 * nx)
+        if scale is 'log':
+            self.xmap = logspace(-1., log10(Rmax), num=nx)
+            self.xmap = concatenate((-self.xmap[::-1], self.xmap))
+
+            self.ymap = logspace(-1., log10(Rmax), num=nx)
+            self.ymap = concatenate((-self.ymap[::-1], self.ymap))
+
+        elif scale is 'linear':
+            self.xmap = linspace(-Rmax, Rmax, num=2 * nx)
+            self.ymap = linspace(-Rmax, Rmax, num=2 * nx)
+        else:
+            raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
 
         #
         # find the projected half mass radius
@@ -319,8 +332,8 @@ class FJmodel(object):
         return self.xmap, self.ymap
 
     @staticmethod
-    def projection(incl, b, Rmax, nx, npsi, Fast_evaluate_moments=None, rho=None, vrot=None, sigR=None,
-                   sigp=None, sigz=None, verbose=True):
+    def projection(incl, b, Rmax, nx, npsi, scale='linear', Fast_evaluate_moments=None, rho=None, vrot=None,
+                   sigR=None, sigp=None, sigz=None, verbose=True):
         """
         Static method: projects the given model
         :param incl: inclination angle of the line-of-sight
@@ -370,11 +383,26 @@ class FJmodel(object):
                     ' ', widgets.ETA()]
             pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
 
+        if scale is 'log':
+            yy = logspace(-1., log10(Rmax), num=nx)
+            yy = concatenate((-yy[::-1], yy))
+
         for i in range(nx):
-            yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
+            if scale is 'log':
+                yp = yy[nx + i]
+            elif scale is 'linear':
+                yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
+            else:
+                raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
 
             for j in range(2 * nx):
-                zp = (-1. + 2. * j / float(2 * nx - 1)) * zmax
+                if scale is 'log':
+                    zp = yy[j]
+                elif scale is 'linear':
+                    zp = (-1. + 2. * j / float(2 * nx - 1)) * zmax
+                else:
+                    raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
+
                 rp = sqrt(yp * yp + zp * zp)
                 a, I1, I2, I3 = max(sqrt(yp * yp + zp * zp), .1 * b), 0., 0., 0.
 
@@ -417,6 +445,44 @@ class FJmodel(object):
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
 
         return dlos, slos, vlos
+
+    def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', **kwargs):
+
+        x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale, **kwargs)
+
+        R_arcsec = linspace(0.2, 250., num=200)
+        R = R_arcsec * 5.08 / 26.
+
+        """
+        idx = []
+        Y, X = ogrid[-nx:nx, -nx:nx]
+
+        for i in range(len(R)):
+            idx.append(abs(x[len(x) / 2:] * 25. / 5.08 - R[i]).argmin())
+
+        for i in range(1, len(idx)):
+            m = (X ** 2 + Y ** 2 <= idx[i]) & (X ** 2 + Y ** 2 >= idx[i - 1])
+            print (10. ** self.dlos[m]).mean()
+        """
+
+        # dpsf = gaussian_filter(self.dlos, 1., mode='nearest')
+        s = []
+        for i in range(len(x)):
+            for j in range(len(y)):
+                if x[i] ** 2 + y[j] ** 2 <= R[0]:
+                    s.append(10. ** self.dlos[i, j])
+        light_profile = [array(s).mean()]
+
+        for k in range(1, len(R)):
+            s = []
+            for i in range(len(x)):
+                for j in range(len(y)):
+                    if (x[i] ** 2 + y[j] ** 2 <= R[k]) &\
+                            (x[i] ** 2 + y[j] ** 2 > R[k - 1]):
+                        s.append(10. ** self.dlos[i, j])
+            light_profile.append(array(s).mean())
+
+        return R_arcsec, 2.5 * log10(light_profile)
 
     def voronoiBin(self, **kwargs):
 
