@@ -453,7 +453,7 @@ class FJmodel(object):
         R_arcsec = linspace(0.2, 250., num=200)
         R = R_arcsec * .314 / 26.
 
-        dpsf = gaussian_filter(self.dlos, 3., mode='nearest')
+        d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 
         """
         THIS IS THE RADIAL SURFACE BRIGHTNESS PROFILE
@@ -474,6 +474,12 @@ class FJmodel(object):
             light_profile.append(array(s).mean())
         """
 
+        # if computations larger than 30x30x100 initialize pbar
+        pbar = None
+        if nx * nx * len(R) > 9e4:  # pragma: no cover
+            wdgt = [widgets.FormatLabel('Computing growth curve: '), widgets.Percentage()]
+            pbar = ProgressBar(maxval=nx * nx * len(R), widgets=wdgt).start()
+
         # compute the growth curve for the model (i.e. integrated flux within circular apertures)
 
         growth_curve = []
@@ -481,10 +487,18 @@ class FJmodel(object):
             s = []
             for i in range(len(x)):
                 for j in range(len(y)):
+
+                    # update ProgressBar
+                    if nx * nx * len(R) > 9e4:  # pragma: no cover
+                        pbar.update((k * (nx - 1) + i) * (nx - 1) + j)
+
                     if x[i] ** 2 + y[j] ** 2 <= R[k]:
                         # s.append(10. ** self.dlos[i, j])
-                        s.append(10. ** dpsf[i, j])
+                        s.append(10. ** d_psf[i, j])
             growth_curve.append(array(s).sum())
+
+        if nx * nx * len(R) > 9e4:  # pragma: no cover
+            pbar.finish()
 
         return R_arcsec, -2.5 * log10(growth_curve)
 
