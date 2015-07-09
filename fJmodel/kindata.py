@@ -3,7 +3,8 @@ __author__ = 'lposti'
 from fJmodel import FJmodel
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
-    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array, full, around
+    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array, full, around, \
+    asarray
 from numpy.ma import masked_array
 from linecache import getline
 from math import sin, cos, tan, pi
@@ -15,6 +16,7 @@ from numpy import abs as npabs
 from numpy import reshape as numpy_reshape
 from scipy.spatial import distance
 from scipy.interpolate import RectBivariateSpline
+from scipy.optimize import minimize, curve_fit
 import matplotlib.pylab as plt
 import pyfits
 
@@ -22,7 +24,7 @@ import pyfits
 class KinData(object):
 
     def __init__(self, directory=None, mge_file=None, kin_data_file=None, aperture_file=None, bins_file=None,
-                 fits_file=None):
+                 fits_file=None, gc_file=None):
 
         if directory is not None:
             self.mge_file = directory + "/MGE_rband.txt"
@@ -37,6 +39,7 @@ class KinData(object):
             print "Galaxy:", self.gal_name
 
             self.fits_file = directory + '/' + self.gal_name + '.V1200.rscube_INDOUSv2_SN20_stellar_kin.fits'
+            self.gc_file = directory + '/' + self.gal_name + '_GCs.dat'
 
         elif mge_file is not None and kin_data_file is not None and \
                 aperture_file is not None and bins_file is not None and \
@@ -46,12 +49,19 @@ class KinData(object):
             self.aperture_file = aperture_file
             self.bins_file = bins_file
             self.fits_file = fits_file
+            self.gc_file = gc_file
 
         else:
             raise ValueError("ERROR: either pass the directory where the MGE, kinematic"
                              "and aperture data are or pass the filenames directly.")
 
         self.angle = float(getline(self.aperture_file, 4).split()[0])
+        self.R_arcsec, self.gc = None, None
+
+        try:
+            self.R_arcsec, self.gc = self._read_growth_curve_file()
+        except IOError:
+            print "  - WARNING: Could not find growth curve file."
 
     def _get_mge(self, xt=None, yt=None, angle=0., size=100):
 
@@ -548,6 +558,16 @@ class KinData(object):
         plt.plot(X_xd_pv, (flux[s])[xd], 'ro')
         plt.show()
 
+    def get_sb_profile(self):
+
+        R, sb = self.get_surface_brightness(self.R_arcsec, self.gc)
+        alpha, n, I_0 = self.fit_sersic_profile(R, -sb)
+
+        plt.gca().invert_yaxis()
+        plt.plot(R, sb, 'ro-')
+        plt.plot(R, -KinData.sersic(R, alpha, n, I_0), 'k-', lw=2)
+        plt.show()
+
     @staticmethod
     def display_pixels(x, y, val, pixelsize=None, angle=None):
         """
@@ -662,6 +682,56 @@ class KinData(object):
 
         return theta_out, x, tan(theta_out) * x
 
+    @staticmethod
+    def get_surface_brightness(R, gc):
+
+        gc = 10. ** (-0.4 * gc)  # convert into fluxes
+        sb, Rout = [-2.5 * log10(gc[0] / (4. * pi * R[0] ** 2))], [R[0]]
+
+        for i in range(1, len(R)):
+            area = 4. * pi * (R[i] ** 2 - R[i - 1] ** 2)
+            sb.append(-2.5 * log10(gc[i] - gc[i - 1]) + 2.5 * log10(area))
+            Rout.append(R[i])
+
+        return array(Rout), array(sb)
+
+    @staticmethod
+    def sersic(x, alpha, n, I_0):
+        x = asarray(x)
+        return 2.5 * log10(I_0 * exp(-(x / abs(alpha)) ** (1. / n)))
+
+    @staticmethod
+    def fit_sersic_profile(R, sb):
+
+        I_0_in = 10. ** (0.4 * sb[0]) * 1.5
+
+        def likelihood(t, x, y):
+            # chi squared likelihood
+            alpha, n = t
+            chi_square = (y - KinData.sersic(x, alpha, n, I_0_in)) ** 2
+            return chi_square[chi_square < 999.].sum()
+
+        f = lambda *args: likelihood(*args)
+        res = minimize(f, [1e-3, 4.], args=(R, sb))
+        alpha_min, n_min = res["x"]
+        chi_sq_min = (sb - KinData.sersic(R, alpha_min, n_min, I_0_in)) ** 2
+        print "\nLikelihood minimization: \t (%f, %f, %e) \t CHIsq=%f" % \
+                  (alpha_min, n_min, I_0_in, chi_sq_min[chi_sq_min < 999.].sum())
+
+        try:
+            w = (sb < 999.) & (sb > -999.)
+            p_opt, p_cov = curve_fit(KinData.sersic, R[w], sb[w], p0=[1e-3, 4., I_0_in])
+            alpha_c, n_c, I_0_c = p_opt[0], p_opt[1], p_opt[2]
+            chi_sq_c = (sb - KinData.sersic(R, alpha_c, n_c, I_0_c)) ** 2
+            print "\nCurve fitting: \t (%f, %f, %e) \t CHIsq=%f" % \
+                  (alpha_c, n_c, I_0_c, chi_sq_c[chi_sq_c < 999.].sum())
+            ret = alpha_c, n_c, I_0_c
+
+        except RuntimeError:
+            ret = alpha_min, n_min, I_0_in
+
+        return ret
+
     def _get_vu(self, X, Y, vel, sig):
 
         # get MGE data
@@ -716,6 +786,13 @@ class KinData(object):
         s = where(bins > -0.5)[0]
 
         return bins, s
+
+    def _read_growth_curve_file(self):
+
+        # read growth curve file
+        gc_data = genfromtxt(self.gc_file)
+
+        return gc_data[:, 0], gc_data[:, 2]
 
     def _read_aperture_file(self):
 
