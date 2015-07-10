@@ -492,7 +492,7 @@ class FJmodel(object):
                     if nx * nx * len(R) > 9e4:  # pragma: no cover
                         pbar.update((k * (nx - 1) + i) * (nx - 1) + j)
 
-                    if x[i] ** 2 + y[j] ** 2 <= R[k]:
+                    if x[i] ** 2 + y[j] ** 2 <= R[k] ** 2:
                         # s.append(10. ** self.dlos[i, j])
                         s.append(10. ** d_psf[i, j])
             growth_curve.append(array(s).sum())
