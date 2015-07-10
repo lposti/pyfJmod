@@ -701,9 +701,10 @@ class KinData(object):
         return 2.5 * log10(I_0 * exp(-(x / abs(alpha)) ** (1. / n)))
 
     @staticmethod
-    def fit_sersic_profile(R, sb):
+    def fit_sersic_profile(R, sb, I_0_in=None):
 
-        I_0_in = 10. ** (0.4 * sb[0]) * 1.5
+        if I_0_in is None:
+            I_0_in = 10. ** (0.4 * sb[0]) * 1.5
 
         def likelihood(t, x, y):
             # chi squared likelihood
@@ -716,7 +717,7 @@ class KinData(object):
         alpha_min, n_min = res["x"]
         chi_sq_min = (sb - KinData.sersic(R, alpha_min, n_min, I_0_in)) ** 2
         print "\nLikelihood minimization: \t (%f, %f, %e) \t CHIsq=%f" % \
-                  (alpha_min, n_min, I_0_in, chi_sq_min[chi_sq_min < 999.].sum())
+            (alpha_min, n_min, I_0_in, chi_sq_min[chi_sq_min < 999.].sum())
 
         try:
             w = (sb < 999.) & (sb > -999.)

@@ -446,12 +446,12 @@ class FJmodel(object):
 
         return dlos, slos, vlos
 
-    def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', **kwargs):
+    def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', Re_model=1., Re_data=1., **kwargs):
 
         x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale, **kwargs)
 
         R_arcsec = linspace(0.2, 250., num=200)
-        R = R_arcsec * .314 / 26.
+        R = R_arcsec * Re_model / Re_data
 
         d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 
