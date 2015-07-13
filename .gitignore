@@ -1,4 +1,5 @@
 *.pyc
+profile.prof
 distutlis.cmds
 dist/
 htmlcov

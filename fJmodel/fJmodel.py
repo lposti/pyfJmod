@@ -19,7 +19,9 @@ from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, 
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
-from scipy.ndimage.filters import gaussian_filter
+# from scipy.ndimage.filters import gaussian_filter
+from scipy.interpolate import SmoothBivariateSpline
+from projection_cy import projection, LagrangePolynomials
 
 
 class FJmodel(object):
@@ -268,10 +270,11 @@ class FJmodel(object):
             Rmax = self.ar[-1]
 
         # nx, npsi = 60, 81
-        self.dlos, self.slos, self.vlos = self.projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
-                                                          npsi=npsi, scale=scale,
-                                                          Fast_evaluate_moments=self._fast_evaluate_moments,
-                                                          verbose=verbose)
+        lag_poly = LagrangePolynomials(self.npoly, self.ar, self.rhl, self.vrotl, self.sigRl, self.sigpl, self.sigzl)
+        self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
+                                                     npsi=npsi, scale=scale,
+                                                     Fast_evaluate_moments=lag_poly.fast_evaluate_moments,  # self._fast_evaluate_moments,
+                                                     verbose=verbose)
 
         # remove nans in the maps
         for j in range(2 * nx):
@@ -332,8 +335,8 @@ class FJmodel(object):
         return self.xmap, self.ymap
 
     @staticmethod
-    def projection(incl, b, Rmax, nx, npsi, scale='linear', Fast_evaluate_moments=None, rho=None, vrot=None,
-                   sigR=None, sigp=None, sigz=None, verbose=True):
+    def projection_static(incl, b, Rmax, nx, npsi, scale='linear',
+                        Fast_evaluate_moments=None, verbose=True):
         """
         Static method: projects the given model
         :param incl: inclination angle of the line-of-sight
@@ -342,28 +345,13 @@ class FJmodel(object):
         :param nx: number of grid points
         :param npsi: number of angular subdivisions (for projection)
         :param Fast_evaluate_moments: function to eval. moments
-        :param rho: rho function
-        :param vrot: vrot function
-        :param sigR: sigR function
-        :param sigp: sigp function
-        :param sigz: sigz function
         :param verbose: if True, prints Progressbar
         :return: three maps of density, velocity and velocity dispersion along line-of-sight
         """
 
-        # check if functions are callable
+        # check if function is callable
         if Fast_evaluate_moments is not None:  # pragma: no cover
             assert hasattr(Fast_evaluate_moments, '__call__')
-        if rho is not None:  # pragma: no cover
-            assert hasattr(rho, '__call__')
-        if vrot is not None:  # pragma: no cover
-            assert hasattr(vrot, '__call__')
-        if sigR is not None:  # pragma: no cover
-            assert hasattr(sigR, '__call__')
-        if sigp is not None:  # pragma: no cover
-            assert hasattr(sigp, '__call__')
-        if sigz is not None:  # pragma: no cover
-            assert hasattr(sigz, '__call__')
 
         # set numpy errors: Ignore invalid values, so that no Warning is raised by sqrt(I2/I1)
         seterr(invalid='ignore')
@@ -373,7 +361,7 @@ class FJmodel(object):
         sin_incl, cos_incl = sin(incl * to_radians), cos(incl * to_radians)
 
         dpsi = 2 * psi_max / float(npsi - 1)
-        lam_top, lam_bot = 0., 0.
+        # lam_top, lam_bot = 0., 0.
         dlos, slos, vlos = zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx))
 
         # initialize Progressbar if verbose==True
@@ -418,11 +406,7 @@ class FJmodel(object):
                     R, phi, abs_z = sqrt(x * x + y * y), arctan2(y, x), abs(z)
                     cphi, sphi = cos(phi), sin(phi)
 
-                    if Fast_evaluate_moments is not None:
-                        dens, Vrot, SigR, Sigp, Sigz = Fast_evaluate_moments(R, abs_z)
-                    else:  # pragma: no cover
-                        dens, Vrot = rho(R, abs_z), vrot(R, abs_z)
-                        SigR, Sigp, Sigz = sigR(R, abs_z), sigp(R, abs_z), sigz(R, abs_z)
+                    dens, Vrot, SigR, Sigp, Sigz = Fast_evaluate_moments(R, abs_z)
 
                     I1 += ch * dens
                     I2 += ch * dens * ((power(SigR * cphi * sin_incl, 2)
@@ -430,15 +414,19 @@ class FJmodel(object):
                                        + power(Sigz * cos_incl, 2))   # +2*SigRz*sin_incl*cos_incl
                     I3 += ch * dens * Vrot * sphi * sin_incl
 
-                dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j] = log10(max(a * dpsi * I1, 1e-10)), \
+                if abs(I1) > 0:
+                    dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j] = log10(max(a * dpsi * I1, 1e-10)), \
                     sqrt(I2 / I1), I3 / I1
 
                 # symmetrize arrays (the velocity field gets negative for R<0)
                 dlos[nx - 1 - i, j], slos[nx - 1 - i, j], vlos[nx - 1 - i, j] = \
                     dlos[nx + i, j], slos[nx + i, j], -vlos[nx + i, j]
+
+                '''
                 if rp < 3:
                     lam_top += abs(I3) * rp
                     lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
+                '''
 
         if verbose:  # pragma: no cover
             pbar.finish()
@@ -453,7 +441,7 @@ class FJmodel(object):
         R_arcsec = linspace(0.2, 250., num=200)
         R = R_arcsec * Re_model / Re_data
 
-        d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
+        # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 
         """
         THIS IS THE RADIAL SURFACE BRIGHTNESS PROFILE
@@ -482,6 +470,15 @@ class FJmodel(object):
 
         # compute the growth curve for the model (i.e. integrated flux within circular apertures)
 
+        X, Y, D = [], [], []
+        for i in range(len(x)):
+            for j in range(len(y)):
+                X.append(x[i])
+                Y.append(y[j])
+                D.append(self.dlos[j, i])
+
+        density = SmoothBivariateSpline(Y, X, D, s=len(X))
+
         growth_curve = []
         for k in range(0, len(R)):
             s = []
@@ -493,8 +490,9 @@ class FJmodel(object):
                         pbar.update((k * (nx - 1) + i) * (nx - 1) + j)
 
                     if x[i] ** 2 + y[j] ** 2 <= R[k] ** 2:
-                        # s.append(10. ** self.dlos[i, j])
-                        s.append(10. ** d_psf[i, j])
+                        # s.append(10. ** self.dlos[j, i])
+                        # s.append(10. ** d_psf[i, j])
+                        s.append(10. ** density(y[j], x[i]))
             growth_curve.append(array(s).sum())
 
         if nx * nx * len(R) > 9e4:  # pragma: no cover
@@ -737,8 +735,8 @@ class FJmodel(object):
 
     def _fast_evaluate_moments(self, R, z):
 
-        assert R.size is 1
-        assert z.size is 1
+        # assert R.size is 1
+        # assert z.size is 1
 
         r = sqrt(R * R + z * z)
         c = z / r
@@ -765,7 +763,7 @@ class FJmodel(object):
         """
 
         # check r is a scalar
-        assert r.size is 1
+        # assert r.size is 1
 
         rhop = zeros(self.npoly, dtype=float)
         vrotp = zeros(self.npoly, dtype=float)
