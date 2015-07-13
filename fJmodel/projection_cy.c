@@ -820,8 +820,8 @@ typedef npy_cdouble __pyx_t_5numpy_complex_t;
 struct __pyx_opt_args_13projection_cy_projection;
 
 /* "projection_cy.pyx":26
- * @cython.boundscheck(False)
- * @cython.wraparound(False)
+ *     double atan2 ( double x, double y ) nogil
+ * 
  * cpdef projection(double incl, double b, double Rmax, int nx, int npsi,             # <<<<<<<<<<<<<<
  *                  LagrangePolynomials lp, scale='linear', verbose=True):
  *         """
@@ -1520,10 +1520,6 @@ static PyTypeObject *__pyx_ptype_5numpy_ndarray = 0;
 static PyTypeObject *__pyx_ptype_5numpy_ufunc = 0;
 static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, char *, char *, int *); /*proto*/
 
-/* Module declarations from 'cython.view' */
-
-/* Module declarations from 'cython' */
-
 /* Module declarations from 'projection_cy' */
 static PyTypeObject *__pyx_ptype_13projection_cy_LagrangePolynomials = 0;
 static PyTypeObject *__pyx_array_type = 0;
@@ -1914,8 +1910,8 @@ static PyObject *__pyx_tuple__26;
 static PyObject *__pyx_tuple__27;
 
 /* "projection_cy.pyx":26
- * @cython.boundscheck(False)
- * @cython.wraparound(False)
+ *     double atan2 ( double x, double y ) nogil
+ * 
  * cpdef projection(double incl, double b, double Rmax, int nx, int npsi,             # <<<<<<<<<<<<<<
  *                  LagrangePolynomials lp, scale='linear', verbose=True):
  *         """
@@ -1926,16 +1922,16 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
   PyObject *__pyx_v_scale = ((PyObject *)__pyx_n_s_linear);
 
   /* "projection_cy.pyx":27
- * @cython.wraparound(False)
+ * 
  * cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
  *                  LagrangePolynomials lp, scale='linear', verbose=True):             # <<<<<<<<<<<<<<
  *         """
  *         Static method: projects the given model
  */
   PyObject *__pyx_v_verbose = ((PyObject *)Py_True);
-  size_t __pyx_v_i;
-  size_t __pyx_v_j;
-  size_t __pyx_v_k;
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_k;
   PyArrayObject *__pyx_v_dlos = 0;
   PyArrayObject *__pyx_v_slos = 0;
   PyArrayObject *__pyx_v_vlos = 0;
@@ -1947,8 +1943,8 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
   double __pyx_v_sin_incl;
   double __pyx_v_cos_incl;
   double __pyx_v_dpsi;
-  PyObject *__pyx_v_pbar = NULL;
-  PyObject *__pyx_v_wdgt = NULL;
+  PyObject *__pyx_v_pbar = 0;
+  PyObject *__pyx_v_wdgt = 0;
   double __pyx_v_yp;
   double __pyx_v_zp;
   double __pyx_v_rp;
@@ -1999,37 +1995,36 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
   int __pyx_t_14;
   int __pyx_t_15;
   PyArrayObject *__pyx_t_16 = NULL;
-  size_t __pyx_t_17;
-  size_t __pyx_t_18;
-  size_t __pyx_t_19;
+  int __pyx_t_17;
+  int __pyx_t_18;
+  int __pyx_t_19;
   long __pyx_t_20;
-  size_t __pyx_t_21;
-  size_t __pyx_t_22;
-  size_t __pyx_t_23;
+  long __pyx_t_21;
+  long __pyx_t_22;
+  int __pyx_t_23;
   double __pyx_t_24;
   double __pyx_t_25;
   int __pyx_t_26;
-  size_t __pyx_t_27;
-  size_t __pyx_t_28;
-  size_t __pyx_t_29;
-  size_t __pyx_t_30;
-  size_t __pyx_t_31;
-  size_t __pyx_t_32;
-  size_t __pyx_t_33;
-  size_t __pyx_t_34;
-  __pyx_t_5numpy_double_t __pyx_t_35;
-  size_t __pyx_t_36;
-  size_t __pyx_t_37;
-  __pyx_t_5numpy_double_t __pyx_t_38;
-  size_t __pyx_t_39;
-  size_t __pyx_t_40;
-  __pyx_t_5numpy_double_t __pyx_t_41;
-  size_t __pyx_t_42;
-  size_t __pyx_t_43;
-  size_t __pyx_t_44;
-  size_t __pyx_t_45;
-  size_t __pyx_t_46;
-  size_t __pyx_t_47;
+  int __pyx_t_27;
+  int __pyx_t_28;
+  int __pyx_t_29;
+  int __pyx_t_30;
+  int __pyx_t_31;
+  int __pyx_t_32;
+  int __pyx_t_33;
+  __pyx_t_5numpy_double_t __pyx_t_34;
+  int __pyx_t_35;
+  int __pyx_t_36;
+  __pyx_t_5numpy_double_t __pyx_t_37;
+  int __pyx_t_38;
+  int __pyx_t_39;
+  __pyx_t_5numpy_double_t __pyx_t_40;
+  long __pyx_t_41;
+  int __pyx_t_42;
+  long __pyx_t_43;
+  int __pyx_t_44;
+  long __pyx_t_45;
+  int __pyx_t_46;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -2459,7 +2454,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
     __pyx_t_1 = 0;
     __pyx_t_6 = 0;
     __pyx_t_2 = 0;
-    __pyx_v_wdgt = ((PyObject*)__pyx_t_8);
+    __pyx_v_wdgt = __pyx_t_8;
     __pyx_t_8 = 0;
 
     /* "projection_cy.pyx":63
@@ -2733,9 +2728,9 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
         __pyx_t_10 = __pyx_v_nx;
         if (1 == 0) abort();
         {
-            double __pyx_parallel_temp0 = __PYX_NAN();
+            int __pyx_parallel_temp0 = 0xbad0bad0;
             double __pyx_parallel_temp1 = __PYX_NAN();
-            size_t __pyx_parallel_temp2 = 0xbad0bad0;
+            double __pyx_parallel_temp2 = __PYX_NAN();
             double __pyx_parallel_temp3 = __PYX_NAN();
             double __pyx_parallel_temp4 = __PYX_NAN();
             double __pyx_parallel_temp5 = __PYX_NAN();
@@ -2754,12 +2749,12 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
             double __pyx_parallel_temp18 = __PYX_NAN();
             double __pyx_parallel_temp19 = __PYX_NAN();
             double __pyx_parallel_temp20 = __PYX_NAN();
-            double __pyx_parallel_temp21 = __PYX_NAN();
+            int __pyx_parallel_temp21 = 0xbad0bad0;
             double __pyx_parallel_temp22 = __PYX_NAN();
-            size_t __pyx_parallel_temp23 = 0xbad0bad0;
+            int __pyx_parallel_temp23 = 0xbad0bad0;
             double __pyx_parallel_temp24 = __PYX_NAN();
             double __pyx_parallel_temp25 = __PYX_NAN();
-            size_t __pyx_parallel_temp26 = 0xbad0bad0;
+            double __pyx_parallel_temp26 = __PYX_NAN();
             const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
             PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
             int __pyx_parallel_why;
@@ -2774,7 +2769,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
             if (__pyx_t_18 > 0)
             {
                 #ifdef _OPENMP
-                #pragma omp parallel private(__pyx_t_19, __pyx_t_15, __pyx_t_14, __pyx_t_22, __pyx_t_21, __pyx_t_20) firstprivate(__pyx_t_2) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                #pragma omp parallel private(__pyx_t_21, __pyx_t_15, __pyx_t_22, __pyx_t_14, __pyx_t_20, __pyx_t_19) firstprivate(__pyx_t_2) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
@@ -2784,39 +2779,39 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                     Py_BEGIN_ALLOW_THREADS
                     #endif /* _OPENMP */
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_I2) lastprivate(__pyx_v_I3) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_ch) lastprivate(__pyx_v_phi) lastprivate(__pyx_v_rp) lastprivate(__pyx_v_xp) lastprivate(__pyx_v_yp) lastprivate(__pyx_v_psi) lastprivate(__pyx_v_zp) lastprivate(__pyx_v_sh) lastprivate(__pyx_v_sphi) lastprivate(__pyx_v_Sigz) lastprivate(__pyx_v_SigR) lastprivate(__pyx_v_cphi) lastprivate(__pyx_v_a) lastprivate(__pyx_v_Vrot) lastprivate(__pyx_v_Sigp) lastprivate(__pyx_v_I1) lastprivate(__pyx_v_z) lastprivate(__pyx_v_density) lastprivate(__pyx_v_abs_z) lastprivate(__pyx_v_dens) lastprivate(__pyx_v_j) lastprivate(__pyx_v_R) lastprivate(__pyx_v_x) lastprivate(__pyx_v_k)
+                    #pragma omp for lastprivate(__pyx_v_k) lastprivate(__pyx_v_I2) lastprivate(__pyx_v_Vrot) lastprivate(__pyx_v_Sigp) lastprivate(__pyx_v_ch) lastprivate(__pyx_v_SigR) lastprivate(__pyx_v_xp) lastprivate(__pyx_v_density) lastprivate(__pyx_v_psi) lastprivate(__pyx_v_Sigz) lastprivate(__pyx_v_yp) lastprivate(__pyx_v_a) lastprivate(__pyx_v_sphi) lastprivate(__pyx_v_rp) lastprivate(__pyx_v_cphi) lastprivate(__pyx_v_zp) lastprivate(__pyx_v_I1) lastprivate(__pyx_v_R) lastprivate(__pyx_v_sh) lastprivate(__pyx_v_x) lastprivate(__pyx_v_z) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_abs_z) lastprivate(__pyx_v_j) lastprivate(__pyx_v_dens) lastprivate(__pyx_v_phi) lastprivate(__pyx_v_I3)
                     #endif /* _OPENMP */
                     for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_18; __pyx_t_17++){
                         if (__pyx_parallel_why < 2)
                         {
                             __pyx_v_i = 0 + 1 * __pyx_t_17;
                             /* Initialize private variables to invalid values */
+                            __pyx_v_k = ((int)0xbad0bad0);
                             __pyx_v_I2 = ((double)__PYX_NAN());
-                            __pyx_v_I3 = ((double)__PYX_NAN());
-                            __pyx_v_ch = ((double)__PYX_NAN());
-                            __pyx_v_phi = ((double)__PYX_NAN());
-                            __pyx_v_rp = ((double)__PYX_NAN());
-                            __pyx_v_xp = ((double)__PYX_NAN());
-                            __pyx_v_yp = ((double)__PYX_NAN());
-                            __pyx_v_psi = ((double)__PYX_NAN());
-                            __pyx_v_zp = ((double)__PYX_NAN());
-                            __pyx_v_sh = ((double)__PYX_NAN());
-                            __pyx_v_sphi = ((double)__PYX_NAN());
-                            __pyx_v_Sigz = ((double)__PYX_NAN());
-                            __pyx_v_SigR = ((double)__PYX_NAN());
-                            __pyx_v_cphi = ((double)__PYX_NAN());
-                            __pyx_v_a = ((double)__PYX_NAN());
                             __pyx_v_Vrot = ((double)__PYX_NAN());
                             __pyx_v_Sigp = ((double)__PYX_NAN());
-                            __pyx_v_I1 = ((double)__PYX_NAN());
-                            __pyx_v_z = ((double)__PYX_NAN());
+                            __pyx_v_ch = ((double)__PYX_NAN());
+                            __pyx_v_SigR = ((double)__PYX_NAN());
+                            __pyx_v_xp = ((double)__PYX_NAN());
                             __pyx_v_density = ((double)__PYX_NAN());
-                            __pyx_v_abs_z = ((double)__PYX_NAN());
-                            __pyx_v_dens = ((double)__PYX_NAN());
-                            __pyx_v_j = ((size_t)0xbad0bad0);
+                            __pyx_v_psi = ((double)__PYX_NAN());
+                            __pyx_v_Sigz = ((double)__PYX_NAN());
+                            __pyx_v_yp = ((double)__PYX_NAN());
+                            __pyx_v_a = ((double)__PYX_NAN());
+                            __pyx_v_sphi = ((double)__PYX_NAN());
+                            __pyx_v_rp = ((double)__PYX_NAN());
+                            __pyx_v_cphi = ((double)__PYX_NAN());
+                            __pyx_v_zp = ((double)__PYX_NAN());
+                            __pyx_v_I1 = ((double)__PYX_NAN());
                             __pyx_v_R = ((double)__PYX_NAN());
+                            __pyx_v_sh = ((double)__PYX_NAN());
                             __pyx_v_x = ((double)__PYX_NAN());
-                            __pyx_v_k = ((size_t)0xbad0bad0);
+                            __pyx_v_z = ((double)__PYX_NAN());
+                            __pyx_v_abs_z = ((double)__PYX_NAN());
+                            __pyx_v_j = ((int)0xbad0bad0);
+                            __pyx_v_dens = ((double)__PYX_NAN());
+                            __pyx_v_phi = ((double)__PYX_NAN());
+                            __pyx_v_I3 = ((double)__PYX_NAN());
 
                             /* "projection_cy.pyx":80
  *         for i in prange(nx, nogil=True):
@@ -2927,7 +2922,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                             __pyx_t_20 = (2 * __pyx_v_nx);
                             if (1 == 0) abort();
                             {
-                                double __pyx_parallel_temp0 = __PYX_NAN();
+                                int __pyx_parallel_temp0 = 0xbad0bad0;
                                 double __pyx_parallel_temp1 = __PYX_NAN();
                                 double __pyx_parallel_temp2 = __PYX_NAN();
                                 double __pyx_parallel_temp3 = __PYX_NAN();
@@ -2948,10 +2943,10 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                 double __pyx_parallel_temp18 = __PYX_NAN();
                                 double __pyx_parallel_temp19 = __PYX_NAN();
                                 double __pyx_parallel_temp20 = __PYX_NAN();
-                                size_t __pyx_parallel_temp21 = 0xbad0bad0;
+                                int __pyx_parallel_temp21 = 0xbad0bad0;
                                 double __pyx_parallel_temp22 = __PYX_NAN();
                                 double __pyx_parallel_temp23 = __PYX_NAN();
-                                size_t __pyx_parallel_temp24 = 0xbad0bad0;
+                                double __pyx_parallel_temp24 = __PYX_NAN();
                                 const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
                                 PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
                                 int __pyx_parallel_why;
@@ -2960,7 +2955,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                 if (__pyx_t_22 > 0)
                                 {
                                     #if 0
-                                    #pragma omp parallel private(__pyx_t_41, __pyx_t_29, __pyx_t_46, __pyx_t_14, __pyx_t_30, __pyx_t_38, __pyx_t_34, __pyx_t_40, __pyx_t_26, __pyx_t_44, __pyx_t_47, __pyx_t_4, __pyx_t_39, __pyx_t_35, __pyx_t_32, __pyx_t_33, __pyx_t_24, __pyx_t_45, __pyx_t_27, __pyx_t_37, __pyx_t_23, __pyx_t_28, __pyx_t_15, __pyx_t_31, __pyx_t_43, __pyx_t_25, __pyx_t_36, __pyx_t_42) firstprivate(__pyx_t_2) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                                    #pragma omp parallel private(__pyx_t_30, __pyx_t_29, __pyx_t_14, __pyx_t_33, __pyx_t_34, __pyx_t_37, __pyx_t_38, __pyx_t_23, __pyx_t_26, __pyx_t_45, __pyx_t_41, __pyx_t_43, __pyx_t_4, __pyx_t_32, __pyx_t_25, __pyx_t_46, __pyx_t_35, __pyx_t_42, __pyx_t_27, __pyx_t_24, __pyx_t_31, __pyx_t_40, __pyx_t_28, __pyx_t_15, __pyx_t_44, __pyx_t_36, __pyx_t_39) firstprivate(__pyx_t_2) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                                     #endif /* _OPENMP */
                                     {
                                         #ifdef _OPENMP
@@ -2970,37 +2965,37 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                         Py_BEGIN_ALLOW_THREADS
                                         #endif /* _OPENMP */
                                         #if 0
-                                        #pragma omp for lastprivate(__pyx_v_I2) lastprivate(__pyx_v_I3) lastprivate(__pyx_v_ch) lastprivate(__pyx_v_phi) lastprivate(__pyx_v_rp) lastprivate(__pyx_v_xp) lastprivate(__pyx_v_psi) lastprivate(__pyx_v_zp) lastprivate(__pyx_v_sh) lastprivate(__pyx_v_sphi) lastprivate(__pyx_v_Sigz) lastprivate(__pyx_v_SigR) lastprivate(__pyx_v_cphi) lastprivate(__pyx_v_a) lastprivate(__pyx_v_Vrot) lastprivate(__pyx_v_Sigp) lastprivate(__pyx_v_I1) lastprivate(__pyx_v_z) lastprivate(__pyx_v_density) lastprivate(__pyx_v_abs_z) lastprivate(__pyx_v_dens) firstprivate(__pyx_v_j) lastprivate(__pyx_v_j) lastprivate(__pyx_v_R) lastprivate(__pyx_v_x) lastprivate(__pyx_v_k)
+                                        #pragma omp for lastprivate(__pyx_v_k) lastprivate(__pyx_v_I2) lastprivate(__pyx_v_Vrot) lastprivate(__pyx_v_Sigp) lastprivate(__pyx_v_ch) lastprivate(__pyx_v_SigR) lastprivate(__pyx_v_xp) lastprivate(__pyx_v_density) lastprivate(__pyx_v_psi) lastprivate(__pyx_v_Sigz) lastprivate(__pyx_v_a) lastprivate(__pyx_v_sphi) lastprivate(__pyx_v_rp) lastprivate(__pyx_v_cphi) lastprivate(__pyx_v_zp) lastprivate(__pyx_v_I1) lastprivate(__pyx_v_R) lastprivate(__pyx_v_sh) lastprivate(__pyx_v_x) lastprivate(__pyx_v_z) lastprivate(__pyx_v_abs_z) firstprivate(__pyx_v_j) lastprivate(__pyx_v_j) lastprivate(__pyx_v_dens) lastprivate(__pyx_v_phi) lastprivate(__pyx_v_I3)
                                         #endif /* _OPENMP */
                                         for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_22; __pyx_t_21++){
                                             if (__pyx_parallel_why < 2)
                                             {
                                                 __pyx_v_j = 0 + 1 * __pyx_t_21;
                                                 /* Initialize private variables to invalid values */
+                                                __pyx_v_k = ((int)0xbad0bad0);
                                                 __pyx_v_I2 = ((double)__PYX_NAN());
-                                                __pyx_v_I3 = ((double)__PYX_NAN());
-                                                __pyx_v_ch = ((double)__PYX_NAN());
-                                                __pyx_v_phi = ((double)__PYX_NAN());
-                                                __pyx_v_rp = ((double)__PYX_NAN());
-                                                __pyx_v_xp = ((double)__PYX_NAN());
-                                                __pyx_v_psi = ((double)__PYX_NAN());
-                                                __pyx_v_zp = ((double)__PYX_NAN());
-                                                __pyx_v_sh = ((double)__PYX_NAN());
-                                                __pyx_v_sphi = ((double)__PYX_NAN());
-                                                __pyx_v_Sigz = ((double)__PYX_NAN());
-                                                __pyx_v_SigR = ((double)__PYX_NAN());
-                                                __pyx_v_cphi = ((double)__PYX_NAN());
-                                                __pyx_v_a = ((double)__PYX_NAN());
                                                 __pyx_v_Vrot = ((double)__PYX_NAN());
                                                 __pyx_v_Sigp = ((double)__PYX_NAN());
-                                                __pyx_v_I1 = ((double)__PYX_NAN());
-                                                __pyx_v_z = ((double)__PYX_NAN());
+                                                __pyx_v_ch = ((double)__PYX_NAN());
+                                                __pyx_v_SigR = ((double)__PYX_NAN());
+                                                __pyx_v_xp = ((double)__PYX_NAN());
                                                 __pyx_v_density = ((double)__PYX_NAN());
+                                                __pyx_v_psi = ((double)__PYX_NAN());
+                                                __pyx_v_Sigz = ((double)__PYX_NAN());
+                                                __pyx_v_a = ((double)__PYX_NAN());
+                                                __pyx_v_sphi = ((double)__PYX_NAN());
+                                                __pyx_v_rp = ((double)__PYX_NAN());
+                                                __pyx_v_cphi = ((double)__PYX_NAN());
+                                                __pyx_v_zp = ((double)__PYX_NAN());
+                                                __pyx_v_I1 = ((double)__PYX_NAN());
+                                                __pyx_v_R = ((double)__PYX_NAN());
+                                                __pyx_v_sh = ((double)__PYX_NAN());
+                                                __pyx_v_x = ((double)__PYX_NAN());
+                                                __pyx_v_z = ((double)__PYX_NAN());
                                                 __pyx_v_abs_z = ((double)__PYX_NAN());
                                                 __pyx_v_dens = ((double)__PYX_NAN());
-                                                __pyx_v_R = ((double)__PYX_NAN());
-                                                __pyx_v_x = ((double)__PYX_NAN());
-                                                __pyx_v_k = ((size_t)0xbad0bad0);
+                                                __pyx_v_phi = ((double)__PYX_NAN());
+                                                __pyx_v_I3 = ((double)__PYX_NAN());
 
                                                 /* "projection_cy.pyx":90
  *             for j in prange(2 * nx):
@@ -3214,7 +3209,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                     double __pyx_parallel_temp7 = __PYX_NAN();
                                                     double __pyx_parallel_temp8 = __PYX_NAN();
                                                     double __pyx_parallel_temp9 = __PYX_NAN();
-                                                    double __pyx_parallel_temp10 = __PYX_NAN();
+                                                    int __pyx_parallel_temp10 = 0xbad0bad0;
                                                     double __pyx_parallel_temp11 = __PYX_NAN();
                                                     double __pyx_parallel_temp12 = __PYX_NAN();
                                                     double __pyx_parallel_temp13 = __PYX_NAN();
@@ -3223,7 +3218,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                     double __pyx_parallel_temp16 = __PYX_NAN();
                                                     double __pyx_parallel_temp17 = __PYX_NAN();
                                                     double __pyx_parallel_temp18 = __PYX_NAN();
-                                                    size_t __pyx_parallel_temp19 = 0xbad0bad0;
+                                                    double __pyx_parallel_temp19 = __PYX_NAN();
                                                     const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
                                                     PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
                                                     int __pyx_parallel_why;
@@ -3232,7 +3227,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                     if (__pyx_t_28 > 0)
                                                     {
                                                         #if 0
-                                                        #pragma omp parallel reduction(+:__pyx_v_I2) reduction(+:__pyx_v_I3) reduction(+:__pyx_v_I1) private(__pyx_t_15) firstprivate(__pyx_t_8, __pyx_t_3, __pyx_t_1, __pyx_t_6, __pyx_t_2) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                                                        #pragma omp parallel reduction(+:__pyx_v_I1) reduction(+:__pyx_v_I2) reduction(+:__pyx_v_I3) private(__pyx_t_15) firstprivate(__pyx_t_8, __pyx_t_3, __pyx_t_1, __pyx_t_6, __pyx_t_2) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                                                         #endif /* _OPENMP */
                                                         {
                                                             #ifdef _OPENMP
@@ -3242,29 +3237,29 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                             Py_BEGIN_ALLOW_THREADS
                                                             #endif /* _OPENMP */
                                                             #if 0
-                                                            #pragma omp for lastprivate(__pyx_v_z) lastprivate(__pyx_v_SigR) lastprivate(__pyx_v_psi) lastprivate(__pyx_v_phi) lastprivate(__pyx_v_x) lastprivate(__pyx_v_ch) lastprivate(__pyx_v_abs_z) lastprivate(__pyx_v_cphi) lastprivate(__pyx_v_dens) lastprivate(__pyx_v_sphi) lastprivate(__pyx_v_Sigz) lastprivate(__pyx_v_Vrot) lastprivate(__pyx_v_xp) lastprivate(__pyx_v_Sigp) lastprivate(__pyx_v_R) lastprivate(__pyx_v_sh) firstprivate(__pyx_v_k) lastprivate(__pyx_v_k)
+                                                            #pragma omp for lastprivate(__pyx_v_Sigp) lastprivate(__pyx_v_xp) lastprivate(__pyx_v_abs_z) lastprivate(__pyx_v_z) lastprivate(__pyx_v_ch) lastprivate(__pyx_v_Sigz) lastprivate(__pyx_v_Vrot) lastprivate(__pyx_v_R) firstprivate(__pyx_v_k) lastprivate(__pyx_v_k) lastprivate(__pyx_v_psi) lastprivate(__pyx_v_x) lastprivate(__pyx_v_sphi) lastprivate(__pyx_v_cphi) lastprivate(__pyx_v_phi) lastprivate(__pyx_v_dens) lastprivate(__pyx_v_sh) lastprivate(__pyx_v_SigR)
                                                             #endif /* _OPENMP */
                                                             for (__pyx_t_27 = 0; __pyx_t_27 < __pyx_t_28; __pyx_t_27++){
                                                                 if (__pyx_parallel_why < 2)
                                                                 {
                                                                     __pyx_v_k = 0 + 1 * __pyx_t_27;
                                                                     /* Initialize private variables to invalid values */
-                                                                    __pyx_v_z = ((double)__PYX_NAN());
-                                                                    __pyx_v_SigR = ((double)__PYX_NAN());
-                                                                    __pyx_v_psi = ((double)__PYX_NAN());
-                                                                    __pyx_v_phi = ((double)__PYX_NAN());
-                                                                    __pyx_v_x = ((double)__PYX_NAN());
-                                                                    __pyx_v_ch = ((double)__PYX_NAN());
+                                                                    __pyx_v_Sigp = ((double)__PYX_NAN());
+                                                                    __pyx_v_xp = ((double)__PYX_NAN());
                                                                     __pyx_v_abs_z = ((double)__PYX_NAN());
-                                                                    __pyx_v_cphi = ((double)__PYX_NAN());
-                                                                    __pyx_v_dens = ((double)__PYX_NAN());
-                                                                    __pyx_v_sphi = ((double)__PYX_NAN());
+                                                                    __pyx_v_z = ((double)__PYX_NAN());
+                                                                    __pyx_v_ch = ((double)__PYX_NAN());
                                                                     __pyx_v_Sigz = ((double)__PYX_NAN());
                                                                     __pyx_v_Vrot = ((double)__PYX_NAN());
-                                                                    __pyx_v_xp = ((double)__PYX_NAN());
-                                                                    __pyx_v_Sigp = ((double)__PYX_NAN());
                                                                     __pyx_v_R = ((double)__PYX_NAN());
+                                                                    __pyx_v_psi = ((double)__PYX_NAN());
+                                                                    __pyx_v_x = ((double)__PYX_NAN());
+                                                                    __pyx_v_sphi = ((double)__PYX_NAN());
+                                                                    __pyx_v_cphi = ((double)__PYX_NAN());
+                                                                    __pyx_v_phi = ((double)__PYX_NAN());
+                                                                    __pyx_v_dens = ((double)__PYX_NAN());
                                                                     __pyx_v_sh = ((double)__PYX_NAN());
+                                                                    __pyx_v_SigR = ((double)__PYX_NAN());
 
                                                                     /* "projection_cy.pyx":108
  * 
@@ -3298,7 +3293,7 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
  */
                                                                             __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L40_error;}
                                                                             __Pyx_GOTREF(__pyx_t_6);
-                                                                            __pyx_t_3 = __Pyx_PyInt_FromSize_t((((((__pyx_v_i * 2) * __pyx_v_nx) + __pyx_v_j) * __pyx_v_npsi) + __pyx_v_k)); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L40_error;}
+                                                                            __pyx_t_3 = __Pyx_PyInt_From_long((((((__pyx_v_i * 2) * __pyx_v_nx) + __pyx_v_j) * __pyx_v_npsi) + __pyx_v_k)); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L40_error;}
                                                                             __Pyx_GOTREF(__pyx_t_3);
                                                                             __pyx_t_1 = NULL;
                                                                             if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_6))) {
@@ -3560,26 +3555,26 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                                     #pragma omp critical(__pyx_parallel_lastprivates0)
                                                                     #endif /* _OPENMP */
                                                                     {
-                                                                        __pyx_parallel_temp0 = __pyx_v_z;
-                                                                        __pyx_parallel_temp1 = __pyx_v_SigR;
-                                                                        __pyx_parallel_temp2 = __pyx_v_psi;
-                                                                        __pyx_parallel_temp3 = __pyx_v_phi;
-                                                                        __pyx_parallel_temp4 = __pyx_v_x;
-                                                                        __pyx_parallel_temp5 = __pyx_v_I2;
+                                                                        __pyx_parallel_temp0 = __pyx_v_Sigp;
+                                                                        __pyx_parallel_temp1 = __pyx_v_xp;
+                                                                        __pyx_parallel_temp2 = __pyx_v_abs_z;
+                                                                        __pyx_parallel_temp3 = __pyx_v_I1;
+                                                                        __pyx_parallel_temp4 = __pyx_v_I2;
+                                                                        __pyx_parallel_temp5 = __pyx_v_z;
                                                                         __pyx_parallel_temp6 = __pyx_v_ch;
-                                                                        __pyx_parallel_temp7 = __pyx_v_abs_z;
-                                                                        __pyx_parallel_temp8 = __pyx_v_cphi;
-                                                                        __pyx_parallel_temp9 = __pyx_v_dens;
-                                                                        __pyx_parallel_temp10 = __pyx_v_sphi;
-                                                                        __pyx_parallel_temp11 = __pyx_v_Sigz;
-                                                                        __pyx_parallel_temp12 = __pyx_v_Vrot;
-                                                                        __pyx_parallel_temp13 = __pyx_v_xp;
-                                                                        __pyx_parallel_temp14 = __pyx_v_Sigp;
-                                                                        __pyx_parallel_temp15 = __pyx_v_R;
-                                                                        __pyx_parallel_temp16 = __pyx_v_I3;
-                                                                        __pyx_parallel_temp17 = __pyx_v_I1;
+                                                                        __pyx_parallel_temp7 = __pyx_v_Sigz;
+                                                                        __pyx_parallel_temp8 = __pyx_v_Vrot;
+                                                                        __pyx_parallel_temp9 = __pyx_v_R;
+                                                                        __pyx_parallel_temp10 = __pyx_v_k;
+                                                                        __pyx_parallel_temp11 = __pyx_v_I3;
+                                                                        __pyx_parallel_temp12 = __pyx_v_psi;
+                                                                        __pyx_parallel_temp13 = __pyx_v_x;
+                                                                        __pyx_parallel_temp14 = __pyx_v_sphi;
+                                                                        __pyx_parallel_temp15 = __pyx_v_cphi;
+                                                                        __pyx_parallel_temp16 = __pyx_v_phi;
+                                                                        __pyx_parallel_temp17 = __pyx_v_dens;
                                                                         __pyx_parallel_temp18 = __pyx_v_sh;
-                                                                        __pyx_parallel_temp19 = __pyx_v_k;
+                                                                        __pyx_parallel_temp19 = __pyx_v_SigR;
                                                                     }
                                                                     __pyx_L44:;
                                                                     #ifdef _OPENMP
@@ -3608,26 +3603,26 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                       __pyx_parallel_why = 4;
                                                     }
                                                     if (__pyx_parallel_why) {
-                                                      __pyx_v_z = __pyx_parallel_temp0;
-                                                      __pyx_v_SigR = __pyx_parallel_temp1;
-                                                      __pyx_v_psi = __pyx_parallel_temp2;
-                                                      __pyx_v_phi = __pyx_parallel_temp3;
-                                                      __pyx_v_x = __pyx_parallel_temp4;
-                                                      __pyx_v_I2 = __pyx_parallel_temp5;
+                                                      __pyx_v_Sigp = __pyx_parallel_temp0;
+                                                      __pyx_v_xp = __pyx_parallel_temp1;
+                                                      __pyx_v_abs_z = __pyx_parallel_temp2;
+                                                      __pyx_v_I1 = __pyx_parallel_temp3;
+                                                      __pyx_v_I2 = __pyx_parallel_temp4;
+                                                      __pyx_v_z = __pyx_parallel_temp5;
                                                       __pyx_v_ch = __pyx_parallel_temp6;
-                                                      __pyx_v_abs_z = __pyx_parallel_temp7;
-                                                      __pyx_v_cphi = __pyx_parallel_temp8;
-                                                      __pyx_v_dens = __pyx_parallel_temp9;
-                                                      __pyx_v_sphi = __pyx_parallel_temp10;
-                                                      __pyx_v_Sigz = __pyx_parallel_temp11;
-                                                      __pyx_v_Vrot = __pyx_parallel_temp12;
-                                                      __pyx_v_xp = __pyx_parallel_temp13;
-                                                      __pyx_v_Sigp = __pyx_parallel_temp14;
-                                                      __pyx_v_R = __pyx_parallel_temp15;
-                                                      __pyx_v_I3 = __pyx_parallel_temp16;
-                                                      __pyx_v_I1 = __pyx_parallel_temp17;
+                                                      __pyx_v_Sigz = __pyx_parallel_temp7;
+                                                      __pyx_v_Vrot = __pyx_parallel_temp8;
+                                                      __pyx_v_R = __pyx_parallel_temp9;
+                                                      __pyx_v_k = __pyx_parallel_temp10;
+                                                      __pyx_v_I3 = __pyx_parallel_temp11;
+                                                      __pyx_v_psi = __pyx_parallel_temp12;
+                                                      __pyx_v_x = __pyx_parallel_temp13;
+                                                      __pyx_v_sphi = __pyx_parallel_temp14;
+                                                      __pyx_v_cphi = __pyx_parallel_temp15;
+                                                      __pyx_v_phi = __pyx_parallel_temp16;
+                                                      __pyx_v_dens = __pyx_parallel_temp17;
                                                       __pyx_v_sh = __pyx_parallel_temp18;
-                                                      __pyx_v_k = __pyx_parallel_temp19;
+                                                      __pyx_v_SigR = __pyx_parallel_temp19;
                                                       switch (__pyx_parallel_why) {
                                                             case 3: goto __pyx_L21_return;
                                                             case 4:
@@ -3734,12 +3729,12 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                   __pyx_t_28 = (__pyx_v_nx + __pyx_v_i);
                                                   __pyx_t_27 = __pyx_v_j;
                                                   *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_dlos.rcbuffer->pybuffer.buf, __pyx_t_28, __pyx_pybuffernd_dlos.diminfo[0].strides, __pyx_t_27, __pyx_pybuffernd_dlos.diminfo[1].strides) = __pyx_t_24;
-                                                  __pyx_t_29 = (__pyx_v_nx + __pyx_v_i);
-                                                  __pyx_t_30 = __pyx_v_j;
-                                                  *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_slos.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_slos.diminfo[0].strides, __pyx_t_30, __pyx_pybuffernd_slos.diminfo[1].strides) = __pyx_t_25;
-                                                  __pyx_t_31 = (__pyx_v_nx + __pyx_v_i);
-                                                  __pyx_t_32 = __pyx_v_j;
-                                                  *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vlos.rcbuffer->pybuffer.buf, __pyx_t_31, __pyx_pybuffernd_vlos.diminfo[0].strides, __pyx_t_32, __pyx_pybuffernd_vlos.diminfo[1].strides) = __pyx_t_4;
+                                                  __pyx_t_26 = (__pyx_v_nx + __pyx_v_i);
+                                                  __pyx_t_29 = __pyx_v_j;
+                                                  *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_slos.rcbuffer->pybuffer.buf, __pyx_t_26, __pyx_pybuffernd_slos.diminfo[0].strides, __pyx_t_29, __pyx_pybuffernd_slos.diminfo[1].strides) = __pyx_t_25;
+                                                  __pyx_t_30 = (__pyx_v_nx + __pyx_v_i);
+                                                  __pyx_t_31 = __pyx_v_j;
+                                                  *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vlos.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_vlos.diminfo[0].strides, __pyx_t_31, __pyx_pybuffernd_vlos.diminfo[1].strides) = __pyx_t_4;
                                                   goto __pyx_L45;
                                                 }
                                                 __pyx_L45:;
@@ -3751,15 +3746,15 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
  * 
  *                 '''
  */
-                                                __pyx_t_33 = (__pyx_v_nx + __pyx_v_i);
-                                                __pyx_t_34 = __pyx_v_j;
-                                                __pyx_t_35 = (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_dlos.rcbuffer->pybuffer.buf, __pyx_t_33, __pyx_pybuffernd_dlos.diminfo[0].strides, __pyx_t_34, __pyx_pybuffernd_dlos.diminfo[1].strides));
-                                                __pyx_t_36 = (__pyx_v_nx + __pyx_v_i);
-                                                __pyx_t_37 = __pyx_v_j;
-                                                __pyx_t_38 = (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_slos.rcbuffer->pybuffer.buf, __pyx_t_36, __pyx_pybuffernd_slos.diminfo[0].strides, __pyx_t_37, __pyx_pybuffernd_slos.diminfo[1].strides));
-                                                __pyx_t_39 = (__pyx_v_nx + __pyx_v_i);
-                                                __pyx_t_40 = __pyx_v_j;
-                                                __pyx_t_41 = (-(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vlos.rcbuffer->pybuffer.buf, __pyx_t_39, __pyx_pybuffernd_vlos.diminfo[0].strides, __pyx_t_40, __pyx_pybuffernd_vlos.diminfo[1].strides)));
+                                                __pyx_t_32 = (__pyx_v_nx + __pyx_v_i);
+                                                __pyx_t_33 = __pyx_v_j;
+                                                __pyx_t_34 = (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_dlos.rcbuffer->pybuffer.buf, __pyx_t_32, __pyx_pybuffernd_dlos.diminfo[0].strides, __pyx_t_33, __pyx_pybuffernd_dlos.diminfo[1].strides));
+                                                __pyx_t_35 = (__pyx_v_nx + __pyx_v_i);
+                                                __pyx_t_36 = __pyx_v_j;
+                                                __pyx_t_37 = (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_slos.rcbuffer->pybuffer.buf, __pyx_t_35, __pyx_pybuffernd_slos.diminfo[0].strides, __pyx_t_36, __pyx_pybuffernd_slos.diminfo[1].strides));
+                                                __pyx_t_38 = (__pyx_v_nx + __pyx_v_i);
+                                                __pyx_t_39 = __pyx_v_j;
+                                                __pyx_t_40 = (-(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vlos.rcbuffer->pybuffer.buf, __pyx_t_38, __pyx_pybuffernd_vlos.diminfo[0].strides, __pyx_t_39, __pyx_pybuffernd_vlos.diminfo[1].strides)));
 
                                                 /* "projection_cy.pyx":146
  * 
@@ -3768,15 +3763,15 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
  *                     dlos[nx + i, j], slos[nx + i, j], -vlos[nx + i, j]
  * 
  */
-                                                __pyx_t_42 = ((__pyx_v_nx - 1) - __pyx_v_i);
-                                                __pyx_t_43 = __pyx_v_j;
-                                                *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_dlos.rcbuffer->pybuffer.buf, __pyx_t_42, __pyx_pybuffernd_dlos.diminfo[0].strides, __pyx_t_43, __pyx_pybuffernd_dlos.diminfo[1].strides) = __pyx_t_35;
-                                                __pyx_t_44 = ((__pyx_v_nx - 1) - __pyx_v_i);
-                                                __pyx_t_45 = __pyx_v_j;
-                                                *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_slos.rcbuffer->pybuffer.buf, __pyx_t_44, __pyx_pybuffernd_slos.diminfo[0].strides, __pyx_t_45, __pyx_pybuffernd_slos.diminfo[1].strides) = __pyx_t_38;
-                                                __pyx_t_46 = ((__pyx_v_nx - 1) - __pyx_v_i);
-                                                __pyx_t_47 = __pyx_v_j;
-                                                *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vlos.rcbuffer->pybuffer.buf, __pyx_t_46, __pyx_pybuffernd_vlos.diminfo[0].strides, __pyx_t_47, __pyx_pybuffernd_vlos.diminfo[1].strides) = __pyx_t_41;
+                                                __pyx_t_41 = ((__pyx_v_nx - 1) - __pyx_v_i);
+                                                __pyx_t_42 = __pyx_v_j;
+                                                *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_dlos.rcbuffer->pybuffer.buf, __pyx_t_41, __pyx_pybuffernd_dlos.diminfo[0].strides, __pyx_t_42, __pyx_pybuffernd_dlos.diminfo[1].strides) = __pyx_t_34;
+                                                __pyx_t_43 = ((__pyx_v_nx - 1) - __pyx_v_i);
+                                                __pyx_t_44 = __pyx_v_j;
+                                                *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_slos.rcbuffer->pybuffer.buf, __pyx_t_43, __pyx_pybuffernd_slos.diminfo[0].strides, __pyx_t_44, __pyx_pybuffernd_slos.diminfo[1].strides) = __pyx_t_37;
+                                                __pyx_t_45 = ((__pyx_v_nx - 1) - __pyx_v_i);
+                                                __pyx_t_46 = __pyx_v_j;
+                                                *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vlos.rcbuffer->pybuffer.buf, __pyx_t_45, __pyx_pybuffernd_vlos.diminfo[0].strides, __pyx_t_46, __pyx_pybuffernd_vlos.diminfo[1].strides) = __pyx_t_40;
                                                 goto __pyx_L52;
                                                 __pyx_L21_return:;
                                                 __pyx_parallel_why = 3;
@@ -3805,31 +3800,31 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                                 #pragma omp critical(__pyx_parallel_lastprivates1)
                                                 #endif /* _OPENMP */
                                                 {
-                                                    __pyx_parallel_temp0 = __pyx_v_I2;
-                                                    __pyx_parallel_temp1 = __pyx_v_I3;
-                                                    __pyx_parallel_temp2 = __pyx_v_ch;
-                                                    __pyx_parallel_temp3 = __pyx_v_phi;
-                                                    __pyx_parallel_temp4 = __pyx_v_rp;
-                                                    __pyx_parallel_temp5 = __pyx_v_xp;
-                                                    __pyx_parallel_temp6 = __pyx_v_psi;
-                                                    __pyx_parallel_temp7 = __pyx_v_zp;
-                                                    __pyx_parallel_temp8 = __pyx_v_sh;
-                                                    __pyx_parallel_temp9 = __pyx_v_sphi;
-                                                    __pyx_parallel_temp10 = __pyx_v_Sigz;
-                                                    __pyx_parallel_temp11 = __pyx_v_SigR;
-                                                    __pyx_parallel_temp12 = __pyx_v_cphi;
-                                                    __pyx_parallel_temp13 = __pyx_v_a;
-                                                    __pyx_parallel_temp14 = __pyx_v_Vrot;
-                                                    __pyx_parallel_temp15 = __pyx_v_Sigp;
-                                                    __pyx_parallel_temp16 = __pyx_v_I1;
-                                                    __pyx_parallel_temp17 = __pyx_v_z;
-                                                    __pyx_parallel_temp18 = __pyx_v_density;
-                                                    __pyx_parallel_temp19 = __pyx_v_abs_z;
-                                                    __pyx_parallel_temp20 = __pyx_v_dens;
+                                                    __pyx_parallel_temp0 = __pyx_v_k;
+                                                    __pyx_parallel_temp1 = __pyx_v_I2;
+                                                    __pyx_parallel_temp2 = __pyx_v_Vrot;
+                                                    __pyx_parallel_temp3 = __pyx_v_Sigp;
+                                                    __pyx_parallel_temp4 = __pyx_v_ch;
+                                                    __pyx_parallel_temp5 = __pyx_v_SigR;
+                                                    __pyx_parallel_temp6 = __pyx_v_xp;
+                                                    __pyx_parallel_temp7 = __pyx_v_density;
+                                                    __pyx_parallel_temp8 = __pyx_v_psi;
+                                                    __pyx_parallel_temp9 = __pyx_v_Sigz;
+                                                    __pyx_parallel_temp10 = __pyx_v_a;
+                                                    __pyx_parallel_temp11 = __pyx_v_sphi;
+                                                    __pyx_parallel_temp12 = __pyx_v_rp;
+                                                    __pyx_parallel_temp13 = __pyx_v_cphi;
+                                                    __pyx_parallel_temp14 = __pyx_v_zp;
+                                                    __pyx_parallel_temp15 = __pyx_v_I1;
+                                                    __pyx_parallel_temp16 = __pyx_v_R;
+                                                    __pyx_parallel_temp17 = __pyx_v_sh;
+                                                    __pyx_parallel_temp18 = __pyx_v_x;
+                                                    __pyx_parallel_temp19 = __pyx_v_z;
+                                                    __pyx_parallel_temp20 = __pyx_v_abs_z;
                                                     __pyx_parallel_temp21 = __pyx_v_j;
-                                                    __pyx_parallel_temp22 = __pyx_v_R;
-                                                    __pyx_parallel_temp23 = __pyx_v_x;
-                                                    __pyx_parallel_temp24 = __pyx_v_k;
+                                                    __pyx_parallel_temp22 = __pyx_v_dens;
+                                                    __pyx_parallel_temp23 = __pyx_v_phi;
+                                                    __pyx_parallel_temp24 = __pyx_v_I3;
                                                 }
                                                 __pyx_L52:;
                                                 #ifdef _OPENMP
@@ -3858,31 +3853,31 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                                   __pyx_parallel_why = 4;
                                 }
                                 if (__pyx_parallel_why) {
-                                  __pyx_v_I2 = __pyx_parallel_temp0;
-                                  __pyx_v_I3 = __pyx_parallel_temp1;
-                                  __pyx_v_ch = __pyx_parallel_temp2;
-                                  __pyx_v_phi = __pyx_parallel_temp3;
-                                  __pyx_v_rp = __pyx_parallel_temp4;
-                                  __pyx_v_xp = __pyx_parallel_temp5;
-                                  __pyx_v_psi = __pyx_parallel_temp6;
-                                  __pyx_v_zp = __pyx_parallel_temp7;
-                                  __pyx_v_sh = __pyx_parallel_temp8;
-                                  __pyx_v_sphi = __pyx_parallel_temp9;
-                                  __pyx_v_Sigz = __pyx_parallel_temp10;
-                                  __pyx_v_SigR = __pyx_parallel_temp11;
-                                  __pyx_v_cphi = __pyx_parallel_temp12;
-                                  __pyx_v_a = __pyx_parallel_temp13;
-                                  __pyx_v_Vrot = __pyx_parallel_temp14;
-                                  __pyx_v_Sigp = __pyx_parallel_temp15;
-                                  __pyx_v_I1 = __pyx_parallel_temp16;
-                                  __pyx_v_z = __pyx_parallel_temp17;
-                                  __pyx_v_density = __pyx_parallel_temp18;
-                                  __pyx_v_abs_z = __pyx_parallel_temp19;
-                                  __pyx_v_dens = __pyx_parallel_temp20;
+                                  __pyx_v_k = __pyx_parallel_temp0;
+                                  __pyx_v_I2 = __pyx_parallel_temp1;
+                                  __pyx_v_Vrot = __pyx_parallel_temp2;
+                                  __pyx_v_Sigp = __pyx_parallel_temp3;
+                                  __pyx_v_ch = __pyx_parallel_temp4;
+                                  __pyx_v_SigR = __pyx_parallel_temp5;
+                                  __pyx_v_xp = __pyx_parallel_temp6;
+                                  __pyx_v_density = __pyx_parallel_temp7;
+                                  __pyx_v_psi = __pyx_parallel_temp8;
+                                  __pyx_v_Sigz = __pyx_parallel_temp9;
+                                  __pyx_v_a = __pyx_parallel_temp10;
+                                  __pyx_v_sphi = __pyx_parallel_temp11;
+                                  __pyx_v_rp = __pyx_parallel_temp12;
+                                  __pyx_v_cphi = __pyx_parallel_temp13;
+                                  __pyx_v_zp = __pyx_parallel_temp14;
+                                  __pyx_v_I1 = __pyx_parallel_temp15;
+                                  __pyx_v_R = __pyx_parallel_temp16;
+                                  __pyx_v_sh = __pyx_parallel_temp17;
+                                  __pyx_v_x = __pyx_parallel_temp18;
+                                  __pyx_v_z = __pyx_parallel_temp19;
+                                  __pyx_v_abs_z = __pyx_parallel_temp20;
                                   __pyx_v_j = __pyx_parallel_temp21;
-                                  __pyx_v_R = __pyx_parallel_temp22;
-                                  __pyx_v_x = __pyx_parallel_temp23;
-                                  __pyx_v_k = __pyx_parallel_temp24;
+                                  __pyx_v_dens = __pyx_parallel_temp22;
+                                  __pyx_v_phi = __pyx_parallel_temp23;
+                                  __pyx_v_I3 = __pyx_parallel_temp24;
                                   switch (__pyx_parallel_why) {
                                         case 3: goto __pyx_L11_return;
                                         case 4:
@@ -3929,33 +3924,33 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
                             #pragma omp critical(__pyx_parallel_lastprivates2)
                             #endif /* _OPENMP */
                             {
-                                __pyx_parallel_temp0 = __pyx_v_I2;
-                                __pyx_parallel_temp1 = __pyx_v_I3;
-                                __pyx_parallel_temp2 = __pyx_v_i;
-                                __pyx_parallel_temp3 = __pyx_v_ch;
-                                __pyx_parallel_temp4 = __pyx_v_phi;
-                                __pyx_parallel_temp5 = __pyx_v_rp;
+                                __pyx_parallel_temp0 = __pyx_v_k;
+                                __pyx_parallel_temp1 = __pyx_v_I2;
+                                __pyx_parallel_temp2 = __pyx_v_Vrot;
+                                __pyx_parallel_temp3 = __pyx_v_Sigp;
+                                __pyx_parallel_temp4 = __pyx_v_ch;
+                                __pyx_parallel_temp5 = __pyx_v_SigR;
                                 __pyx_parallel_temp6 = __pyx_v_xp;
-                                __pyx_parallel_temp7 = __pyx_v_yp;
+                                __pyx_parallel_temp7 = __pyx_v_density;
                                 __pyx_parallel_temp8 = __pyx_v_psi;
-                                __pyx_parallel_temp9 = __pyx_v_zp;
-                                __pyx_parallel_temp10 = __pyx_v_sh;
-                                __pyx_parallel_temp11 = __pyx_v_sphi;
-                                __pyx_parallel_temp12 = __pyx_v_Sigz;
-                                __pyx_parallel_temp13 = __pyx_v_SigR;
+                                __pyx_parallel_temp9 = __pyx_v_Sigz;
+                                __pyx_parallel_temp10 = __pyx_v_yp;
+                                __pyx_parallel_temp11 = __pyx_v_a;
+                                __pyx_parallel_temp12 = __pyx_v_sphi;
+                                __pyx_parallel_temp13 = __pyx_v_rp;
                                 __pyx_parallel_temp14 = __pyx_v_cphi;
-                                __pyx_parallel_temp15 = __pyx_v_a;
-                                __pyx_parallel_temp16 = __pyx_v_Vrot;
-                                __pyx_parallel_temp17 = __pyx_v_Sigp;
-                                __pyx_parallel_temp18 = __pyx_v_I1;
-                                __pyx_parallel_temp19 = __pyx_v_z;
-                                __pyx_parallel_temp20 = __pyx_v_density;
-                                __pyx_parallel_temp21 = __pyx_v_abs_z;
-                                __pyx_parallel_temp22 = __pyx_v_dens;
+                                __pyx_parallel_temp15 = __pyx_v_zp;
+                                __pyx_parallel_temp16 = __pyx_v_I1;
+                                __pyx_parallel_temp17 = __pyx_v_R;
+                                __pyx_parallel_temp18 = __pyx_v_sh;
+                                __pyx_parallel_temp19 = __pyx_v_x;
+                                __pyx_parallel_temp20 = __pyx_v_z;
+                                __pyx_parallel_temp21 = __pyx_v_i;
+                                __pyx_parallel_temp22 = __pyx_v_abs_z;
                                 __pyx_parallel_temp23 = __pyx_v_j;
-                                __pyx_parallel_temp24 = __pyx_v_R;
-                                __pyx_parallel_temp25 = __pyx_v_x;
-                                __pyx_parallel_temp26 = __pyx_v_k;
+                                __pyx_parallel_temp24 = __pyx_v_dens;
+                                __pyx_parallel_temp25 = __pyx_v_phi;
+                                __pyx_parallel_temp26 = __pyx_v_I3;
                             }
                             __pyx_L54:;
                             #ifdef _OPENMP
@@ -3987,33 +3982,33 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
               __pyx_parallel_why = 4;
             }
             if (__pyx_parallel_why) {
-              __pyx_v_I2 = __pyx_parallel_temp0;
-              __pyx_v_I3 = __pyx_parallel_temp1;
-              __pyx_v_i = __pyx_parallel_temp2;
-              __pyx_v_ch = __pyx_parallel_temp3;
-              __pyx_v_phi = __pyx_parallel_temp4;
-              __pyx_v_rp = __pyx_parallel_temp5;
+              __pyx_v_k = __pyx_parallel_temp0;
+              __pyx_v_I2 = __pyx_parallel_temp1;
+              __pyx_v_Vrot = __pyx_parallel_temp2;
+              __pyx_v_Sigp = __pyx_parallel_temp3;
+              __pyx_v_ch = __pyx_parallel_temp4;
+              __pyx_v_SigR = __pyx_parallel_temp5;
               __pyx_v_xp = __pyx_parallel_temp6;
-              __pyx_v_yp = __pyx_parallel_temp7;
+              __pyx_v_density = __pyx_parallel_temp7;
               __pyx_v_psi = __pyx_parallel_temp8;
-              __pyx_v_zp = __pyx_parallel_temp9;
-              __pyx_v_sh = __pyx_parallel_temp10;
-              __pyx_v_sphi = __pyx_parallel_temp11;
-              __pyx_v_Sigz = __pyx_parallel_temp12;
-              __pyx_v_SigR = __pyx_parallel_temp13;
+              __pyx_v_Sigz = __pyx_parallel_temp9;
+              __pyx_v_yp = __pyx_parallel_temp10;
+              __pyx_v_a = __pyx_parallel_temp11;
+              __pyx_v_sphi = __pyx_parallel_temp12;
+              __pyx_v_rp = __pyx_parallel_temp13;
               __pyx_v_cphi = __pyx_parallel_temp14;
-              __pyx_v_a = __pyx_parallel_temp15;
-              __pyx_v_Vrot = __pyx_parallel_temp16;
-              __pyx_v_Sigp = __pyx_parallel_temp17;
-              __pyx_v_I1 = __pyx_parallel_temp18;
-              __pyx_v_z = __pyx_parallel_temp19;
-              __pyx_v_density = __pyx_parallel_temp20;
-              __pyx_v_abs_z = __pyx_parallel_temp21;
-              __pyx_v_dens = __pyx_parallel_temp22;
+              __pyx_v_zp = __pyx_parallel_temp15;
+              __pyx_v_I1 = __pyx_parallel_temp16;
+              __pyx_v_R = __pyx_parallel_temp17;
+              __pyx_v_sh = __pyx_parallel_temp18;
+              __pyx_v_x = __pyx_parallel_temp19;
+              __pyx_v_z = __pyx_parallel_temp20;
+              __pyx_v_i = __pyx_parallel_temp21;
+              __pyx_v_abs_z = __pyx_parallel_temp22;
               __pyx_v_j = __pyx_parallel_temp23;
-              __pyx_v_R = __pyx_parallel_temp24;
-              __pyx_v_x = __pyx_parallel_temp25;
-              __pyx_v_k = __pyx_parallel_temp26;
+              __pyx_v_dens = __pyx_parallel_temp24;
+              __pyx_v_phi = __pyx_parallel_temp25;
+              __pyx_v_I3 = __pyx_parallel_temp26;
               switch (__pyx_parallel_why) {
                     case 3: goto __pyx_L5_return;
                     case 4:
@@ -4136,8 +4131,8 @@ static PyObject *__pyx_f_13projection_cy_projection(double __pyx_v_incl, double 
   goto __pyx_L0;
 
   /* "projection_cy.pyx":26
- * @cython.boundscheck(False)
- * @cython.wraparound(False)
+ *     double atan2 ( double x, double y ) nogil
+ * 
  * cpdef projection(double incl, double b, double Rmax, int nx, int npsi,             # <<<<<<<<<<<<<<
  *                  LagrangePolynomials lp, scale='linear', verbose=True):
  *         """
@@ -4203,7 +4198,7 @@ static PyObject *__pyx_pw_13projection_cy_1projection(PyObject *__pyx_self, PyOb
     values[6] = ((PyObject *)__pyx_n_s_linear);
 
     /* "projection_cy.pyx":27
- * @cython.wraparound(False)
+ * 
  * cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
  *                  LagrangePolynomials lp, scale='linear', verbose=True):             # <<<<<<<<<<<<<<
  *         """
@@ -4304,8 +4299,8 @@ static PyObject *__pyx_pw_13projection_cy_1projection(PyObject *__pyx_self, PyOb
   __pyx_r = __pyx_pf_13projection_cy_projection(__pyx_self, __pyx_v_incl, __pyx_v_b, __pyx_v_Rmax, __pyx_v_nx, __pyx_v_npsi, __pyx_v_lp, __pyx_v_scale, __pyx_v_verbose);
 
   /* "projection_cy.pyx":26
- * @cython.boundscheck(False)
- * @cython.wraparound(False)
+ *     double atan2 ( double x, double y ) nogil
+ * 
  * cpdef projection(double incl, double b, double Rmax, int nx, int npsi,             # <<<<<<<<<<<<<<
  *                  LagrangePolynomials lp, scale='linear', verbose=True):
  *         """
@@ -4519,7 +4514,7 @@ static int __pyx_pf_13projection_cy_19LagrangePolynomials___init__(struct __pyx_
  *         self.vrotl = vrotl
  *         self.sigRl, self.sigpl, self.sigzl = sigRl, sigpl, sigzl             # <<<<<<<<<<<<<<
  * 
- *     @cython.boundscheck(False)
+ *     cdef inline void even_Legendre(self, double c, double [:] pol) nogil:
  */
   __pyx_t_1 = __pyx_v_sigRl;
   __PYX_INC_MEMVIEW(&__pyx_t_1, 1);
@@ -4560,9 +4555,9 @@ static int __pyx_pf_13projection_cy_19LagrangePolynomials___init__(struct __pyx_
   return __pyx_r;
 }
 
-/* "projection_cy.pyx":180
- *     @cython.boundscheck(False)
- *     @cython.wraparound(False)
+/* "projection_cy.pyx":178
+ *         self.sigRl, self.sigpl, self.sigzl = sigRl, sigpl, sigzl
+ * 
  *     cdef inline void even_Legendre(self, double c, double [:] pol) nogil:             # <<<<<<<<<<<<<<
  *         """
  *         Static method: gets the even Legendre polynomials at cos(theta)
@@ -4584,7 +4579,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
   int __pyx_t_9;
   int __pyx_t_10;
 
-  /* "projection_cy.pyx":191
+  /* "projection_cy.pyx":189
  *         cdef int l, l2, np
  * 
  *         c2 = c * c             # <<<<<<<<<<<<<<
@@ -4593,7 +4588,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
  */
   __pyx_v_c2 = (__pyx_v_c * __pyx_v_c);
 
-  /* "projection_cy.pyx":193
+  /* "projection_cy.pyx":191
  *         c2 = c * c
  * 
  *         pol[0] = 1             # <<<<<<<<<<<<<<
@@ -4603,7 +4598,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
   __pyx_t_1 = 0;
   *((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_1 * __pyx_v_pol.strides[0]) )) = 1.0;
 
-  /* "projection_cy.pyx":194
+  /* "projection_cy.pyx":192
  * 
  *         pol[0] = 1
  *         if self.npoly < 2:  # pragma: no cover             # <<<<<<<<<<<<<<
@@ -4613,7 +4608,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
   __pyx_t_2 = ((__pyx_v_self->npoly < 2) != 0);
   if (__pyx_t_2) {
 
-    /* "projection_cy.pyx":195
+    /* "projection_cy.pyx":193
  *         pol[0] = 1
  *         if self.npoly < 2:  # pragma: no cover
  *             return             # <<<<<<<<<<<<<<
@@ -4623,7 +4618,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
     goto __pyx_L0;
   }
 
-  /* "projection_cy.pyx":197
+  /* "projection_cy.pyx":195
  *             return
  * 
  *         pol[1] = 1.5 * c2 - .5             # <<<<<<<<<<<<<<
@@ -4633,7 +4628,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
   __pyx_t_3 = 1;
   *((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_3 * __pyx_v_pol.strides[0]) )) = ((1.5 * __pyx_v_c2) - .5);
 
-  /* "projection_cy.pyx":199
+  /* "projection_cy.pyx":197
  *         pol[1] = 1.5 * c2 - .5
  * 
  *         for np in prange(2, self.npoly):             # <<<<<<<<<<<<<<
@@ -4657,16 +4652,16 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
           #endif /* _OPENMP */
           {
               #ifdef _OPENMP
-              #pragma omp for lastprivate(__pyx_v_l) firstprivate(__pyx_v_np) lastprivate(__pyx_v_np) lastprivate(__pyx_v_l2)
+              #pragma omp for lastprivate(__pyx_v_l2) lastprivate(__pyx_v_l) firstprivate(__pyx_v_np) lastprivate(__pyx_v_np)
               #endif /* _OPENMP */
               for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_6; __pyx_t_5++){
                   {
                       __pyx_v_np = 2 + 1 * __pyx_t_5;
                       /* Initialize private variables to invalid values */
-                      __pyx_v_l = ((int)0xbad0bad0);
                       __pyx_v_l2 = ((int)0xbad0bad0);
+                      __pyx_v_l = ((int)0xbad0bad0);
 
-                      /* "projection_cy.pyx":200
+                      /* "projection_cy.pyx":198
  * 
  *         for np in prange(2, self.npoly):
  *             l = 2 * (np - 1)             # <<<<<<<<<<<<<<
@@ -4675,7 +4670,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
  */
                       __pyx_v_l = (2 * (__pyx_v_np - 1));
 
-                      /* "projection_cy.pyx":201
+                      /* "projection_cy.pyx":199
  *         for np in prange(2, self.npoly):
  *             l = 2 * (np - 1)
  *             l2 = 2 * l             # <<<<<<<<<<<<<<
@@ -4684,7 +4679,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
  */
                       __pyx_v_l2 = (2 * __pyx_v_l);
 
-                      /* "projection_cy.pyx":202
+                      /* "projection_cy.pyx":200
  *             l = 2 * (np - 1)
  *             l2 = 2 * l
  *             pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \             # <<<<<<<<<<<<<<
@@ -4693,7 +4688,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
  */
                       __pyx_t_7 = (__pyx_v_np - 2);
 
-                      /* "projection_cy.pyx":203
+                      /* "projection_cy.pyx":201
  *             l2 = 2 * l
  *             pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \
  *                 pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))             # <<<<<<<<<<<<<<
@@ -4702,7 +4697,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
  */
                       __pyx_t_8 = (__pyx_v_np - 1);
 
-                      /* "projection_cy.pyx":202
+                      /* "projection_cy.pyx":200
  *             l = 2 * (np - 1)
  *             l2 = 2 * l
  *             pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \             # <<<<<<<<<<<<<<
@@ -4712,12 +4707,12 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
                       __pyx_t_9 = __pyx_v_np;
                       *((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_9 * __pyx_v_pol.strides[0]) )) = (((((-(*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_7 * __pyx_v_pol.strides[0]) )))) * __pyx_v_l) * (__pyx_v_l - 1)) / ((double)((__pyx_v_l2 + 1) * (__pyx_v_l2 - 1)))) + ((*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_8 * __pyx_v_pol.strides[0]) ))) * (__pyx_v_c2 - ((((__pyx_v_l2 * __pyx_v_l) + __pyx_v_l2) - 1) / ((double)((__pyx_v_l2 - 1) * (__pyx_v_l2 + 3)))))));
 
-                      /* "projection_cy.pyx":204
+                      /* "projection_cy.pyx":202
  *             pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \
  *                 pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))
  *             pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))             # <<<<<<<<<<<<<<
  * 
- *     @cython.boundscheck(False)
+ *     cdef void fast_evaluate_moments(self, double R, double z,
  */
                       __pyx_t_10 = __pyx_v_np;
                       *((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_10 * __pyx_v_pol.strides[0]) )) *= (((__pyx_v_l2 + 1) * (__pyx_v_l2 + 3)) / ((double)((__pyx_v_l + 1) * (__pyx_v_l + 2))));
@@ -4733,9 +4728,9 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
       #define unlikely(x) __builtin_expect(!!(x), 0)
   #endif
 
-  /* "projection_cy.pyx":180
- *     @cython.boundscheck(False)
- *     @cython.wraparound(False)
+  /* "projection_cy.pyx":178
+ *         self.sigRl, self.sigpl, self.sigzl = sigRl, sigpl, sigzl
+ * 
  *     cdef inline void even_Legendre(self, double c, double [:] pol) nogil:             # <<<<<<<<<<<<<<
  *         """
  *         Static method: gets the even Legendre polynomials at cos(theta)
@@ -4745,17 +4740,17 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials_even_Leg
   __pyx_L0:;
 }
 
-/* "projection_cy.pyx":208
- *     @cython.boundscheck(False)
- *     @cython.wraparound(False)
+/* "projection_cy.pyx":204
+ *             pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))
+ * 
  *     cdef void fast_evaluate_moments(self, double R, double z,             # <<<<<<<<<<<<<<
  *                                       double* Rho, double* Vrot, double* SigR, double* Sigp, double* Sigz) nogil:
  * 
  */
 
 static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(struct __pyx_obj_13projection_cy_LagrangePolynomials *__pyx_v_self, double __pyx_v_R, double __pyx_v_z, double *__pyx_v_Rho, double *__pyx_v_Vrot, double *__pyx_v_SigR, double *__pyx_v_Sigp, double *__pyx_v_Sigz) {
-  size_t __pyx_v_i;
-  size_t __pyx_v_npoly;
+  int __pyx_v_i;
+  int __pyx_v_npoly;
   double __pyx_v_r;
   double __pyx_v_c;
   double __pyx_v_f;
@@ -4778,20 +4773,19 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
   Py_ssize_t __pyx_t_10;
   Py_ssize_t __pyx_t_11;
   Py_ssize_t __pyx_t_12;
-  size_t __pyx_t_13;
-  size_t __pyx_t_14;
-  size_t __pyx_t_15;
-  long __pyx_t_16;
-  size_t __pyx_t_17;
-  size_t __pyx_t_18;
-  size_t __pyx_t_19;
-  size_t __pyx_t_20;
-  size_t __pyx_t_21;
-  size_t __pyx_t_22;
-  size_t __pyx_t_23;
-  size_t __pyx_t_24;
-  size_t __pyx_t_25;
-  size_t __pyx_t_26;
+  long __pyx_t_13;
+  long __pyx_t_14;
+  long __pyx_t_15;
+  int __pyx_t_16;
+  int __pyx_t_17;
+  int __pyx_t_18;
+  int __pyx_t_19;
+  int __pyx_t_20;
+  int __pyx_t_21;
+  int __pyx_t_22;
+  int __pyx_t_23;
+  int __pyx_t_24;
+  int __pyx_t_25;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4804,18 +4798,18 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
   #endif
   /*try:*/ {
 
-    /* "projection_cy.pyx":212
+    /* "projection_cy.pyx":208
  * 
  *         # Cython-ize
- *         cdef size_t i, npoly = self.npoly             # <<<<<<<<<<<<<<
+ *         cdef int i, npoly = self.npoly             # <<<<<<<<<<<<<<
  *         cdef double r, c, f
  *         cdef double [:] pol
  */
     __pyx_t_1 = __pyx_v_self->npoly;
     __pyx_v_npoly = __pyx_t_1;
 
-    /* "projection_cy.pyx":218
- *         # cdef double Rho, Vrot, SigR, Sigp, Sigz
+    /* "projection_cy.pyx":213
+ *         cdef double [:] rhop, vrotp, sigRp, sigpp, sigzp
  * 
  *         r = sqrt(R * R + z * z)             # <<<<<<<<<<<<<<
  *         c = z / r
@@ -4823,7 +4817,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
  */
     __pyx_v_r = sqrt(((__pyx_v_R * __pyx_v_R) + (__pyx_v_z * __pyx_v_z)));
 
-    /* "projection_cy.pyx":219
+    /* "projection_cy.pyx":214
  * 
  *         r = sqrt(R * R + z * z)
  *         c = z / r             # <<<<<<<<<<<<<<
@@ -4832,7 +4826,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
  */
     __pyx_v_c = (__pyx_v_z / __pyx_v_r);
 
-    /* "projection_cy.pyx":221
+    /* "projection_cy.pyx":216
  *         c = z / r
  * 
  *         with gil:             # <<<<<<<<<<<<<<
@@ -4845,16 +4839,16 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
         #endif
         /*try:*/ {
 
-          /* "projection_cy.pyx":222
+          /* "projection_cy.pyx":217
  * 
  *         with gil:
  *             pol = zeros(npoly)             # <<<<<<<<<<<<<<
  *             rhop = zeros(npoly)
  *             vrotp = zeros(npoly)
  */
-          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_4 = __Pyx_PyInt_FromSize_t(__pyx_v_npoly); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_npoly); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_4);
           __pyx_t_5 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4867,38 +4861,38 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             }
           }
           if (!__pyx_t_5) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
             __Pyx_GIVEREF(__pyx_t_4);
             PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
             __pyx_t_4 = 0;
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_pol = __pyx_t_7;
           __pyx_t_7.memview = NULL;
           __pyx_t_7.data = NULL;
 
-          /* "projection_cy.pyx":223
+          /* "projection_cy.pyx":218
  *         with gil:
  *             pol = zeros(npoly)
  *             rhop = zeros(npoly)             # <<<<<<<<<<<<<<
  *             vrotp = zeros(npoly)
  *             sigRp = zeros(npoly)
  */
-          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_6 = __Pyx_PyInt_FromSize_t(__pyx_v_npoly); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_npoly); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_6);
           __pyx_t_4 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4911,38 +4905,38 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             }
           }
           if (!__pyx_t_4) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
             __Pyx_GIVEREF(__pyx_t_6);
             PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_6);
             __pyx_t_6 = 0;
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_rhop = __pyx_t_7;
           __pyx_t_7.memview = NULL;
           __pyx_t_7.data = NULL;
 
-          /* "projection_cy.pyx":224
+          /* "projection_cy.pyx":219
  *             pol = zeros(npoly)
  *             rhop = zeros(npoly)
  *             vrotp = zeros(npoly)             # <<<<<<<<<<<<<<
  *             sigRp = zeros(npoly)
  *             sigpp = zeros(npoly)
  */
-          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_5 = __Pyx_PyInt_FromSize_t(__pyx_v_npoly); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_npoly); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_6 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4955,38 +4949,38 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             }
           }
           if (!__pyx_t_6) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6); __pyx_t_6 = NULL;
             __Pyx_GIVEREF(__pyx_t_5);
             PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_t_5);
             __pyx_t_5 = 0;
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_vrotp = __pyx_t_7;
           __pyx_t_7.memview = NULL;
           __pyx_t_7.data = NULL;
 
-          /* "projection_cy.pyx":225
+          /* "projection_cy.pyx":220
  *             rhop = zeros(npoly)
  *             vrotp = zeros(npoly)
  *             sigRp = zeros(npoly)             # <<<<<<<<<<<<<<
  *             sigpp = zeros(npoly)
  *             sigzp = zeros(npoly)
  */
-          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_4 = __Pyx_PyInt_FromSize_t(__pyx_v_npoly); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_npoly); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_4);
           __pyx_t_5 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4999,38 +4993,38 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             }
           }
           if (!__pyx_t_5) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
             __Pyx_GIVEREF(__pyx_t_4);
             PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
             __pyx_t_4 = 0;
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_sigRp = __pyx_t_7;
           __pyx_t_7.memview = NULL;
           __pyx_t_7.data = NULL;
 
-          /* "projection_cy.pyx":226
+          /* "projection_cy.pyx":221
  *             vrotp = zeros(npoly)
  *             sigRp = zeros(npoly)
  *             sigpp = zeros(npoly)             # <<<<<<<<<<<<<<
  *             sigzp = zeros(npoly)
  * 
  */
-          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_6 = __Pyx_PyInt_FromSize_t(__pyx_v_npoly); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_npoly); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_6);
           __pyx_t_4 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -5043,38 +5037,38 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             }
           }
           if (!__pyx_t_4) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
             __Pyx_GIVEREF(__pyx_t_6);
             PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_6);
             __pyx_t_6 = 0;
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_sigpp = __pyx_t_7;
           __pyx_t_7.memview = NULL;
           __pyx_t_7.data = NULL;
 
-          /* "projection_cy.pyx":227
+          /* "projection_cy.pyx":222
  *             sigRp = zeros(npoly)
  *             sigpp = zeros(npoly)
  *             sigzp = zeros(npoly)             # <<<<<<<<<<<<<<
  * 
  *         self.even_Legendre(c, pol)
  */
-          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_5 = __Pyx_PyInt_FromSize_t(__pyx_v_npoly); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_npoly); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_6 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -5087,30 +5081,30 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             }
           }
           if (!__pyx_t_6) {
-            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             __Pyx_GOTREF(__pyx_t_2);
           } else {
-            __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6); __pyx_t_6 = NULL;
             __Pyx_GIVEREF(__pyx_t_5);
             PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_t_5);
             __pyx_t_5 = 0;
-            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           }
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_2);
-          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_t_7.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_sigzp = __pyx_t_7;
           __pyx_t_7.memview = NULL;
           __pyx_t_7.data = NULL;
         }
 
-        /* "projection_cy.pyx":221
+        /* "projection_cy.pyx":216
  *         c = z / r
  * 
  *         with gil:             # <<<<<<<<<<<<<<
@@ -5134,7 +5128,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
         }
     }
 
-    /* "projection_cy.pyx":229
+    /* "projection_cy.pyx":224
  *             sigzp = zeros(npoly)
  * 
  *         self.even_Legendre(c, pol)             # <<<<<<<<<<<<<<
@@ -5143,7 +5137,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
  */
     __pyx_f_13projection_cy_19LagrangePolynomials_even_Legendre(__pyx_v_self, __pyx_v_c, __pyx_v_pol);
 
-    /* "projection_cy.pyx":230
+    /* "projection_cy.pyx":225
  * 
  *         self.even_Legendre(c, pol)
  *         self._fast_interpolate_moments(r, rhop, vrotp, sigRp, sigpp, sigzp)             # <<<<<<<<<<<<<<
@@ -5152,7 +5146,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
  */
     __pyx_f_13projection_cy_19LagrangePolynomials__fast_interpolate_moments(__pyx_v_self, __pyx_v_r, __pyx_v_rhop, __pyx_v_vrotp, __pyx_v_sigRp, __pyx_v_sigpp, __pyx_v_sigzp);
 
-    /* "projection_cy.pyx":232
+    /* "projection_cy.pyx":227
  *         self._fast_interpolate_moments(r, rhop, vrotp, sigRp, sigpp, sigzp)
  * 
  *         Rho[0] = .5 * rhop[0]             # <<<<<<<<<<<<<<
@@ -5162,7 +5156,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     __pyx_t_8 = 0;
     (__pyx_v_Rho[0]) = (.5 * (*((double *) ( /* dim=0 */ (__pyx_v_rhop.data + __pyx_t_8 * __pyx_v_rhop.strides[0]) ))));
 
-    /* "projection_cy.pyx":233
+    /* "projection_cy.pyx":228
  * 
  *         Rho[0] = .5 * rhop[0]
  *         Vrot[0] = .5 * vrotp[0]             # <<<<<<<<<<<<<<
@@ -5172,7 +5166,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     __pyx_t_9 = 0;
     (__pyx_v_Vrot[0]) = (.5 * (*((double *) ( /* dim=0 */ (__pyx_v_vrotp.data + __pyx_t_9 * __pyx_v_vrotp.strides[0]) ))));
 
-    /* "projection_cy.pyx":234
+    /* "projection_cy.pyx":229
  *         Rho[0] = .5 * rhop[0]
  *         Vrot[0] = .5 * vrotp[0]
  *         SigR[0] = .5 * sigRp[0]             # <<<<<<<<<<<<<<
@@ -5182,7 +5176,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     __pyx_t_10 = 0;
     (__pyx_v_SigR[0]) = (.5 * (*((double *) ( /* dim=0 */ (__pyx_v_sigRp.data + __pyx_t_10 * __pyx_v_sigRp.strides[0]) ))));
 
-    /* "projection_cy.pyx":235
+    /* "projection_cy.pyx":230
  *         Vrot[0] = .5 * vrotp[0]
  *         SigR[0] = .5 * sigRp[0]
  *         Sigp[0] = .5 * sigpp[0]             # <<<<<<<<<<<<<<
@@ -5192,7 +5186,7 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     __pyx_t_11 = 0;
     (__pyx_v_Sigp[0]) = (.5 * (*((double *) ( /* dim=0 */ (__pyx_v_sigpp.data + __pyx_t_11 * __pyx_v_sigpp.strides[0]) ))));
 
-    /* "projection_cy.pyx":236
+    /* "projection_cy.pyx":231
  *         SigR[0] = .5 * sigRp[0]
  *         Sigp[0] = .5 * sigpp[0]
  *         Sigz[0] = .5 * sigzp[0]             # <<<<<<<<<<<<<<
@@ -5202,14 +5196,14 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     __pyx_t_12 = 0;
     (__pyx_v_Sigz[0]) = (.5 * (*((double *) ( /* dim=0 */ (__pyx_v_sigzp.data + __pyx_t_12 * __pyx_v_sigzp.strides[0]) ))));
 
-    /* "projection_cy.pyx":238
+    /* "projection_cy.pyx":233
  *         Sigz[0] = .5 * sigzp[0]
  * 
  *         for i in prange(1, npoly):             # <<<<<<<<<<<<<<
  *             f = .5 * (4 * i + 1)
  *             Rho[0] += f * rhop[i] * pol[i]
  */
-    __pyx_t_13 = __pyx_v_npoly;
+    __pyx_t_1 = __pyx_v_npoly;
     if (1 == 0) abort();
     {
         #if ((defined(__APPLE__) || defined(__OSX__)) && (defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && (__GNUC_MINOR__ > 95)))))
@@ -5218,23 +5212,23 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
             #define likely(x)   (x)
             #define unlikely(x) (x)
         #endif
-        __pyx_t_15 = (__pyx_t_13 - 1) / 1;
-        if (__pyx_t_15 > 0)
+        __pyx_t_14 = (__pyx_t_1 - 1) / 1;
+        if (__pyx_t_14 > 0)
         {
             #ifdef _OPENMP
-            #pragma omp parallel private(__pyx_t_16, __pyx_t_17, __pyx_t_19, __pyx_t_18, __pyx_t_24, __pyx_t_26, __pyx_t_20, __pyx_t_22, __pyx_t_21, __pyx_t_23, __pyx_t_25)
+            #pragma omp parallel private(__pyx_t_22, __pyx_t_18, __pyx_t_23, __pyx_t_17, __pyx_t_20, __pyx_t_16, __pyx_t_21, __pyx_t_24, __pyx_t_25, __pyx_t_15, __pyx_t_19)
             #endif /* _OPENMP */
             {
                 #ifdef _OPENMP
-                #pragma omp for lastprivate(__pyx_v_f) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i)
+                #pragma omp for firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_f)
                 #endif /* _OPENMP */
-                for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_15; __pyx_t_14++){
+                for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_14; __pyx_t_13++){
                     {
-                        __pyx_v_i = 1 + 1 * __pyx_t_14;
+                        __pyx_v_i = 1 + 1 * __pyx_t_13;
                         /* Initialize private variables to invalid values */
                         __pyx_v_f = ((double)__PYX_NAN());
 
-                        /* "projection_cy.pyx":239
+                        /* "projection_cy.pyx":234
  * 
  *         for i in prange(1, npoly):
  *             f = .5 * (4 * i + 1)             # <<<<<<<<<<<<<<
@@ -5243,65 +5237,65 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
  */
                         __pyx_v_f = (.5 * ((4 * __pyx_v_i) + 1));
 
-                        /* "projection_cy.pyx":240
+                        /* "projection_cy.pyx":235
  *         for i in prange(1, npoly):
  *             f = .5 * (4 * i + 1)
  *             Rho[0] += f * rhop[i] * pol[i]             # <<<<<<<<<<<<<<
  *             Vrot[0] += f * vrotp[i] * pol[i]
  *             SigR[0] += f * sigRp[i] * pol[i]
  */
-                        __pyx_t_16 = 0;
+                        __pyx_t_15 = 0;
+                        __pyx_t_16 = __pyx_v_i;
                         __pyx_t_17 = __pyx_v_i;
-                        __pyx_t_18 = __pyx_v_i;
-                        (__pyx_v_Rho[__pyx_t_16]) = ((__pyx_v_Rho[__pyx_t_16]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_rhop.data + __pyx_t_17 * __pyx_v_rhop.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_18 * __pyx_v_pol.strides[0]) )))));
+                        (__pyx_v_Rho[__pyx_t_15]) = ((__pyx_v_Rho[__pyx_t_15]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_rhop.data + __pyx_t_16 * __pyx_v_rhop.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_17 * __pyx_v_pol.strides[0]) )))));
 
-                        /* "projection_cy.pyx":241
+                        /* "projection_cy.pyx":236
  *             f = .5 * (4 * i + 1)
  *             Rho[0] += f * rhop[i] * pol[i]
  *             Vrot[0] += f * vrotp[i] * pol[i]             # <<<<<<<<<<<<<<
  *             SigR[0] += f * sigRp[i] * pol[i]
  *             Sigp[0] += f * sigpp[i] * pol[i]
  */
-                        __pyx_t_16 = 0;
+                        __pyx_t_15 = 0;
+                        __pyx_t_18 = __pyx_v_i;
                         __pyx_t_19 = __pyx_v_i;
-                        __pyx_t_20 = __pyx_v_i;
-                        (__pyx_v_Vrot[__pyx_t_16]) = ((__pyx_v_Vrot[__pyx_t_16]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_vrotp.data + __pyx_t_19 * __pyx_v_vrotp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_20 * __pyx_v_pol.strides[0]) )))));
+                        (__pyx_v_Vrot[__pyx_t_15]) = ((__pyx_v_Vrot[__pyx_t_15]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_vrotp.data + __pyx_t_18 * __pyx_v_vrotp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_19 * __pyx_v_pol.strides[0]) )))));
 
-                        /* "projection_cy.pyx":242
+                        /* "projection_cy.pyx":237
  *             Rho[0] += f * rhop[i] * pol[i]
  *             Vrot[0] += f * vrotp[i] * pol[i]
  *             SigR[0] += f * sigRp[i] * pol[i]             # <<<<<<<<<<<<<<
  *             Sigp[0] += f * sigpp[i] * pol[i]
  *             Sigz[0] += f * sigzp[i] * pol[i]
  */
-                        __pyx_t_16 = 0;
+                        __pyx_t_15 = 0;
+                        __pyx_t_20 = __pyx_v_i;
                         __pyx_t_21 = __pyx_v_i;
-                        __pyx_t_22 = __pyx_v_i;
-                        (__pyx_v_SigR[__pyx_t_16]) = ((__pyx_v_SigR[__pyx_t_16]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_sigRp.data + __pyx_t_21 * __pyx_v_sigRp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_22 * __pyx_v_pol.strides[0]) )))));
+                        (__pyx_v_SigR[__pyx_t_15]) = ((__pyx_v_SigR[__pyx_t_15]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_sigRp.data + __pyx_t_20 * __pyx_v_sigRp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_21 * __pyx_v_pol.strides[0]) )))));
 
-                        /* "projection_cy.pyx":243
+                        /* "projection_cy.pyx":238
  *             Vrot[0] += f * vrotp[i] * pol[i]
  *             SigR[0] += f * sigRp[i] * pol[i]
  *             Sigp[0] += f * sigpp[i] * pol[i]             # <<<<<<<<<<<<<<
  *             Sigz[0] += f * sigzp[i] * pol[i]
  * 
  */
-                        __pyx_t_16 = 0;
+                        __pyx_t_15 = 0;
+                        __pyx_t_22 = __pyx_v_i;
                         __pyx_t_23 = __pyx_v_i;
-                        __pyx_t_24 = __pyx_v_i;
-                        (__pyx_v_Sigp[__pyx_t_16]) = ((__pyx_v_Sigp[__pyx_t_16]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_sigpp.data + __pyx_t_23 * __pyx_v_sigpp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_24 * __pyx_v_pol.strides[0]) )))));
+                        (__pyx_v_Sigp[__pyx_t_15]) = ((__pyx_v_Sigp[__pyx_t_15]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_sigpp.data + __pyx_t_22 * __pyx_v_sigpp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_23 * __pyx_v_pol.strides[0]) )))));
 
-                        /* "projection_cy.pyx":244
+                        /* "projection_cy.pyx":239
  *             SigR[0] += f * sigRp[i] * pol[i]
  *             Sigp[0] += f * sigpp[i] * pol[i]
  *             Sigz[0] += f * sigzp[i] * pol[i]             # <<<<<<<<<<<<<<
  * 
- *     @cython.boundscheck(False)
+ *     cdef inline void _fast_interpolate_moments(self, double r, double [:] rhop, double [:] vrotp,
  */
-                        __pyx_t_16 = 0;
+                        __pyx_t_15 = 0;
+                        __pyx_t_24 = __pyx_v_i;
                         __pyx_t_25 = __pyx_v_i;
-                        __pyx_t_26 = __pyx_v_i;
-                        (__pyx_v_Sigz[__pyx_t_16]) = ((__pyx_v_Sigz[__pyx_t_16]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_sigzp.data + __pyx_t_25 * __pyx_v_sigzp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_26 * __pyx_v_pol.strides[0]) )))));
+                        (__pyx_v_Sigz[__pyx_t_15]) = ((__pyx_v_Sigz[__pyx_t_15]) + ((__pyx_v_f * (*((double *) ( /* dim=0 */ (__pyx_v_sigzp.data + __pyx_t_24 * __pyx_v_sigzp.strides[0]) )))) * (*((double *) ( /* dim=0 */ (__pyx_v_pol.data + __pyx_t_25 * __pyx_v_pol.strides[0]) )))));
                     }
                 }
             }
@@ -5315,10 +5309,10 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     #endif
   }
 
-  /* "projection_cy.pyx":212
+  /* "projection_cy.pyx":208
  * 
  *         # Cython-ize
- *         cdef size_t i, npoly = self.npoly             # <<<<<<<<<<<<<<
+ *         cdef int i, npoly = self.npoly             # <<<<<<<<<<<<<<
  *         cdef double r, c, f
  *         cdef double [:] pol
  */
@@ -5338,9 +5332,9 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
     __pyx_L5:;
   }
 
-  /* "projection_cy.pyx":208
- *     @cython.boundscheck(False)
- *     @cython.wraparound(False)
+  /* "projection_cy.pyx":204
+ *             pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))
+ * 
  *     cdef void fast_evaluate_moments(self, double R, double z,             # <<<<<<<<<<<<<<
  *                                       double* Rho, double* Vrot, double* SigR, double* Sigp, double* Sigz) nogil:
  * 
@@ -5368,17 +5362,17 @@ static void __pyx_f_13projection_cy_19LagrangePolynomials_fast_evaluate_moments(
   #endif
 }
 
-/* "projection_cy.pyx":248
- *     @cython.boundscheck(False)
- *     @cython.wraparound(False)
+/* "projection_cy.pyx":241
+ *             Sigz[0] += f * sigzp[i] * pol[i]
+ * 
  *     cdef inline void _fast_interpolate_moments(self, double r, double [:] rhop, double [:] vrotp,             # <<<<<<<<<<<<<<
  *                                                double [:] sigRp, double [:] sigpp, double [:] sigzp) nogil:
  *         """
  */
 
 static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_interpolate_moments(struct __pyx_obj_13projection_cy_LagrangePolynomials *__pyx_v_self, double __pyx_v_r, __Pyx_memviewslice __pyx_v_rhop, __Pyx_memviewslice __pyx_v_vrotp, __Pyx_memviewslice __pyx_v_sigRp, __Pyx_memviewslice __pyx_v_sigpp, __Pyx_memviewslice __pyx_v_sigzp) {
-  size_t __pyx_v_i;
-  CYTHON_UNUSED size_t __pyx_v_npoly;
+  int __pyx_v_i;
+  CYTHON_UNUSED int __pyx_v_npoly;
   int __pyx_v_top;
   int __pyx_v_bot;
   int __pyx_v_ar_size;
@@ -5394,27 +5388,27 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
   PyObject *__pyx_t_8 = NULL;
   int __pyx_t_9;
   int __pyx_t_10;
-  size_t __pyx_t_11;
-  size_t __pyx_t_12;
-  size_t __pyx_t_13;
+  int __pyx_t_11;
+  long __pyx_t_12;
+  long __pyx_t_13;
   __Pyx_memviewslice __pyx_t_14 = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_t_15 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  size_t __pyx_t_16;
+  int __pyx_t_16;
   __Pyx_memviewslice __pyx_t_17 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  size_t __pyx_t_18;
-  size_t __pyx_t_19;
-  size_t __pyx_t_20;
-  size_t __pyx_t_21;
-  size_t __pyx_t_22;
-  size_t __pyx_t_23;
-  size_t __pyx_t_24;
-  size_t __pyx_t_25;
-  size_t __pyx_t_26;
-  size_t __pyx_t_27;
-  size_t __pyx_t_28;
-  size_t __pyx_t_29;
-  size_t __pyx_t_30;
-  size_t __pyx_t_31;
+  int __pyx_t_18;
+  int __pyx_t_19;
+  int __pyx_t_20;
+  int __pyx_t_21;
+  int __pyx_t_22;
+  int __pyx_t_23;
+  int __pyx_t_24;
+  int __pyx_t_25;
+  int __pyx_t_26;
+  int __pyx_t_27;
+  int __pyx_t_28;
+  int __pyx_t_29;
+  int __pyx_t_30;
+  int __pyx_t_31;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5427,17 +5421,17 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
   #endif
   /*try:*/ {
 
-    /* "projection_cy.pyx":257
+    /* "projection_cy.pyx":250
  * 
  *         #Cython-ize
- *         cdef size_t i, npoly = self.npoly             # <<<<<<<<<<<<<<
+ *         cdef int i, npoly = self.npoly             # <<<<<<<<<<<<<<
  *         cdef int top, bot, ar_size
  *         cdef double f
  */
     __pyx_t_1 = __pyx_v_self->npoly;
     __pyx_v_npoly = __pyx_t_1;
 
-    /* "projection_cy.pyx":261
+    /* "projection_cy.pyx":254
  *         cdef double f
  * 
  *         with gil:             # <<<<<<<<<<<<<<
@@ -5450,22 +5444,22 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
         #endif
         /*try:*/ {
 
-          /* "projection_cy.pyx":262
+          /* "projection_cy.pyx":255
  * 
  *         with gil:
  *             ar_size = len(self.ar)             # <<<<<<<<<<<<<<
  * 
  *         if r > self.ar[ar_size-1]:
  */
-          if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L7_error;}}
-          __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_self->ar, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L7_error;}}
+          __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_self->ar, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_3 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_3 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_3 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_ar_size = __pyx_t_3;
         }
 
-        /* "projection_cy.pyx":261
+        /* "projection_cy.pyx":254
  *         cdef double f
  * 
  *         with gil:             # <<<<<<<<<<<<<<
@@ -5489,14 +5483,14 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
         }
     }
 
-    /* "projection_cy.pyx":264
+    /* "projection_cy.pyx":257
  *             ar_size = len(self.ar)
  * 
  *         if r > self.ar[ar_size-1]:             # <<<<<<<<<<<<<<
  *             pass
  *         else:
  */
-    if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
+    if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
     __pyx_t_4 = (__pyx_v_ar_size - 1);
     __pyx_t_5 = ((__pyx_v_r > (*((double *) ( /* dim=0 */ (__pyx_v_self->ar.data + __pyx_t_4 * __pyx_v_self->ar.strides[0]) )))) != 0);
     if (__pyx_t_5) {
@@ -5504,7 +5498,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
     }
     /*else*/ {
 
-      /* "projection_cy.pyx":267
+      /* "projection_cy.pyx":260
  *             pass
  *         else:
  *             with gil:             # <<<<<<<<<<<<<<
@@ -5517,21 +5511,21 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
           #endif
           /*try:*/ {
 
-            /* "projection_cy.pyx":268
+            /* "projection_cy.pyx":261
  *         else:
  *             with gil:
  *                 bot = searchsorted(self.ar, r, side='left') - 1             # <<<<<<<<<<<<<<
  *             top = bot + 1
  * 
  */
-            __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_searchsorted); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_searchsorted); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_2);
-            if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}}
-            __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_self->ar, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}}
+            __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_self->ar, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_r); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_r); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_8);
             __Pyx_GIVEREF(__pyx_t_6);
             PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6);
@@ -5539,23 +5533,23 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
             PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_7);
             __pyx_t_6 = 0;
             __pyx_t_7 = 0;
-            __pyx_t_7 = PyDict_New(); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_7 = PyDict_New(); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_7);
-            if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_side, __pyx_n_s_left) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
-            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, __pyx_t_7); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_side, __pyx_n_s_left) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, __pyx_t_7); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __pyx_t_7 = PyNumber_Subtract(__pyx_t_6, __pyx_int_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_7 = PyNumber_Subtract(__pyx_t_6, __pyx_int_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
+            __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L11_error;}
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
             __pyx_v_bot = __pyx_t_1;
           }
 
-          /* "projection_cy.pyx":267
+          /* "projection_cy.pyx":260
  *             pass
  *         else:
  *             with gil:             # <<<<<<<<<<<<<<
@@ -5579,7 +5573,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
           }
       }
 
-      /* "projection_cy.pyx":269
+      /* "projection_cy.pyx":262
  *             with gil:
  *                 bot = searchsorted(self.ar, r, side='left') - 1
  *             top = bot + 1             # <<<<<<<<<<<<<<
@@ -5588,22 +5582,22 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
  */
       __pyx_v_top = (__pyx_v_bot + 1);
 
-      /* "projection_cy.pyx":271
+      /* "projection_cy.pyx":264
  *             top = bot + 1
  * 
  *             f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])             # <<<<<<<<<<<<<<
  *             for i in prange(0, npoly):
  *                 rhop[i] = f * self.rhl[top][i] + (1. - f) * self.rhl[bot][i]
  */
-      if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
+      if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
       __pyx_t_1 = __pyx_v_bot;
-      if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
+      if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
       __pyx_t_9 = __pyx_v_top;
-      if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
+      if (unlikely(!__pyx_v_self->ar.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L4_error;}}
       __pyx_t_10 = __pyx_v_bot;
       __pyx_v_f = ((__pyx_v_r - (*((double *) ( /* dim=0 */ (__pyx_v_self->ar.data + __pyx_t_1 * __pyx_v_self->ar.strides[0]) )))) / ((*((double *) ( /* dim=0 */ (__pyx_v_self->ar.data + __pyx_t_9 * __pyx_v_self->ar.strides[0]) ))) - (*((double *) ( /* dim=0 */ (__pyx_v_self->ar.data + __pyx_t_10 * __pyx_v_self->ar.strides[0]) )))));
 
-      /* "projection_cy.pyx":272
+      /* "projection_cy.pyx":265
  * 
  *             f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])
  *             for i in prange(0, npoly):             # <<<<<<<<<<<<<<
@@ -5613,7 +5607,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
       __pyx_t_11 = __pyx_v_npoly;
       if (1 == 0) abort();
       {
-          size_t __pyx_parallel_temp0 = 0xbad0bad0;
+          int __pyx_parallel_temp0 = 0xbad0bad0;
           const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
           PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
           int __pyx_parallel_why;
@@ -5628,7 +5622,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
           if (__pyx_t_13 > 0)
           {
               #ifdef _OPENMP
-              #pragma omp parallel private(__pyx_t_30, __pyx_t_29, __pyx_t_24, __pyx_t_19, __pyx_t_16, __pyx_t_18, __pyx_t_26, __pyx_t_31, __pyx_t_27, __pyx_t_25, __pyx_t_20, __pyx_t_22, __pyx_t_21, __pyx_t_23, __pyx_t_28) firstprivate(__pyx_t_14, __pyx_t_17, __pyx_t_15) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+              #pragma omp parallel private(__pyx_t_22, __pyx_t_18, __pyx_t_23, __pyx_t_26, __pyx_t_28, __pyx_t_27, __pyx_t_29, __pyx_t_20, __pyx_t_16, __pyx_t_30, __pyx_t_21, __pyx_t_24, __pyx_t_25, __pyx_t_31, __pyx_t_19) firstprivate(__pyx_t_17, __pyx_t_14, __pyx_t_15) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
               #endif /* _OPENMP */
               {
                   #ifdef _OPENMP
@@ -5645,14 +5639,14 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
                       {
                           __pyx_v_i = 0 + 1 * __pyx_t_12;
 
-                          /* "projection_cy.pyx":273
+                          /* "projection_cy.pyx":266
  *             f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])
  *             for i in prange(0, npoly):
  *                 rhop[i] = f * self.rhl[top][i] + (1. - f) * self.rhl[bot][i]             # <<<<<<<<<<<<<<
  *                 vrotp[i] = f * self.vrotl[top][i] + (1. - f) * self.vrotl[bot][i]
  *                 sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]
  */
-                          if (unlikely(!__pyx_v_self->rhl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 273; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->rhl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->rhl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_15.data = __pyx_t_14.data;
@@ -5672,7 +5666,7 @@ static CYTHON_INLINE void __pyx_f_13projection_cy_19LagrangePolynomials__fast_in
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 273; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_15.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5683,7 +5677,7 @@ __pyx_t_15.strides[0] = __pyx_t_14.strides[1];
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_16 = __pyx_v_i;
-                          if (unlikely(!__pyx_v_self->rhl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 273; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->rhl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->rhl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_17.data = __pyx_t_14.data;
@@ -5703,7 +5697,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 273; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_17.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5719,14 +5713,14 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_15, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_17, 0);
 
-                          /* "projection_cy.pyx":274
+                          /* "projection_cy.pyx":267
  *             for i in prange(0, npoly):
  *                 rhop[i] = f * self.rhl[top][i] + (1. - f) * self.rhl[bot][i]
  *                 vrotp[i] = f * self.vrotl[top][i] + (1. - f) * self.vrotl[bot][i]             # <<<<<<<<<<<<<<
  *                 sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]
  *                 sigpp[i] = f * self.sigpl[top][i] + (1. - f) * self.sigpl[bot][i]
  */
-                          if (unlikely(!__pyx_v_self->vrotl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->vrotl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->vrotl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_17.data = __pyx_t_14.data;
@@ -5746,7 +5740,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_17.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5757,7 +5751,7 @@ __pyx_t_17.strides[0] = __pyx_t_14.strides[1];
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_20 = __pyx_v_i;
-                          if (unlikely(!__pyx_v_self->vrotl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->vrotl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->vrotl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_15.data = __pyx_t_14.data;
@@ -5777,7 +5771,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_15.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5793,14 +5787,14 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_17, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_15, 0);
 
-                          /* "projection_cy.pyx":275
+                          /* "projection_cy.pyx":268
  *                 rhop[i] = f * self.rhl[top][i] + (1. - f) * self.rhl[bot][i]
  *                 vrotp[i] = f * self.vrotl[top][i] + (1. - f) * self.vrotl[bot][i]
  *                 sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]             # <<<<<<<<<<<<<<
  *                 sigpp[i] = f * self.sigpl[top][i] + (1. - f) * self.sigpl[bot][i]
  *                 sigzp[i] = f * self.sigzl[top][i] + (1. - f) * self.sigzl[bot][i]
  */
-                          if (unlikely(!__pyx_v_self->sigRl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->sigRl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->sigRl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_15.data = __pyx_t_14.data;
@@ -5820,7 +5814,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_15.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5831,7 +5825,7 @@ __pyx_t_15.strides[0] = __pyx_t_14.strides[1];
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_23 = __pyx_v_i;
-                          if (unlikely(!__pyx_v_self->sigRl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->sigRl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->sigRl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_17.data = __pyx_t_14.data;
@@ -5851,7 +5845,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_17.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5867,14 +5861,13 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_15, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_17, 0);
 
-                          /* "projection_cy.pyx":276
+                          /* "projection_cy.pyx":269
  *                 vrotp[i] = f * self.vrotl[top][i] + (1. - f) * self.vrotl[bot][i]
  *                 sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]
  *                 sigpp[i] = f * self.sigpl[top][i] + (1. - f) * self.sigpl[bot][i]             # <<<<<<<<<<<<<<
  *                 sigzp[i] = f * self.sigzl[top][i] + (1. - f) * self.sigzl[bot][i]
- * 
  */
-                          if (unlikely(!__pyx_v_self->sigpl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->sigpl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->sigpl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_17.data = __pyx_t_14.data;
@@ -5894,7 +5887,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_17.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5905,7 +5898,7 @@ __pyx_t_17.strides[0] = __pyx_t_14.strides[1];
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_26 = __pyx_v_i;
-                          if (unlikely(!__pyx_v_self->sigpl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->sigpl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->sigpl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_15.data = __pyx_t_14.data;
@@ -5925,7 +5918,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_15.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5941,14 +5934,12 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_17, 0);
                           __PYX_XDEC_MEMVIEW(&__pyx_t_15, 0);
 
-                          /* "projection_cy.pyx":277
+                          /* "projection_cy.pyx":270
  *                 sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]
  *                 sigpp[i] = f * self.sigpl[top][i] + (1. - f) * self.sigpl[bot][i]
  *                 sigzp[i] = f * self.sigzl[top][i] + (1. - f) * self.sigzl[bot][i]             # <<<<<<<<<<<<<<
- * 
- *         # return rhop, vrotp, sigRp, sigpp, sigzp
  */
-                          if (unlikely(!__pyx_v_self->sigzl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->sigzl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->sigzl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_15.data = __pyx_t_14.data;
@@ -5968,7 +5959,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_15.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5979,7 +5970,7 @@ __pyx_t_15.strides[0] = __pyx_t_14.strides[1];
 
 __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_29 = __pyx_v_i;
-                          if (unlikely(!__pyx_v_self->sigzl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
+                          if (unlikely(!__pyx_v_self->sigzl.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");{__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L15_error;}}
                           __pyx_t_14 = __pyx_v_self->sigzl;
                           __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
                           __pyx_t_17.data = __pyx_t_14.data;
@@ -5999,7 +5990,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
             #ifdef WITH_THREAD
             PyGILState_Release(__pyx_gilstate_save);
             #endif
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L15_error;}
     }
         __pyx_t_17.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -6056,8 +6047,8 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                   #endif
                   #endif /* _OPENMP */
                   /* Clean up any temporaries */
-                  __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                   __PYX_XDEC_MEMVIEW(&__pyx_t_17, 0);
+                  __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
                   __PYX_XDEC_MEMVIEW(&__pyx_t_15, 0);
                   #ifdef WITH_THREAD
                   PyGILState_Release(__pyx_gilstate_save);
@@ -6101,7 +6092,7 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
     __pyx_L9:;
   }
 
-  /* "projection_cy.pyx":250
+  /* "projection_cy.pyx":243
  *     cdef inline void _fast_interpolate_moments(self, double r, double [:] rhop, double [:] vrotp,
  *                                                double [:] sigRp, double [:] sigpp, double [:] sigzp) nogil:
  *         """             # <<<<<<<<<<<<<<
@@ -6130,9 +6121,9 @@ __PYX_XDEC_MEMVIEW(&__pyx_t_14, 0);
     __pyx_L5:;
   }
 
-  /* "projection_cy.pyx":248
- *     @cython.boundscheck(False)
- *     @cython.wraparound(False)
+  /* "projection_cy.pyx":241
+ *             Sigz[0] += f * sigzp[i] * pol[i]
+ * 
  *     cdef inline void _fast_interpolate_moments(self, double r, double [:] rhop, double [:] vrotp,             # <<<<<<<<<<<<<<
  *                                                double [:] sigRp, double [:] sigpp, double [:] sigzp) nogil:
  *         """
@@ -12063,7 +12054,7 @@ static PyObject *__pyx_memoryview_convert_item_to_object(struct __pyx_memoryview
  * 
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_result, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;};
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_result, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;};
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_r = __pyx_t_1;
         __pyx_t_1 = 0;
@@ -20852,23 +20843,23 @@ PyMODINIT_FUNC PyInit_projection_cy(void)
   /*--- Function import code ---*/
   /*--- Execution code ---*/
 
-  /* "projection_cy.pyx":3
- * # cython: cdivision=True
- * # cython: nonecheck=False
+  /* "projection_cy.pyx":6
+ * # cython: wraparound=False
+ * # cython: infer_types=False
  * __author__ = 'lposti'             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_author, __pyx_n_s_lposti) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 3; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_author, __pyx_n_s_lposti) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "projection_cy.pyx":6
+  /* "projection_cy.pyx":9
  * 
  * 
  * from numpy import pi, zeros, logspace, concatenate, seterr, searchsorted             # <<<<<<<<<<<<<<
  * from numpy cimport ndarray, double_t
  * from progressbar import ProgressBar, widgets
  */
-  __pyx_t_1 = PyList_New(6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_pi);
   __Pyx_GIVEREF(__pyx_n_s_pi);
@@ -20888,43 +20879,43 @@ PyMODINIT_FUNC PyInit_projection_cy(void)
   __Pyx_INCREF(__pyx_n_s_searchsorted);
   __Pyx_GIVEREF(__pyx_n_s_searchsorted);
   PyList_SET_ITEM(__pyx_t_1, 5, __pyx_n_s_searchsorted);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_numpy, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_numpy, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_pi); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_pi); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pi, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_pi, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_zeros, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_zeros, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_logspace); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_logspace); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logspace, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logspace, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_concatenate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_concatenate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_concatenate, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_concatenate, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_seterr); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_seterr); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_seterr, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_seterr, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_searchsorted, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_searchsorted, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "projection_cy.pyx":8
+  /* "projection_cy.pyx":11
  * from numpy import pi, zeros, logspace, concatenate, seterr, searchsorted
  * from numpy cimport ndarray, double_t
  * from progressbar import ProgressBar, widgets             # <<<<<<<<<<<<<<
- * import cython
  * from cython.parallel import prange
+ * 
  */
-  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 11; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_ProgressBar);
   __Pyx_GIVEREF(__pyx_n_s_ProgressBar);
@@ -20932,23 +20923,23 @@ PyMODINIT_FUNC PyInit_projection_cy(void)
   __Pyx_INCREF(__pyx_n_s_widgets);
   __Pyx_GIVEREF(__pyx_n_s_widgets);
   PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_widgets);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_progressbar, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_progressbar, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 11; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_ProgressBar); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_ProgressBar); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 11; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ProgressBar, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ProgressBar, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 11; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_widgets); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_widgets); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 11; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_widgets, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_widgets, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 11; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "projection_cy.pyx":1
  * # cython: cdivision=True             # <<<<<<<<<<<<<<
  * # cython: nonecheck=False
- * __author__ = 'lposti'
+ * # cython: boundscheck=False
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);

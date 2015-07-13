@@ -1,12 +1,14 @@
 # cython: cdivision=True
 # cython: nonecheck=False
+# cython: boundscheck=False
+# cython: wraparound=False
+# cython: infer_types=False
 __author__ = 'lposti'
 
 
 from numpy import pi, zeros, logspace, concatenate, seterr, searchsorted
 from numpy cimport ndarray, double_t
 from progressbar import ProgressBar, widgets
-import cython
 from cython.parallel import prange
 
 
@@ -21,8 +23,6 @@ cdef extern from "math.h":
     double sinh ( double x ) nogil
     double atan2 ( double x, double y ) nogil
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
                  LagrangePolynomials lp, scale='linear', verbose=True):
         """
@@ -41,7 +41,7 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
         seterr(invalid='ignore')
 
         # Cython-ing code
-        cdef size_t i, j, k
+        cdef int i, j, k
 
         cdef ndarray[double_t, ndim=2] dlos, slos, vlos
         cdef ndarray[double_t, ndim=1] yy
@@ -175,8 +175,6 @@ cdef class LagrangePolynomials(object):
         self.vrotl = vrotl
         self.sigRl, self.sigpl, self.sigzl = sigRl, sigpl, sigzl
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef inline void even_Legendre(self, double c, double [:] pol) nogil:
         """
         Static method: gets the even Legendre polynomials at cos(theta)
@@ -203,17 +201,14 @@ cdef class LagrangePolynomials(object):
                 pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))
             pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef void fast_evaluate_moments(self, double R, double z,
                                       double* Rho, double* Vrot, double* SigR, double* Sigp, double* Sigz) nogil:
 
         # Cython-ize
-        cdef size_t i, npoly = self.npoly
+        cdef int i, npoly = self.npoly
         cdef double r, c, f
         cdef double [:] pol
         cdef double [:] rhop, vrotp, sigRp, sigpp, sigzp
-        # cdef double Rho, Vrot, SigR, Sigp, Sigz
 
         r = sqrt(R * R + z * z)
         c = z / r
@@ -243,8 +238,6 @@ cdef class LagrangePolynomials(object):
             Sigp[0] += f * sigpp[i] * pol[i]
             Sigz[0] += f * sigzp[i] * pol[i]
 
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
     cdef inline void _fast_interpolate_moments(self, double r, double [:] rhop, double [:] vrotp,
                                                double [:] sigRp, double [:] sigpp, double [:] sigzp) nogil:
         """
@@ -254,7 +247,7 @@ cdef class LagrangePolynomials(object):
         """
 
         #Cython-ize
-        cdef size_t i, npoly = self.npoly
+        cdef int i, npoly = self.npoly
         cdef int top, bot, ar_size
         cdef double f
 
@@ -275,5 +268,3 @@ cdef class LagrangePolynomials(object):
                 sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]
                 sigpp[i] = f * self.sigpl[top][i] + (1. - f) * self.sigpl[bot][i]
                 sigzp[i] = f * self.sigzl[top][i] + (1. - f) * self.sigzl[bot][i]
-
-        # return rhop, vrotp, sigRp, sigpp, sigzp

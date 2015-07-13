@@ -20,7 +20,6 @@ from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
 # from scipy.ndimage.filters import gaussian_filter
-from scipy.interpolate import SmoothBivariateSpline
 from projection_cy import projection, LagrangePolynomials
 
 
@@ -475,15 +474,6 @@ class FJmodel(object):
 
         # compute the growth curve for the model (i.e. integrated flux within circular apertures)
 
-        X, Y, D = [], [], []
-        for i in range(len(x)):
-            for j in range(len(y)):
-                X.append(x[i])
-                Y.append(y[j])
-                D.append(self.dlos[j, i])
-
-        density = SmoothBivariateSpline(Y, X, D, s=len(X))
-
         growth_curve = []
         for k in range(0, len(R)):
             s = []
@@ -497,7 +487,7 @@ class FJmodel(object):
                     if x[i] ** 2 + y[j] ** 2 <= R[k] ** 2:
                         # s.append(10. ** self.dlos[j, i])
                         # s.append(10. ** d_psf[i, j])
-                        s.append(10. ** density(y[j], x[i]))
+                        s.append(10. ** self.dlos[j, i])
             growth_curve.append(array(s).sum())
 
         if nx * nx * len(R) > 9e4:  # pragma: no cover
