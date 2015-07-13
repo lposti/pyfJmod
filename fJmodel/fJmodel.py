@@ -14,7 +14,7 @@ from linecache import getline
 from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, ogrid, logspace,\
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, arange, logspace,\
     concatenate, array
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
@@ -253,7 +253,7 @@ class FJmodel(object):
 
         return massfJ
 
-    def project(self, inclination, nx=80, npsi=31, b=1., scale='linear', Rmax=None, verbose=True):
+    def project(self, inclination, nx=60, npsi=31, b=1., scale='linear', Rmax=None, verbose=True):
         """
         Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
         :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
@@ -270,7 +270,7 @@ class FJmodel(object):
 
         # nx, npsi = 60, 81
         '''
-        self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
+        self.dlos, self.slos, self.vlos = self.projection_static(incl=inclination, b=b, Rmax=Rmax, nx=nx,
                                                      npsi=npsi, scale=scale,
                                                      Fast_evaluate_moments=self._fast_evaluate_moments,
                                                      verbose=verbose)
@@ -774,11 +774,11 @@ class FJmodel(object):
 
             f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])
             for i in range(self.npoly):
-                rhop[i] = f * self.rhl[top][i] + (1 - f) * self.rhl[bot][i]
-                vrotp[i] = f * self.vrotl[top][i] + (1 - f) * self.vrotl[bot][i]
-                sigRp[i] = f * self.sigRl[top][i] + (1 - f) * self.sigRl[bot][i]
-                sigpp[i] = f * self.sigpl[top][i] + (1 - f) * self.sigpl[bot][i]
-                sigzp[i] = f * self.sigzl[top][i] + (1 - f) * self.sigzl[bot][i]
+                rhop[i] = f * self.rhl[top, i] + (1 - f) * self.rhl[bot, i]
+                vrotp[i] = f * self.vrotl[top, i] + (1 - f) * self.vrotl[bot, i]
+                sigRp[i] = f * self.sigRl[top, i] + (1 - f) * self.sigRl[bot, i]
+                sigpp[i] = f * self.sigpl[top, i] + (1 - f) * self.sigpl[bot, i]
+                sigzp[i] = f * self.sigzl[top, i] + (1 - f) * self.sigzl[bot, i]
 
         return rhop, vrotp, sigRp, sigpp, sigzp
 

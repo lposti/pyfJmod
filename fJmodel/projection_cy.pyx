@@ -1,3 +1,4 @@
+# cython: profile=True
 # cython: cdivision=True
 # cython: nonecheck=False
 # cython: boundscheck=False
@@ -6,7 +7,7 @@
 __author__ = 'lposti'
 
 
-from numpy import pi, zeros, logspace, concatenate, seterr, searchsorted
+from numpy import pi, zeros, logspace, concatenate, seterr, searchsorted, sum
 from numpy cimport ndarray, double_t
 from progressbar import ProgressBar, widgets
 from cython.parallel import prange
@@ -250,6 +251,7 @@ cdef class LagrangePolynomials(object):
         Sigp[0] = .5 * sigpp[0]
         Sigz[0] = .5 * sigzp[0]
 
+
         for i in prange(1, npoly):
             f = .5 * (4 * i + 1)
             Rho[0] += f * rhop[i] * pol[i]
@@ -257,6 +259,15 @@ cdef class LagrangePolynomials(object):
             SigR[0] += f * sigRp[i] * pol[i]
             Sigp[0] += f * sigpp[i] * pol[i]
             Sigz[0] += f * sigzp[i] * pol[i]
+        '''
+
+        f = .5 * (4 * range(1, npoly) + 1)
+        Rho[0] = sum(f * rhop * pol)
+        Vrot[0] = sum(f * vrotp * pol)
+        SigR[0] = sum(f * sigRp * pol)
+        Sigp[0] = sum(f * sigpp * pol)
+        Sigz[0] = sum(f * sigzp * pol)
+        '''
 
     cdef inline void _fast_interpolate_moments(self, double r, double [:] rhop, double [:] vrotp,
                                                double [:] sigRp, double [:] sigpp, double [:] sigzp) nogil:
@@ -283,8 +294,8 @@ cdef class LagrangePolynomials(object):
 
             f = (r - self.ar[bot]) / (self.ar[top] - self.ar[bot])
             for i in prange(0, npoly):
-                rhop[i] = f * self.rhl[top][i] + (1. - f) * self.rhl[bot][i]
-                vrotp[i] = f * self.vrotl[top][i] + (1. - f) * self.vrotl[bot][i]
-                sigRp[i] = f * self.sigRl[top][i] + (1. - f) * self.sigRl[bot][i]
-                sigpp[i] = f * self.sigpl[top][i] + (1. - f) * self.sigpl[bot][i]
-                sigzp[i] = f * self.sigzl[top][i] + (1. - f) * self.sigzl[bot][i]
+                rhop[i] = f * self.rhl[top, i] + (1. - f) * self.rhl[bot, i]
+                vrotp[i] = f * self.vrotl[top, i] + (1. - f) * self.vrotl[bot, i]
+                sigRp[i] = f * self.sigRl[top, i] + (1. - f) * self.sigRl[bot, i]
+                sigpp[i] = f * self.sigpl[top, i] + (1. - f) * self.sigpl[bot, i]
+                sigzp[i] = f * self.sigzl[top, i] + (1. - f) * self.sigzl[bot, i]
