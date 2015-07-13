@@ -10,6 +10,7 @@ from numpy import pi, zeros, logspace, concatenate, seterr, searchsorted
 from numpy cimport ndarray, double_t
 from progressbar import ProgressBar, widgets
 from cython.parallel import prange
+from cpython cimport array
 
 
 # C definitions
@@ -40,10 +41,39 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
         # set numpy errors: Ignore invalid values, so that no Warning is raised by sqrt(I2/I1)
         seterr(invalid='ignore')
 
+        dlos, slos, vlos = zeros(2 * nx * 2 * nx), zeros(2 * nx * 2 * nx), zeros(2 * nx * 2 * nx)
+        cdef array.array dlos_arr = array.array('d', dlos)
+        cdef array.array slos_arr = array.array('d', slos)
+        cdef array.array vlos_arr = array.array('d', vlos)
+
+        if scale is 'linear':
+            compute_projection(incl, b, Rmax, nx, npsi, lp, 0,
+                               dlos_arr.data.as_doubles, vlos_arr.data.as_doubles, slos_arr.data.as_doubles)
+        elif scale is 'log':
+            compute_projection(incl, b, Rmax, nx, npsi, lp, 1,
+                               dlos_arr.data.as_doubles, vlos_arr.data.as_doubles, slos_arr.data.as_doubles)
+        else:
+            raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
+
+        cdef int i, j
+
+        dlos, slos, vlos = zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx))
+        for i in range(2 * nx):
+            for j in range(2 * nx):
+                dlos[i, j] = dlos_arr[i * 2 * nx + j]
+                slos[i, j] = slos_arr[i * 2 * nx + j]
+                vlos[i, j] = vlos_arr[i * 2 * nx + j]
+
+        return dlos, slos, vlos
+
+
+cdef void compute_projection(double incl, double b, double Rmax, int nx, int npsi,
+                             LagrangePolynomials lp, int scale,
+                             double* dlos, double* vlos, double* slos):
+
         # Cython-ing code
         cdef int i, j, k
 
-        cdef ndarray[double_t, ndim=2] dlos, slos, vlos
         cdef ndarray[double_t, ndim=1] yy
 
         cdef double ymax = Rmax, zmax = Rmax, psi_max = 3.
@@ -52,17 +82,15 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
 
         cdef double dpsi = 2 * psi_max / float(npsi - 1)
         # lam_top, lam_bot = 0., 0.
-        dlos, slos, vlos = zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx)), zeros((2 * nx, 2 * nx))
-
 
         # initialize Progressbar if verbose==True
         pbar = None
-        if verbose:  # pragma: no cover
-            wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
-                    ' ', widgets.ETA()]
-            pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
 
-        if scale is 'log':
+        wdgt = ['Projecting: ', widgets.Percentage(), ' ', widgets.Bar(marker=widgets.AnimatedMarker()),
+                ' ', widgets.ETA()]
+        pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
+
+        if scale == 1:
             yy = logspace(-1., log10(Rmax), num=nx)
             yy = concatenate((-yy[::-1], yy))
 
@@ -78,22 +106,18 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
         for i in prange(nx, nogil=True):
 
             with gil:
-                if scale is 'log':
+                if scale == 1:
                     yp = yy[nx + i]
-                elif scale is 'linear':
+                elif scale == 0:
                     yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
-                else:
-                    raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
 
             for j in prange(2 * nx):
 
                 with gil:
-                    if scale is 'log':
+                    if scale == 1:
                         zp = yy[j]
-                    elif scale is 'linear':
+                    elif scale == 0:
                         zp = (-1. + 2. * j / float(2 * nx - 1)) * zmax
-                    else:
-                        raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
 
                 rp = sqrt(yp * yp + zp * zp)
                 a = 0.
@@ -107,8 +131,7 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
                 for k in prange(npsi):
                     with gil:
                         # update ProgressBar
-                        if verbose:  # pragma: no cover
-                            pbar.update((i * 2 * nx + j) * npsi + k)
+                        pbar.update((i * 2 * nx + j) * npsi + k)
 
                     psi = -psi_max + k * dpsi
                     ch = cosh(psi)
@@ -139,12 +162,12 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
                 if fabs(I1) > 0:
                     with gil:
                         density = max(a * dpsi * I1, 1e-10)
-                    dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j] = log10(density), \
-                    sqrt(I2 / I1), I3 / I1
+                    dlos[(nx + i) * 2 * nx + j], slos[(nx + i) * 2 * nx + j], vlos[(nx + i) * 2 * nx + j] = \
+                        log10(density), sqrt(I2 / I1), I3 / I1
 
                 # symmetrize arrays (the velocity field gets negative for R<0)
-                dlos[nx - 1 - i, j], slos[nx - 1 - i, j], vlos[nx - 1 - i, j] = \
-                    dlos[nx + i, j], slos[nx + i, j], -vlos[nx + i, j]
+                dlos[(nx - 1 - i) * 2 * nx + j], slos[(nx - 1 - i) * 2 * nx + j], vlos[(nx - 1 - i) * 2 * nx + j] = \
+                    dlos[(nx + i) * 2 * nx + j], slos[(nx + i) * 2 * nx + j], -vlos[(nx + i) * 2 * nx + j]
 
                 '''
                 if rp < 3:
@@ -152,11 +175,8 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
                     lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
                 '''
 
-        if verbose:  # pragma: no cover
-            pbar.finish()
+        pbar.finish()
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
-
-        return dlos, slos, vlos
 
 
 cdef class LagrangePolynomials(object):
