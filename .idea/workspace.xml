@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dd95a18b-d3ec-4387-b8e7-cb079b0d9bb2" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/temp.macosx-10.10-x86_64-2.7/fJmodel/projection_cy.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/projection_cy.so" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJmodel/fJmodel.py" afterPath="$PROJECT_DIR$/fJmodel/fJmodel.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJmodel/projection_cy.c" afterPath="$PROJECT_DIR$/fJmodel/projection_cy.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fJmodel/projection_cy.pyx" afterPath="$PROJECT_DIR$/fJmodel/projection_cy.pyx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="pyfJmod.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -54,10 +55,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="setup.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="setup.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3446191" vertical-offset="0" max-vertical-offset="827">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="810">
               <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
               <folding>
                 <element signature="e#46#78#0" expanded="true" />
@@ -81,8 +82,8 @@
       <file leaf-file-name="fJmodel.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="3705" max-vertical-offset="18210">
-              <caret line="277" column="0" selection-start-line="277" selection-start-column="0" selection-end-line="277" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3915" max-vertical-offset="18285">
+              <caret line="277" column="11" selection-start-line="277" selection-start-column="11" selection-end-line="277" selection-end-column="11" />
               <folding>
                 <element signature="e#231#257#0" expanded="true" />
               </folding>
@@ -90,11 +91,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="projection_cy.pyx" pinned="false" current-in-tab="false">
+      <file leaf-file-name="projection_cy.pyx" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fJmodel/projection_cy.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1078" max-vertical-offset="3810">
-              <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.43530834" vertical-offset="0" max-vertical-offset="4260">
+              <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -140,11 +141,11 @@
         <option value="$PROJECT_DIR$/fJmodel/profiling_test.py" />
         <option value="$PROJECT_DIR$/profiling_test.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/fJmodel/fJmodel.py" />
-        <option value="$PROJECT_DIR$/fJmodel/projection_cy.pyx" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/distutlis.cmds" />
         <option value="$PROJECT_DIR$/setup.py" />
+        <option value="$PROJECT_DIR$/fJmodel/fJmodel.py" />
+        <option value="$PROJECT_DIR$/fJmodel/projection_cy.pyx" />
       </list>
     </option>
   </component>
@@ -942,16 +943,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3705" max-vertical-offset="18210">
-          <caret line="277" column="0" selection-start-line="277" selection-start-column="0" selection-end-line="277" selection-end-column="0" />
-          <folding>
-            <element signature="e#231#257#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.036275696" vertical-offset="0" max-vertical-offset="827">
@@ -968,21 +959,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fJmodel/projection_cy.pyx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1078" max-vertical-offset="3810">
-          <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3446191" vertical-offset="0" max-vertical-offset="827">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="810">
           <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
           <folding>
             <element signature="e#46#78#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fJmodel/fJmodel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3915" max-vertical-offset="18285">
+          <caret line="277" column="11" selection-start-line="277" selection-start-column="11" selection-end-line="277" selection-end-column="11" />
+          <folding>
+            <element signature="e#231#257#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fJmodel/projection_cy.pyx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.43530834" vertical-offset="0" max-vertical-offset="4260">
+          <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

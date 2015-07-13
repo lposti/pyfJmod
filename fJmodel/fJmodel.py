@@ -270,10 +270,15 @@ class FJmodel(object):
             Rmax = self.ar[-1]
 
         # nx, npsi = 60, 81
-        lag_poly = LagrangePolynomials(self.npoly, self.ar, self.rhl, self.vrotl, self.sigRl, self.sigpl, self.sigzl)
+        '''
         self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
                                                      npsi=npsi, scale=scale,
-                                                     Fast_evaluate_moments=lag_poly.fast_evaluate_moments,  # self._fast_evaluate_moments,
+                                                     Fast_evaluate_moments=self._fast_evaluate_moments,
+                                                     verbose=verbose)
+        '''
+        lag_poly = LagrangePolynomials(self.npoly, self.ar, self.rhl, self.vrotl, self.sigRl, self.sigpl, self.sigzl)
+        self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
+                                                     npsi=npsi, lp=lag_poly, scale=scale,
                                                      verbose=verbose)
 
         # remove nans in the maps
