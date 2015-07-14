@@ -61,8 +61,7 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
 
 
         for i in range(nx):
-
-
+            
             if scale is 'log':
                 yp = yy[nx + i]
             elif scale is 'linear':
@@ -83,9 +82,9 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
 
                 a = max(rp, .1 * b)
 
-                for k in prange(npsi, schedule='static', nogil=True):
+                for k in range(npsi):
                     # update ProgressBar
-                    with gil: pbar.update((i * 2 * nx + j) * npsi + k)
+                    pbar.update((i * 2 * nx + j) * npsi + k)
 
                     psi = -psi_max + k * dpsi
                     ch = cosh(psi)
@@ -104,7 +103,7 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
                     SigR = 0.
                     Sigp = 0.
                     Sigz = 0.
-                    with gil: fast_moments(npoly, nr, ar, &rhl[0], &vrotl[0], &sigRl[0], &sigpl[0], &sigzl[0],
+                    fast_moments(npoly, nr, ar, &rhl[0], &vrotl[0], &sigRl[0], &sigpl[0], &sigzl[0],
                                  R, abs_z, &dens, &Vrot, &SigR, &Sigp, &Sigz)
 
                     I1 += ch * dens
