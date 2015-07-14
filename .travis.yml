@@ -11,10 +11,10 @@ before_install:
  - sudo apt-get install -qq python-scipy python-matplotlib
 # command to install dependencies
 install:
-  - "pip install ."
   - "pip install -r requirements.txt"
   - "pip install coverage"
   - "pip install coveralls"
+  - "python setup.py build_ext --inplace"
 # command to run tests
 script: coverage run tests.py
 # after success run coverage tool
