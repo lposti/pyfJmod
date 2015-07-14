@@ -61,7 +61,7 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
 
 
         for i in range(nx):
-            
+
             if scale is 'log':
                 yp = yy[nx + i]
             elif scale is 'linear':

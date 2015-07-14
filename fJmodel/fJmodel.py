@@ -14,8 +14,8 @@ from linecache import getline
 from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
-    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, arange, logspace,\
-    concatenate, array
+    cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, logspace,\
+    concatenate, sum
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
@@ -452,51 +452,18 @@ class FJmodel(object):
 
         # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 
-        """
-        THIS IS THE RADIAL SURFACE BRIGHTNESS PROFILE
-        s = []
-        for i in range(len(x)):
-            for j in range(len(y)):
-                if x[i] ** 2 + y[j] ** 2 <= R[0]:
-                    s.append(10. ** self.dlos[i, j])
-        light_profile = [array(s).mean()]
+        wdgt = [widgets.FormatLabel('Computing growth curve: '), widgets.Percentage()]
+        pbar = ProgressBar(maxval=len(R), widgets=wdgt).start()
 
-        for k in range(1, len(R)):
-            s = []
-            for i in range(len(x)):
-                for j in range(len(y)):
-                    if (x[i] ** 2 + y[j] ** 2 <= R[k]) &\
-                            (x[i] ** 2 + y[j] ** 2 > R[k - 1]):
-                        s.append(10. ** self.dlos[i, j])
-            light_profile.append(array(s).mean())
-        """
-
-        # if computations larger than 30x30x100 initialize pbar
-        pbar = None
-        if nx * nx * len(R) > 9e4:  # pragma: no cover
-            wdgt = [widgets.FormatLabel('Computing growth curve: '), widgets.Percentage()]
-            pbar = ProgressBar(maxval=nx * nx * len(R), widgets=wdgt).start()
-
-        # compute the growth curve for the model (i.e. integrated flux within circular apertures)
-
+        X, Y = meshgrid(x, y)
         growth_curve = []
-        for k in range(0, len(R)):
-            s = []
-            for i in range(len(x)):
-                for j in range(len(y)):
 
-                    # update ProgressBar
-                    if nx * nx * len(R) > 9e4:  # pragma: no cover
-                        pbar.update((k * (nx - 1) + i) * (nx - 1) + j)
+        for k in range(len(R)):
+            pbar.update(k + 1)
+            w = X ** 2 + Y ** 2 <= R[k] ** 2
+            growth_curve.append(sum(10. ** self.dlos[w]))
 
-                    if x[i] ** 2 + y[j] ** 2 <= R[k] ** 2:
-                        # s.append(10. ** self.dlos[j, i])
-                        # s.append(10. ** d_psf[i, j])
-                        s.append(10. ** self.dlos[j, i])
-            growth_curve.append(array(s).sum())
-
-        if nx * nx * len(R) > 9e4:  # pragma: no cover
-            pbar.finish()
+        pbar.finish()
 
         return R_arcsec, -2.5 * log10(growth_curve)
 
