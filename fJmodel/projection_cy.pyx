@@ -138,7 +138,7 @@ cdef void fast_moments(int npoly, int nr, ndarray[double_t, ndim=1] ar,
 
     # Cython-ize
     cdef int i
-    cdef double r, c, f
+    cdef double r, c, f, f_tb
     cdef ndarray[double_t, ndim=1] pol
     cdef ndarray[double_t, ndim=1] rhop, vrotp, sigRp, sigpp, sigzp
 
@@ -157,6 +157,7 @@ cdef void fast_moments(int npoly, int nr, ndarray[double_t, ndim=1] ar,
 
     cdef double c2
     cdef int l, l2, np
+    cdef int top, bot, ar_size
 
     c2 = c * c
 
@@ -169,8 +170,6 @@ cdef void fast_moments(int npoly, int nr, ndarray[double_t, ndim=1] ar,
         pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \
                   pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))
         pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))
-
-    cdef int top, bot, ar_size
 
     if r > ar[nr-1]:
         pass
@@ -187,15 +186,40 @@ cdef void fast_moments(int npoly, int nr, ndarray[double_t, ndim=1] ar,
             sigpp[i] = f * sigpl[top * npoly + i] + (1. - f) * sigpl[bot * npoly + i]
             sigzp[i] = f * sigzl[top * npoly + i] + (1. - f) * sigzl[bot * npoly + i]
 
-    Rho[0] = .5 * rhop[0]
-    Vrot[0] = .5 * vrotp[0]
-    SigR[0] = .5 * sigRp[0]
-    Sigp[0] = .5 * sigpp[0]
-    Sigz[0] = .5 * sigzp[0]
-    for i in range(1, npoly):
+    Rho[0] = 0.
+    Vrot[0] = 0.
+    SigR[0] = 0.
+    Sigp[0] = 0.
+    Sigz[0] = 0.
+    for i in range(0, npoly):
         f = .5 * (4 * i + 1)
         Rho[0] += f * rhop[i] * pol[i]
         Vrot[0] += f * vrotp[i] * pol[i]
         SigR[0] += f * sigRp[i] * pol[i]
         Sigp[0] += f * sigpp[i] * pol[i]
         Sigz[0] += f * sigzp[i] * pol[i]
+    '''
+
+    bot = searchsorted(ar, r, side='left') - 1
+    top = bot + 1
+    f_tb = (r - ar[bot]) / (ar[top] - ar[bot])
+
+    Rho[0] = 0.5 * (f_tb * rhl[top * npoly] + (1. - f_tb) * rhl[bot * npoly]) + \
+        5. / 2. * (f_tb * rhl[top * npoly + 1] + (1. - f_tb) * rhl[bot * npoly + 1]) * (1.5 * c2 - .5)
+    Vrot[0] = 0.5 * (f_tb * vrotl[top * npoly] + (1. - f_tb) * vrotl[bot * npoly])+ \
+        5. / 2. * (f_tb * vrotl[top * npoly + 1] + (1. - f_tb) * vrotl[bot * npoly + 1]) * (1.5 * c2 - .5)
+    SigR[0] = 0.5 * (f_tb * sigRl[top * npoly] + (1. - f_tb) * sigRl[bot * npoly])+ \
+        5. / 2. * (f_tb * sigRl[top * npoly + 1] + (1. - f_tb) * sigRl[bot * npoly + 1]) * (1.5 * c2 - .5)
+    Sigp[0] = 0.5 * (f_tb * sigpl[top * npoly] + (1. - f_tb) * sigpl[bot * npoly])+ \
+        5. / 2. * (f_tb * sigpl[top * npoly + 1] + (1. - f_tb) * sigpl[bot * npoly + 1]) * (1.5 * c2 - .5)
+    Sigz[0] = 0.5 * (f_tb * sigzl[top * npoly] + (1. - f_tb) * sigzl[bot * npoly])+ \
+        5. / 2. * (f_tb * sigzl[top * npoly + 1] + (1. - f_tb) * sigzl[bot * npoly + 1]) * (1.5 * c2 - .5)
+
+    for i in prange(2, npoly, schedule='static', nogil=True):
+        f = .5 * (4 * i + 1)
+        Rho[0] += f * (f_tb * rhl[top * npoly + i] + (1. - f_tb) * rhl[bot * npoly + i]) * pol[i]
+        Vrot[0] += f * (f_tb * vrotl[top * npoly + i] + (1. - f_tb) * vrotl[bot * npoly + i]) * pol[i]
+        SigR[0] += f * (f_tb * sigRl[top * npoly + i] + (1. - f_tb) * sigRl[bot * npoly + i]) * pol[i]
+        Sigp[0] += f * (f_tb * sigpl[top * npoly + i] + (1. - f_tb) * sigpl[bot * npoly + i]) * pol[i]
+        Sigz[0] += f * (f_tb * sigzl[top * npoly + i] + (1. - f_tb) * sigzl[bot * npoly + i]) * pol[i]
+    '''

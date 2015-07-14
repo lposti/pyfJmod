@@ -3109,21 +3109,16 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
   int __pyx_t_27;
   int __pyx_t_28;
   long __pyx_t_29;
-  long __pyx_t_30;
-  long __pyx_t_31;
-  long __pyx_t_32;
-  long __pyx_t_33;
-  long __pyx_t_34;
+  int __pyx_t_30;
+  int __pyx_t_31;
+  int __pyx_t_32;
+  int __pyx_t_33;
+  int __pyx_t_34;
   int __pyx_t_35;
   int __pyx_t_36;
   int __pyx_t_37;
   int __pyx_t_38;
   int __pyx_t_39;
-  int __pyx_t_40;
-  int __pyx_t_41;
-  int __pyx_t_42;
-  int __pyx_t_43;
-  int __pyx_t_44;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -3534,8 +3529,8 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
   __pyx_v_c = (__pyx_v_z / __pyx_v_r);
 
-  /* "projection_cy.pyx":161
- *     cdef int l, l2, np
+  /* "projection_cy.pyx":162
+ *     cdef int top, bot, ar_size
  * 
  *     c2 = c * c             # <<<<<<<<<<<<<<
  * 
@@ -3543,7 +3538,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
   __pyx_v_c2 = (__pyx_v_c * __pyx_v_c);
 
-  /* "projection_cy.pyx":163
+  /* "projection_cy.pyx":164
  *     c2 = c * c
  * 
  *     pol[0] = 1             # <<<<<<<<<<<<<<
@@ -3553,7 +3548,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
   __pyx_t_12 = 0;
   *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_pol.diminfo[0].strides) = 1.0;
 
-  /* "projection_cy.pyx":164
+  /* "projection_cy.pyx":165
  * 
  *     pol[0] = 1
  *     pol[1] = 1.5 * c2 - .5             # <<<<<<<<<<<<<<
@@ -3563,7 +3558,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
   __pyx_t_13 = 1;
   *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_13, __pyx_pybuffernd_pol.diminfo[0].strides) = ((1.5 * __pyx_v_c2) - .5);
 
-  /* "projection_cy.pyx":166
+  /* "projection_cy.pyx":167
  *     pol[1] = 1.5 * c2 - .5
  * 
  *     for np in range(2, npoly):             # <<<<<<<<<<<<<<
@@ -3574,7 +3569,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
   for (__pyx_t_14 = 2; __pyx_t_14 < __pyx_t_7; __pyx_t_14+=1) {
     __pyx_v_np = __pyx_t_14;
 
-    /* "projection_cy.pyx":167
+    /* "projection_cy.pyx":168
  * 
  *     for np in range(2, npoly):
  *         l = 2 * (np - 1)             # <<<<<<<<<<<<<<
@@ -3583,7 +3578,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
     __pyx_v_l = (2 * (__pyx_v_np - 1));
 
-    /* "projection_cy.pyx":168
+    /* "projection_cy.pyx":169
  *     for np in range(2, npoly):
  *         l = 2 * (np - 1)
  *         l2 = 2 * l             # <<<<<<<<<<<<<<
@@ -3592,7 +3587,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
     __pyx_v_l2 = (2 * __pyx_v_l);
 
-    /* "projection_cy.pyx":169
+    /* "projection_cy.pyx":170
  *         l = 2 * (np - 1)
  *         l2 = 2 * l
  *         pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \             # <<<<<<<<<<<<<<
@@ -3601,7 +3596,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
     __pyx_t_15 = (__pyx_v_np - 2);
 
-    /* "projection_cy.pyx":170
+    /* "projection_cy.pyx":171
  *         l2 = 2 * l
  *         pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \
  *                   pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))             # <<<<<<<<<<<<<<
@@ -3610,7 +3605,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
     __pyx_t_16 = (__pyx_v_np - 1);
 
-    /* "projection_cy.pyx":169
+    /* "projection_cy.pyx":170
  *         l = 2 * (np - 1)
  *         l2 = 2 * l
  *         pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \             # <<<<<<<<<<<<<<
@@ -3620,19 +3615,19 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
     __pyx_t_17 = __pyx_v_np;
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_pol.diminfo[0].strides) = (((((-(*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_pol.diminfo[0].strides))) * __pyx_v_l) * (__pyx_v_l - 1)) / ((double)((__pyx_v_l2 + 1) * (__pyx_v_l2 - 1)))) + ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_pol.diminfo[0].strides)) * (__pyx_v_c2 - ((((__pyx_v_l2 * __pyx_v_l) + __pyx_v_l2) - 1) / ((double)((__pyx_v_l2 - 1) * (__pyx_v_l2 + 3)))))));
 
-    /* "projection_cy.pyx":171
+    /* "projection_cy.pyx":172
  *         pol[np] = -pol[np - 2] * l * (l - 1) / float((l2 + 1) * (l2 - 1)) + \
  *                   pol[np - 1] * (c2 - (l2 * l + l2 - 1) / float((l2 - 1) * (l2 + 3)))
  *         pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))             # <<<<<<<<<<<<<<
  * 
- *     cdef int top, bot, ar_size
+ *     if r > ar[nr-1]:
  */
     __pyx_t_18 = __pyx_v_np;
     *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_18, __pyx_pybuffernd_pol.diminfo[0].strides) *= (((__pyx_v_l2 + 1) * (__pyx_v_l2 + 3)) / ((double)((__pyx_v_l + 1) * (__pyx_v_l + 2))));
   }
 
-  /* "projection_cy.pyx":175
- *     cdef int top, bot, ar_size
+  /* "projection_cy.pyx":174
+ *         pol[np] *= (l2 + 1) * (l2 + 3) / float((l + 1) * (l + 2))
  * 
  *     if r > ar[nr-1]:             # <<<<<<<<<<<<<<
  *         pass
@@ -3645,18 +3640,18 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
   }
   /*else*/ {
 
-    /* "projection_cy.pyx":179
+    /* "projection_cy.pyx":178
  *     else:
  * 
  *         bot = searchsorted(ar, r, side='left') - 1             # <<<<<<<<<<<<<<
  *         top = bot + 1
  * 
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_searchsorted); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_searchsorted); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_r); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_r); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(((PyObject *)__pyx_v_ar));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_ar));
@@ -3664,22 +3659,22 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_side, __pyx_n_s_left) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_side, __pyx_n_s_left) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Subtract(__pyx_t_4, __pyx_int_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyNumber_Subtract(__pyx_t_4, __pyx_int_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_bot = __pyx_t_7;
 
-    /* "projection_cy.pyx":180
+    /* "projection_cy.pyx":179
  * 
  *         bot = searchsorted(ar, r, side='left') - 1
  *         top = bot + 1             # <<<<<<<<<<<<<<
@@ -3688,7 +3683,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
  */
     __pyx_v_top = (__pyx_v_bot + 1);
 
-    /* "projection_cy.pyx":182
+    /* "projection_cy.pyx":181
  *         top = bot + 1
  * 
  *         f = (r - ar[bot]) / (ar[top] - ar[bot])             # <<<<<<<<<<<<<<
@@ -3700,7 +3695,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
     __pyx_t_21 = __pyx_v_bot;
     __pyx_v_f = ((__pyx_v_r - (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_ar.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_ar.diminfo[0].strides))) / ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_ar.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_ar.diminfo[0].strides)) - (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_ar.rcbuffer->pybuffer.buf, __pyx_t_21, __pyx_pybuffernd_ar.diminfo[0].strides))));
 
-    /* "projection_cy.pyx":183
+    /* "projection_cy.pyx":182
  * 
  *         f = (r - ar[bot]) / (ar[top] - ar[bot])
  *         for i in range(0, npoly):             # <<<<<<<<<<<<<<
@@ -3711,7 +3706,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
     for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
       __pyx_v_i = __pyx_t_23;
 
-      /* "projection_cy.pyx":184
+      /* "projection_cy.pyx":183
  *         f = (r - ar[bot]) / (ar[top] - ar[bot])
  *         for i in range(0, npoly):
  *             rhop[i] = f * rhl[top * npoly + i] + (1. - f) * rhl[bot * npoly + i]             # <<<<<<<<<<<<<<
@@ -3721,7 +3716,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
       __pyx_t_24 = __pyx_v_i;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_rhop.rcbuffer->pybuffer.buf, __pyx_t_24, __pyx_pybuffernd_rhop.diminfo[0].strides) = ((__pyx_v_f * (__pyx_v_rhl[((__pyx_v_top * __pyx_v_npoly) + __pyx_v_i)])) + ((1. - __pyx_v_f) * (__pyx_v_rhl[((__pyx_v_bot * __pyx_v_npoly) + __pyx_v_i)])));
 
-      /* "projection_cy.pyx":185
+      /* "projection_cy.pyx":184
  *         for i in range(0, npoly):
  *             rhop[i] = f * rhl[top * npoly + i] + (1. - f) * rhl[bot * npoly + i]
  *             vrotp[i] = f * vrotl[top * npoly + i] + (1. - f) * vrotl[bot * npoly + i]             # <<<<<<<<<<<<<<
@@ -3731,7 +3726,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
       __pyx_t_25 = __pyx_v_i;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vrotp.rcbuffer->pybuffer.buf, __pyx_t_25, __pyx_pybuffernd_vrotp.diminfo[0].strides) = ((__pyx_v_f * (__pyx_v_vrotl[((__pyx_v_top * __pyx_v_npoly) + __pyx_v_i)])) + ((1. - __pyx_v_f) * (__pyx_v_vrotl[((__pyx_v_bot * __pyx_v_npoly) + __pyx_v_i)])));
 
-      /* "projection_cy.pyx":186
+      /* "projection_cy.pyx":185
  *             rhop[i] = f * rhl[top * npoly + i] + (1. - f) * rhl[bot * npoly + i]
  *             vrotp[i] = f * vrotl[top * npoly + i] + (1. - f) * vrotl[bot * npoly + i]
  *             sigRp[i] = f * sigRl[top * npoly + i] + (1. - f) * sigRl[bot * npoly + i]             # <<<<<<<<<<<<<<
@@ -3741,7 +3736,7 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
       __pyx_t_26 = __pyx_v_i;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigRp.rcbuffer->pybuffer.buf, __pyx_t_26, __pyx_pybuffernd_sigRp.diminfo[0].strides) = ((__pyx_v_f * (__pyx_v_sigRl[((__pyx_v_top * __pyx_v_npoly) + __pyx_v_i)])) + ((1. - __pyx_v_f) * (__pyx_v_sigRl[((__pyx_v_bot * __pyx_v_npoly) + __pyx_v_i)])));
 
-      /* "projection_cy.pyx":187
+      /* "projection_cy.pyx":186
  *             vrotp[i] = f * vrotl[top * npoly + i] + (1. - f) * vrotl[bot * npoly + i]
  *             sigRp[i] = f * sigRl[top * npoly + i] + (1. - f) * sigRl[bot * npoly + i]
  *             sigpp[i] = f * sigpl[top * npoly + i] + (1. - f) * sigpl[bot * npoly + i]             # <<<<<<<<<<<<<<
@@ -3751,12 +3746,12 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
       __pyx_t_27 = __pyx_v_i;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigpp.rcbuffer->pybuffer.buf, __pyx_t_27, __pyx_pybuffernd_sigpp.diminfo[0].strides) = ((__pyx_v_f * (__pyx_v_sigpl[((__pyx_v_top * __pyx_v_npoly) + __pyx_v_i)])) + ((1. - __pyx_v_f) * (__pyx_v_sigpl[((__pyx_v_bot * __pyx_v_npoly) + __pyx_v_i)])));
 
-      /* "projection_cy.pyx":188
+      /* "projection_cy.pyx":187
  *             sigRp[i] = f * sigRl[top * npoly + i] + (1. - f) * sigRl[bot * npoly + i]
  *             sigpp[i] = f * sigpl[top * npoly + i] + (1. - f) * sigpl[bot * npoly + i]
  *             sigzp[i] = f * sigzl[top * npoly + i] + (1. - f) * sigzl[bot * npoly + i]             # <<<<<<<<<<<<<<
  * 
- *     Rho[0] = .5 * rhop[0]
+ *     Rho[0] = 0.
  */
       __pyx_t_28 = __pyx_v_i;
       *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigzp.rcbuffer->pybuffer.buf, __pyx_t_28, __pyx_pybuffernd_sigzp.diminfo[0].strides) = ((__pyx_v_f * (__pyx_v_sigzl[((__pyx_v_top * __pyx_v_npoly) + __pyx_v_i)])) + ((1. - __pyx_v_f) * (__pyx_v_sigzl[((__pyx_v_bot * __pyx_v_npoly) + __pyx_v_i)])));
@@ -3764,132 +3759,130 @@ static void __pyx_f_13projection_cy_fast_moments(int __pyx_v_npoly, int __pyx_v_
   }
   __pyx_L5:;
 
-  /* "projection_cy.pyx":190
+  /* "projection_cy.pyx":189
  *             sigzp[i] = f * sigzl[top * npoly + i] + (1. - f) * sigzl[bot * npoly + i]
  * 
- *     Rho[0] = .5 * rhop[0]             # <<<<<<<<<<<<<<
- *     Vrot[0] = .5 * vrotp[0]
- *     SigR[0] = .5 * sigRp[0]
+ *     Rho[0] = 0.             # <<<<<<<<<<<<<<
+ *     Vrot[0] = 0.
+ *     SigR[0] = 0.
  */
-  __pyx_t_29 = 0;
-  (__pyx_v_Rho[0]) = (.5 * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_rhop.rcbuffer->pybuffer.buf, __pyx_t_29, __pyx_pybuffernd_rhop.diminfo[0].strides)));
+  (__pyx_v_Rho[0]) = 0.;
+
+  /* "projection_cy.pyx":190
+ * 
+ *     Rho[0] = 0.
+ *     Vrot[0] = 0.             # <<<<<<<<<<<<<<
+ *     SigR[0] = 0.
+ *     Sigp[0] = 0.
+ */
+  (__pyx_v_Vrot[0]) = 0.;
 
   /* "projection_cy.pyx":191
- * 
- *     Rho[0] = .5 * rhop[0]
- *     Vrot[0] = .5 * vrotp[0]             # <<<<<<<<<<<<<<
- *     SigR[0] = .5 * sigRp[0]
- *     Sigp[0] = .5 * sigpp[0]
+ *     Rho[0] = 0.
+ *     Vrot[0] = 0.
+ *     SigR[0] = 0.             # <<<<<<<<<<<<<<
+ *     Sigp[0] = 0.
+ *     Sigz[0] = 0.
  */
-  __pyx_t_30 = 0;
-  (__pyx_v_Vrot[0]) = (.5 * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vrotp.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_vrotp.diminfo[0].strides)));
+  (__pyx_v_SigR[0]) = 0.;
 
   /* "projection_cy.pyx":192
- *     Rho[0] = .5 * rhop[0]
- *     Vrot[0] = .5 * vrotp[0]
- *     SigR[0] = .5 * sigRp[0]             # <<<<<<<<<<<<<<
- *     Sigp[0] = .5 * sigpp[0]
- *     Sigz[0] = .5 * sigzp[0]
+ *     Vrot[0] = 0.
+ *     SigR[0] = 0.
+ *     Sigp[0] = 0.             # <<<<<<<<<<<<<<
+ *     Sigz[0] = 0.
+ *     for i in range(0, npoly):
  */
-  __pyx_t_31 = 0;
-  (__pyx_v_SigR[0]) = (.5 * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigRp.rcbuffer->pybuffer.buf, __pyx_t_31, __pyx_pybuffernd_sigRp.diminfo[0].strides)));
+  (__pyx_v_Sigp[0]) = 0.;
 
   /* "projection_cy.pyx":193
- *     Vrot[0] = .5 * vrotp[0]
- *     SigR[0] = .5 * sigRp[0]
- *     Sigp[0] = .5 * sigpp[0]             # <<<<<<<<<<<<<<
- *     Sigz[0] = .5 * sigzp[0]
- *     for i in range(1, npoly):
- */
-  __pyx_t_32 = 0;
-  (__pyx_v_Sigp[0]) = (.5 * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigpp.rcbuffer->pybuffer.buf, __pyx_t_32, __pyx_pybuffernd_sigpp.diminfo[0].strides)));
-
-  /* "projection_cy.pyx":194
- *     SigR[0] = .5 * sigRp[0]
- *     Sigp[0] = .5 * sigpp[0]
- *     Sigz[0] = .5 * sigzp[0]             # <<<<<<<<<<<<<<
- *     for i in range(1, npoly):
+ *     SigR[0] = 0.
+ *     Sigp[0] = 0.
+ *     Sigz[0] = 0.             # <<<<<<<<<<<<<<
+ *     for i in range(0, npoly):
  *         f = .5 * (4 * i + 1)
  */
-  __pyx_t_33 = 0;
-  (__pyx_v_Sigz[0]) = (.5 * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigzp.rcbuffer->pybuffer.buf, __pyx_t_33, __pyx_pybuffernd_sigzp.diminfo[0].strides)));
+  (__pyx_v_Sigz[0]) = 0.;
 
-  /* "projection_cy.pyx":195
- *     Sigp[0] = .5 * sigpp[0]
- *     Sigz[0] = .5 * sigzp[0]
- *     for i in range(1, npoly):             # <<<<<<<<<<<<<<
+  /* "projection_cy.pyx":194
+ *     Sigp[0] = 0.
+ *     Sigz[0] = 0.
+ *     for i in range(0, npoly):             # <<<<<<<<<<<<<<
  *         f = .5 * (4 * i + 1)
  *         Rho[0] += f * rhop[i] * pol[i]
  */
   __pyx_t_22 = __pyx_v_npoly;
-  for (__pyx_t_23 = 1; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
+  for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
     __pyx_v_i = __pyx_t_23;
 
-    /* "projection_cy.pyx":196
- *     Sigz[0] = .5 * sigzp[0]
- *     for i in range(1, npoly):
+    /* "projection_cy.pyx":195
+ *     Sigz[0] = 0.
+ *     for i in range(0, npoly):
  *         f = .5 * (4 * i + 1)             # <<<<<<<<<<<<<<
  *         Rho[0] += f * rhop[i] * pol[i]
  *         Vrot[0] += f * vrotp[i] * pol[i]
  */
     __pyx_v_f = (.5 * ((4 * __pyx_v_i) + 1));
 
-    /* "projection_cy.pyx":197
- *     for i in range(1, npoly):
+    /* "projection_cy.pyx":196
+ *     for i in range(0, npoly):
  *         f = .5 * (4 * i + 1)
  *         Rho[0] += f * rhop[i] * pol[i]             # <<<<<<<<<<<<<<
  *         Vrot[0] += f * vrotp[i] * pol[i]
  *         SigR[0] += f * sigRp[i] * pol[i]
  */
-    __pyx_t_34 = 0;
-    __pyx_t_35 = __pyx_v_i;
-    __pyx_t_36 = __pyx_v_i;
-    (__pyx_v_Rho[__pyx_t_34]) = ((__pyx_v_Rho[__pyx_t_34]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_rhop.rcbuffer->pybuffer.buf, __pyx_t_35, __pyx_pybuffernd_rhop.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_36, __pyx_pybuffernd_pol.diminfo[0].strides))));
+    __pyx_t_29 = 0;
+    __pyx_t_30 = __pyx_v_i;
+    __pyx_t_31 = __pyx_v_i;
+    (__pyx_v_Rho[__pyx_t_29]) = ((__pyx_v_Rho[__pyx_t_29]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_rhop.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_rhop.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_31, __pyx_pybuffernd_pol.diminfo[0].strides))));
 
-    /* "projection_cy.pyx":198
+    /* "projection_cy.pyx":197
  *         f = .5 * (4 * i + 1)
  *         Rho[0] += f * rhop[i] * pol[i]
  *         Vrot[0] += f * vrotp[i] * pol[i]             # <<<<<<<<<<<<<<
  *         SigR[0] += f * sigRp[i] * pol[i]
  *         Sigp[0] += f * sigpp[i] * pol[i]
  */
-    __pyx_t_34 = 0;
-    __pyx_t_37 = __pyx_v_i;
-    __pyx_t_38 = __pyx_v_i;
-    (__pyx_v_Vrot[__pyx_t_34]) = ((__pyx_v_Vrot[__pyx_t_34]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vrotp.rcbuffer->pybuffer.buf, __pyx_t_37, __pyx_pybuffernd_vrotp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_38, __pyx_pybuffernd_pol.diminfo[0].strides))));
+    __pyx_t_29 = 0;
+    __pyx_t_32 = __pyx_v_i;
+    __pyx_t_33 = __pyx_v_i;
+    (__pyx_v_Vrot[__pyx_t_29]) = ((__pyx_v_Vrot[__pyx_t_29]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_vrotp.rcbuffer->pybuffer.buf, __pyx_t_32, __pyx_pybuffernd_vrotp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_33, __pyx_pybuffernd_pol.diminfo[0].strides))));
 
-    /* "projection_cy.pyx":199
+    /* "projection_cy.pyx":198
  *         Rho[0] += f * rhop[i] * pol[i]
  *         Vrot[0] += f * vrotp[i] * pol[i]
  *         SigR[0] += f * sigRp[i] * pol[i]             # <<<<<<<<<<<<<<
  *         Sigp[0] += f * sigpp[i] * pol[i]
  *         Sigz[0] += f * sigzp[i] * pol[i]
  */
-    __pyx_t_34 = 0;
-    __pyx_t_39 = __pyx_v_i;
-    __pyx_t_40 = __pyx_v_i;
-    (__pyx_v_SigR[__pyx_t_34]) = ((__pyx_v_SigR[__pyx_t_34]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigRp.rcbuffer->pybuffer.buf, __pyx_t_39, __pyx_pybuffernd_sigRp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_40, __pyx_pybuffernd_pol.diminfo[0].strides))));
+    __pyx_t_29 = 0;
+    __pyx_t_34 = __pyx_v_i;
+    __pyx_t_35 = __pyx_v_i;
+    (__pyx_v_SigR[__pyx_t_29]) = ((__pyx_v_SigR[__pyx_t_29]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigRp.rcbuffer->pybuffer.buf, __pyx_t_34, __pyx_pybuffernd_sigRp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_35, __pyx_pybuffernd_pol.diminfo[0].strides))));
 
-    /* "projection_cy.pyx":200
+    /* "projection_cy.pyx":199
  *         Vrot[0] += f * vrotp[i] * pol[i]
  *         SigR[0] += f * sigRp[i] * pol[i]
  *         Sigp[0] += f * sigpp[i] * pol[i]             # <<<<<<<<<<<<<<
  *         Sigz[0] += f * sigzp[i] * pol[i]
+ *     '''
  */
-    __pyx_t_34 = 0;
-    __pyx_t_41 = __pyx_v_i;
-    __pyx_t_42 = __pyx_v_i;
-    (__pyx_v_Sigp[__pyx_t_34]) = ((__pyx_v_Sigp[__pyx_t_34]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigpp.rcbuffer->pybuffer.buf, __pyx_t_41, __pyx_pybuffernd_sigpp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_42, __pyx_pybuffernd_pol.diminfo[0].strides))));
+    __pyx_t_29 = 0;
+    __pyx_t_36 = __pyx_v_i;
+    __pyx_t_37 = __pyx_v_i;
+    (__pyx_v_Sigp[__pyx_t_29]) = ((__pyx_v_Sigp[__pyx_t_29]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigpp.rcbuffer->pybuffer.buf, __pyx_t_36, __pyx_pybuffernd_sigpp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_37, __pyx_pybuffernd_pol.diminfo[0].strides))));
 
-    /* "projection_cy.pyx":201
+    /* "projection_cy.pyx":200
  *         SigR[0] += f * sigRp[i] * pol[i]
  *         Sigp[0] += f * sigpp[i] * pol[i]
  *         Sigz[0] += f * sigzp[i] * pol[i]             # <<<<<<<<<<<<<<
+ *     '''
+ * 
  */
-    __pyx_t_34 = 0;
-    __pyx_t_43 = __pyx_v_i;
-    __pyx_t_44 = __pyx_v_i;
-    (__pyx_v_Sigz[__pyx_t_34]) = ((__pyx_v_Sigz[__pyx_t_34]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigzp.rcbuffer->pybuffer.buf, __pyx_t_43, __pyx_pybuffernd_sigzp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_44, __pyx_pybuffernd_pol.diminfo[0].strides))));
+    __pyx_t_29 = 0;
+    __pyx_t_38 = __pyx_v_i;
+    __pyx_t_39 = __pyx_v_i;
+    (__pyx_v_Sigz[__pyx_t_29]) = ((__pyx_v_Sigz[__pyx_t_29]) + ((__pyx_v_f * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_sigzp.rcbuffer->pybuffer.buf, __pyx_t_38, __pyx_pybuffernd_sigzp.diminfo[0].strides))) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_pol.rcbuffer->pybuffer.buf, __pyx_t_39, __pyx_pybuffernd_pol.diminfo[0].strides))));
   }
 
   /* "projection_cy.pyx":135
