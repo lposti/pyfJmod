@@ -20,7 +20,7 @@ from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
 # from scipy.ndimage.filters import gaussian_filter
-from projection_cy import projection, LagrangePolynomials
+from projection_cy import projection
 
 
 class FJmodel(object):
@@ -275,9 +275,14 @@ class FJmodel(object):
                                                      Fast_evaluate_moments=self._fast_evaluate_moments,
                                                      verbose=verbose)
         '''
-        lag_poly = LagrangePolynomials(self.npoly, self.ar, self.rhl, self.vrotl, self.sigRl, self.sigpl, self.sigzl)
         self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
-                                                     npsi=npsi, lp=lag_poly, scale=scale,
+                                                     npsi=npsi, npoly=self.npoly, nr=self.nr,
+                                                     ar=self.ar, rhl=self.rhl.reshape((self.nr * self.npoly)),
+                                                     vrotl=self.vrotl.reshape((self.nr * self.npoly)),
+                                                     sigRl=self.sigRl.reshape((self.nr * self.npoly)),
+                                                     sigpl=self.sigpl.reshape((self.nr * self.npoly)),
+                                                     sigzl=self.sigzl.reshape((self.nr * self.npoly)),
+                                                     scale=scale,
                                                      verbose=verbose)
 
         # remove nans in the maps

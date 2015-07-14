@@ -43,6 +43,7 @@ setup(name='pyfJmod',
                    'Topic :: Scientific/Engineering :: Astronomy',
                    'Topic :: Scientific/Engineering :: Physics',
                    'Topic :: Utilities'],
-      ext_modules=[Extension('projection_cy', ['fJmodel/projection_cy.pyx'], include_dirs=[get_include()])],
+      ext_modules=[Extension('projection_cy', ['fJmodel/projection_cy.pyx'], include_dirs=[get_include()],
+                             extra_compile_args=['-fopenmp'], extra_link_args=['-fopenmp'],)],
       cmdclass={'build_ext': build_ext}
       )
