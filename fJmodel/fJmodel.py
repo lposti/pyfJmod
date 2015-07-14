@@ -15,7 +15,7 @@ from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
     cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, logspace,\
-    concatenate, sum
+    concatenate, sum, gradient
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
@@ -310,31 +310,23 @@ class FJmodel(object):
         # find the projected half mass radius
         #
 
-        # grid density (exclude minimum at -10)
-        dd = linspace((self.dlos[self.dlos > -9]).min(), self.dlos.max(), num=nx)
+        X, Y = meshgrid(self.xmap, self.ymap)
+        dx, dy = gradient(X)[1], gradient(Y)[0]
 
-        # compute projected mass array
-        mm = []
-        for i in range(len(dd)):
-            w = self.dlos > dd[i]
-            mm.append(pow(Rmax / nx, 2) * power(10., self.dlos[w]).sum())
+        mass = []
+        for k in range(nx):
+            w = X ** 2 + Y ** 2 <= self.xmap[nx + k] ** 2
+            mass.append(sum(dx[w] * dy[w] * 10. ** self.dlos[w]))
 
-        # compute semi-major axis at each density level
-        RR = []
-        for i in range(len(mm)):
-            idx = abs(self.dlos[:, len(self.dlos) / 2] - dd[i]).argmin()
-            RR.append(abs(self.xmap[idx]))
-
-        # minimize to get the effective radius
-        id_r_eff = abs(mm - mm[0] / 2).argmin()
-        self.r_eff = RR[id_r_eff]
-        print "Effective radius:", self.r_eff, "[M/2-M(Re)]/M=", abs(mm - mm[0] / 2).min() / mm[0]
+        id_r_eff = abs(mass - mass[-1] / 2.).argmin()
+        self.r_eff = self.xmap[nx + id_r_eff]
+        print "Effective radius:", self.r_eff, "[M/2-M(Re)]/M=", abs(mass - mass[-1] / 2).min() / mass[-1]
 
         #
         # compute scale velocity
         #
 
-        w = self.dlos > dd[id_r_eff]
+        w = X ** 2 + Y ** 2 <= self.r_eff
 
         self.v_scale = (power(10., self.dlos[w]) * sqrt(self.vlos[w] ** 2 + self.slos[w] ** 2)).sum() /\
             power(10., self.dlos[w]).sum()
@@ -447,7 +439,7 @@ class FJmodel(object):
 
         x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale, **kwargs)
 
-        R_arcsec = linspace(0.2, 250., num=200)
+        R_arcsec = linspace(0.02, 250., num=200)
         R = R_arcsec * Re_model / Re_data
 
         # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
