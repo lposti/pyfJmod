@@ -296,10 +296,10 @@ class FJmodel(object):
                     self.vlos[j, k] = 1e-10
 
         if scale is 'log':
-            self.xmap = logspace(log10(Rmin), log10(Rmax), num=nx)
+            self.xmap = logspace(float(log10(Rmin)), float(log10(Rmax)), num=nx)
             self.xmap = concatenate((-self.xmap[::-1], self.xmap))
 
-            self.ymap = logspace(log10(Rmin), log10(Rmax), num=nx)
+            self.ymap = logspace(float(log10(Rmin)), float(log10(Rmax)), num=nx)
             self.ymap = concatenate((-self.ymap[::-1], self.ymap))
 
         elif scale is 'linear':
@@ -455,10 +455,11 @@ class FJmodel(object):
             """
             return x_scale * sinh(linspace(xmin, float(arcsinh(xmax / x_scale)), num=num))
 
-        x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale, **kwargs)
-
         R_arcsec = sinhspace(250., xmin=0.05, num=200, x_scale=Re_data / 10.)  # linspace(0.05, 250., num=200)
         R = R_arcsec * float(Re_model / Re_data)
+
+        x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale,
+                            Rmax=R.max(), Rmin=R.min(), **kwargs)
 
         # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 

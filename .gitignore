@@ -4,6 +4,7 @@ distutlis.cmds
 dist/
 htmlcov
 /.project
+.idea/pyfJmod.iml
 plot*.py
 build/
 fJmodel/projection_cy.c
