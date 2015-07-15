@@ -253,7 +253,7 @@ class FJmodel(object):
 
         return massfJ
 
-    def project(self, inclination, nx=60, npsi=31, b=1., scale='linear', Rmax=None, verbose=True):
+    def project(self, inclination, nx=60, npsi=31, b=1., scale='linear', Rmax=None, Rmin=None, verbose=True):
         """
         Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
         :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
@@ -267,6 +267,8 @@ class FJmodel(object):
 
         if Rmax is None:  # pragma: no cover
             Rmax = self.ar[-1]
+        if Rmin is None:  # pragma: no cover
+            Rmin = self.ar[0]
 
         # nx, npsi = 60, 81
         '''
@@ -275,7 +277,7 @@ class FJmodel(object):
                                                      Fast_evaluate_moments=self._fast_evaluate_moments,
                                                      verbose=verbose)
         '''
-        self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, nx=nx,
+        self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, Rmin=Rmin, nx=nx,
                                                      npsi=npsi, npoly=self.npoly, nr=self.nr,
                                                      ar=self.ar, rhl=self.rhl.reshape((self.nr * self.npoly)),
                                                      vrotl=self.vrotl.reshape((self.nr * self.npoly)),
@@ -294,15 +296,18 @@ class FJmodel(object):
                     self.vlos[j, k] = 1e-10
 
         if scale is 'log':
-            self.xmap = logspace(-1., log10(Rmax), num=nx)
+            self.xmap = logspace(log10(Rmin), log10(Rmax), num=nx)
             self.xmap = concatenate((-self.xmap[::-1], self.xmap))
 
-            self.ymap = logspace(-1., log10(Rmax), num=nx)
+            self.ymap = logspace(log10(Rmin), log10(Rmax), num=nx)
             self.ymap = concatenate((-self.ymap[::-1], self.ymap))
 
         elif scale is 'linear':
-            self.xmap = linspace(-Rmax, Rmax, num=2 * nx)
-            self.ymap = linspace(-Rmax, Rmax, num=2 * nx)
+            self.xmap = linspace(Rmin, Rmax, num=nx)
+            self.xmap = concatenate((-self.xmap[::-1], self.xmap))
+
+            self.ymap = linspace(Rmin, Rmax, num=nx)
+            self.ymap = concatenate((-self.ymap[::-1], self.ymap))
         else:
             raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
 

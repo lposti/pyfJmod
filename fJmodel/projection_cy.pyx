@@ -5,7 +5,7 @@
 __author__ = 'lposti'
 
 
-from numpy import pi, zeros, logspace, concatenate, searchsorted
+from numpy import pi, zeros, logspace, linspace, concatenate, searchsorted
 from numpy cimport ndarray, double_t
 from progressbar import ProgressBar, widgets
 from cython.parallel import prange
@@ -23,7 +23,7 @@ cdef extern from "math.h":
     double atan2 ( double x, double y ) nogil
 
 
-cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
+cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int npsi,
                  int npoly, int nr, ndarray[double_t, ndim=1] ar,
                  ndarray[double_t, ndim=1] rhl, ndarray[double_t, ndim=1] vrotl, ndarray[double_t, ndim=1] sigRl,
                  ndarray[double_t, ndim=1] sigpl, ndarray[double_t, ndim=1] sigzl,
@@ -48,8 +48,13 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
         pbar = ProgressBar(maxval=2 * nx * nx * npsi, widgets=wdgt).start()
 
         if scale is 'log':
-            yy = logspace(-1., log10(Rmax), num=nx)
+            yy = logspace(log10(Rmin), log10(Rmax), num=nx)
             yy = concatenate((-yy[::-1], yy))
+        elif scale is 'linear':
+            yy = linspace(Rmin, Rmax, num=nx)
+            yy = concatenate((-yy[::-1], yy))
+        else:
+            raise ValueError("Parameter 'scale' must be set to 'linear' or 'log'!")
 
         cdef:
             double yp=0., zp =0.
@@ -62,17 +67,11 @@ cpdef projection(double incl, double b, double Rmax, int nx, int npsi,
 
         for i in range(nx):
 
-            if scale is 'log':
-                yp = yy[nx + i]
-            elif scale is 'linear':
-                yp = float(i + .5) / (float((nx - 1) + .5)) * ymax
+            yp = yy[nx + i]
 
             for j in range(2 * nx):
 
-                if scale is 'log':
-                    zp = yy[j]
-                elif scale is 'linear':
-                    zp = (-1. + 2. * j / float(2 * nx - 1)) * zmax
+                zp = yy[j]
 
                 rp = sqrt(yp * yp + zp * zp)
                 a = 0.
