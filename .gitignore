@@ -3,3 +3,9 @@ profile.prof
 distutlis.cmds
 dist/
 htmlcov
+/.project
+plot*.py
+build/
+fJmodel/projection_cy.c
+fJmodel/projection_cy.o
+projection_cy.so
