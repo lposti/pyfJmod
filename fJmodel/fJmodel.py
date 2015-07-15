@@ -337,7 +337,7 @@ class FJmodel(object):
 
     @staticmethod
     def projection_static(incl, b, Rmax, nx, npsi, scale='linear',
-                        Fast_evaluate_moments=None, verbose=True):
+                          Fast_evaluate_moments=None, verbose=True):
         """
         Static method: projects the given model
         :param incl: inclination angle of the line-of-sight

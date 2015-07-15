@@ -22,7 +22,7 @@ if "veryclean" in argv[1:]:
     argv[1] = "clean"
 
 setup(name='pyfJmod',
-      version='0.2.2',
+      version='0.2.4',
       description='Python package for f(J) models analysis',
       author='Lorenzo Posti',
       author_email='lorenzo.posti@gmail.com',
