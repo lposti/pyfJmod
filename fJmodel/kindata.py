@@ -558,14 +558,16 @@ class KinData(object):
         plt.plot(X_xd_pv, (flux[s])[xd], 'ro')
         plt.show()
 
-    def get_sb_profile(self):
+    def get_sb_profile(self, Re_fix=None, **kwargs):
 
         R, sb = self.get_surface_brightness(self.R_arcsec, self.gc)
-        alpha, n, I_0 = self.fit_sersic_profile(R, -sb)
+        Re, n, I_0, Re_fix, n_fix, I_0_fix = self.fit_sersic_profile(R, -sb, Re_fix=Re_fix, **kwargs)
 
         plt.gca().invert_yaxis()
         plt.plot(R, sb, 'ro-')
-        plt.plot(R, -KinData.sersic(R, alpha, n, I_0), 'k-', lw=2)
+        plt.plot(R, -KinData.sersic(R, Re, n, I_0), 'k-', lw=2)
+        if Re_fix is not None:
+            plt.plot(R, -KinData.sersic(R, Re_fix, n_fix, I_0_fix), 'g--', lw=2)
         plt.show()
 
     @staticmethod
@@ -696,40 +698,81 @@ class KinData(object):
         return array(Rout), array(sb)
 
     @staticmethod
-    def sersic(x, alpha, n, I_0):
+    def sersic(x, Re, n, I_0):
         x = asarray(x)
-        return 2.5 * log10(I_0 * exp(-(x / abs(alpha)) ** (1. / n)))
+        b = 2. * n - 1. / 3. + 4. / (405. * n)
+        return 2.5 * log10(I_0 * exp(- b * (x / abs(Re)) ** (1. / n)))
 
     @staticmethod
-    def fit_sersic_profile(R, sb, I_0_in=None):
+    def fit_sersic_profile(R, sb, I_0_in=None, Re_fix=None):
 
+        Re_min, n_min, I_0_min = None, None, None
+        n_fix, I_0_fix = None, None
         if I_0_in is None:
-            I_0_in = 10. ** (0.4 * sb[0]) * 1.5
+            I_0_in = 10. ** (0.4 * sb[0])
 
-        def likelihood(t, x, y):
-            # chi squared likelihood
-            alpha, n = t
-            chi_square = (y - KinData.sersic(x, alpha, n, I_0_in)) ** 2
-            return chi_square[chi_square < 999.].sum()
+        if Re_fix is None:
+            '''
+                Likelihood with fixed effective radius
+            '''
+            def likelihood(t, x, y):
+                # chi squared likelihood
+                n, Re, I_0 = t
+                chi_square = (y - KinData.sersic(x, Re, n, I_0)) ** 2
+                return chi_square[chi_square < 999.].sum()
+        else:
+            '''
+                Likelihood with variable effective radius
+            '''
+            def likelihood(t, x, y, Re):
+                # chi squared likelihood
+                n, I_0 = t
+                chi_square = (y - KinData.sersic(x, Re, n, I_0)) ** 2
+                return chi_square[chi_square < 999.].sum()
 
         f = lambda *args: likelihood(*args)
-        res = minimize(f, [1e-3, 4.], args=(R, sb))
-        alpha_min, n_min = res["x"]
-        chi_sq_min = (sb - KinData.sersic(R, alpha_min, n_min, I_0_in)) ** 2
-        print "\nLikelihood minimization: \t (%f, %f, %e) \t CHIsq=%f" % \
-            (alpha_min, n_min, I_0_in, chi_sq_min[chi_sq_min < 999.].sum())
+        if Re_fix is None:
+            # in method L-BFGS-B bounds for the parameters can be specified
+            res = minimize(f, [4., 10., I_0_in], args=(R, sb),
+                           method='L-BFGS-B', bounds=[(0.5, 20.), (.1, 100.), (I_0_in * 1e-1, I_0_in * 1e3)])
+            n_min, Re_min, I_0_min = res["x"]
+            chi_sq_min = (sb - KinData.sersic(R, Re_min, n_min, I_0_min)) ** 2
+            print "\nLikelihood minimization: \t (%f, %f, %e) \t CHIsq=%f" % \
+                (Re_min, n_min, I_0_min, chi_sq_min[chi_sq_min < 999.].sum())
+        else:
+            # in method L-BFGS-B bounds for the parameters can be specified
+            res = minimize(f, [4., I_0_in], args=(R, sb, Re_fix),
+                           method='L-BFGS-B', bounds=[(0.5, 20.), (I_0_in * 1e-1, I_0_in * 1e3)])
+            n_fix, I_0_fix = res["x"]
+            chi_sq_min = (sb - KinData.sersic(R, Re_fix, n_fix, I_0_fix)) ** 2
+            print "\nLikelihood minimization (w. fixed Re): \t (%f, %f, %e) \t CHIsq=%f" % \
+                (Re_fix, n_fix, I_0_fix, chi_sq_min[chi_sq_min < 999.].sum())
 
         try:
+            '''
+                Try with the curve_fit method.
+                Usually gives better results in terms of ChiSQ, so its output is preferred
+            '''
             w = (sb < 999.) & (sb > -999.)
-            p_opt, p_cov = curve_fit(KinData.sersic, R[w], sb[w], p0=[1e-3, 4., I_0_in])
-            alpha_c, n_c, I_0_c = p_opt[0], p_opt[1], p_opt[2]
-            chi_sq_c = (sb - KinData.sersic(R, alpha_c, n_c, I_0_c)) ** 2
+            p_opt, p_cov = curve_fit(KinData.sersic, R[w], sb[w], p0=[10., 4., I_0_in])
+            Re_c, n_c, I_0_c = p_opt[0], p_opt[1], p_opt[2]
+            chi_sq_c = (sb - KinData.sersic(R, Re_c, n_c, I_0_c)) ** 2
             print "\nCurve fitting: \t (%f, %f, %e) \t CHIsq=%f" % \
-                  (alpha_c, n_c, I_0_c, chi_sq_c[chi_sq_c < 999.].sum())
-            ret = alpha_c, n_c, I_0_c
+                  (Re_c, n_c, I_0_c, chi_sq_c[chi_sq_c < 999.].sum())
+
+            '''
+                Return Values
+            '''
+            if Re_fix is None:
+                ret = Re_c, n_c, I_0_c, Re_min, n_min, I_0_min
+            else:
+                ret = Re_c, n_c, I_0_c, Re_fix, n_fix, I_0_fix
 
         except RuntimeError:
-            ret = alpha_min, n_min, I_0_in
+            if Re_fix is None:
+                ret = Re_min, n_min, I_0_min, None, None, None
+            else:
+                ret = Re_fix, n_fix, I_0_fix, None, None, None
 
         return ret
 

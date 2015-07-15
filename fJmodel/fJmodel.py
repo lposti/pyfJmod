@@ -15,7 +15,7 @@ from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
     cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, logspace,\
-    concatenate, sum, gradient
+    concatenate, sum, gradient, arcsinh
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
@@ -437,10 +437,23 @@ class FJmodel(object):
 
     def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', Re_model=1., Re_data=1., **kwargs):
 
+        def sinhspace(xmax, num, x_scale=1., xmin=0.):
+            """
+                Function for numpy array creation:
+                returns an array spaced accordingly to
+                the hyperbolic sine metric.
+
+                The returned array will be linearly
+                spaced from xmin to x_scale and will
+                be logarithmically spaced from x_scale
+                to xmax.
+            """
+            return x_scale * sinh(linspace(xmin, float(arcsinh(xmax / x_scale)), num=num))
+
         x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale, **kwargs)
 
-        R_arcsec = linspace(0.02, 250., num=200)
-        R = R_arcsec * Re_model / Re_data
+        R_arcsec = sinhspace(250., xmin=0.05, num=200, x_scale=Re_data / 10.)  # linspace(0.05, 250., num=200)
+        R = R_arcsec * float(Re_model / Re_data)
 
         # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 
