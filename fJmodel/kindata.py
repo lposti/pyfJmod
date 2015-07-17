@@ -34,8 +34,10 @@ class KinData(object):
 
             if directory[-1] == '/':
                 self.gal_name = directory[-8:-1]
+                self.conf_file = directory[:-8] + 'fits_rband/CALIFA_ETGs.conf'
             else:
                 self.gal_name = directory[-7:]
+                self.conf_file = directory[:-7] + 'fits_rband/CALIFA_ETGs.conf'
             print "Galaxy:", self.gal_name
 
             self.fits_file = directory + '/' + self.gal_name + '.V1200.rscube_INDOUSv2_SN20_stellar_kin.fits'
@@ -55,6 +57,7 @@ class KinData(object):
             raise ValueError("ERROR: either pass the directory where the MGE, kinematic"
                              "and aperture data are or pass the filenames directly.")
 
+        self.Re = self._get_effective_radius()
         self.angle = float(getline(self.aperture_file, 4).split()[0])
         self.R_arcsec, self.gc = None, None
 
@@ -500,63 +503,32 @@ class KinData(object):
 
         return flux_contour
 
-    def plot_light_profile(self, model=None, inclination=90, Rmax_model=None):
+    def plot_light_profile(self, Re_fix=None, model=None, inclination=90, Re_model=None, nx=100):
 
-        flux = self._get_flux_bin()
+        # plotting surface brightness profile with Sersic fits
+        self.get_sb_profile(Re_fix=Re_fix)
 
-        # get kinematic data
-        vel, sig, X, Y, bins, s, dx = self._get_kinematic_data()
-        flux_image = self.display_pixels(X[s], Y[s], flux[s], pixelsize=dx)
-
-        # get flux contour
-        flux_contour = self._get_flux_contour()
-        plt.contourf(flux_contour)
-        plt.show()
-
-        plot = 1
-        if plot:
-            # plotting
-            fig = plt.figure(figsize=(14, 7.5))
-            ax = fig.add_subplot(111)
-            ax.set_xlabel("RA [arcsec]")
-            ax.set_ylabel("DEC [arcsec]")
-            image = plt.imshow(flux_image, cmap=sauron, interpolation='nearest',
-                               extent=[X[s].min() - dx, X[s].max() + dx,
-                                       Y[s].min() - dx, Y[s].max() + dx])
-
-            colorbar = fig.colorbar(image)
-            colorbar.set_label(r'Flux')
-
-        xd, X_pv, X_xd_pv, x, y = self._get_vel_curve_idx(X, Y, s, dx, bins, vel, full_output=True)
-
-        plt.plot(x, y, 'wo')
-        plt.show()
-
-        fig = plt.figure()
         if model is not None and isinstance(model, FJmodel):
 
             f = model
 
-            # get model
-            if Rmax_model is None:
-                Rmax = 20.  # f.ar[-1]
-            else:
-                Rmax = Rmax_model
-            x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+            if Re_model is None:
+                print 'Projecting model to compute Re...'
+                f.project(inclination=inclination, nx=100, scale='log', verbose=False)
+                Re_model = f.r_eff
 
-            model_density = power(10., f.dlos)
-            # peaks of velocity moments, used for re-scaling the model
-            data_scale = npmax(10. ** (-1. / 2.5 * flux[s])[xd])
-            model_scale = npmax(model_density)
+            r_mod, gc_mod = f.light_profile(inclination=inclination, nx=nx, npsi=61,
+                                            Re_model=Re_model, Re_data=self.Re,
+                                            xmin=self.R_arcsec[0], xmax=self.R_arcsec[-1], num=len(self.R_arcsec))
 
-            plt.plot(x / npmax(x) * npmax(X_xd_pv), -2.5 * log10(model_density[:, len(model_density) / 2] /
-                     model_scale * data_scale), 'b-')
+            gc_scale = self.gc[npabs(self.R_arcsec - self.Re).argmin()] - gc_mod[npabs(r_mod - self.Re).argmin()]
+            R_mod, SB_mod = KinData.get_surface_brightness(r_mod, gc_mod + gc_scale)
+            plt.plot(R_mod, SB_mod, 'bo')
 
-        else:
-            plt.plot(X_pv, flux[s], 'b.')
-
-        plt.plot(X_xd_pv, (flux[s])[xd], 'ro')
-        plt.show()
+            # Plot of the growth curves
+            # plt.figure()
+            # plt.plot(r_mod, gc_mod + gc_scale, 'bo', self.R_arcsec, self.gc, 'ro')
+            # plt.show()
 
     def get_sb_profile(self, Re_fix=None, **kwargs):
 
@@ -830,6 +802,17 @@ class KinData(object):
         s = where(bins > -0.5)[0]
 
         return bins, s
+
+    def _get_effective_radius(self):
+
+        # read CALIFA_ETGs.conf file
+        for n_line in range(29, 39):
+            line = getline(self.conf_file, n_line)
+
+            if line.split()[1] == self.gal_name:
+                Re = float(line.split()[16])
+
+        return Re
 
     def _read_growth_curve_file(self):
 

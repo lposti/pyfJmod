@@ -440,9 +440,10 @@ class FJmodel(object):
 
         return dlos, slos, vlos
 
-    def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', Re_model=1., Re_data=1., **kwargs):
+    def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', Re_model=1., Re_data=1.,
+                      xmin=0.05, xmax=250., num=200, **kwargs):
 
-        def sinhspace(xmax, num, x_scale=1., xmin=0.):
+        def sinhspace(x_max, number, x_scale=1., x_min=0.):
             """
                 Function for numpy array creation:
                 returns an array spaced accordingly to
@@ -453,26 +454,27 @@ class FJmodel(object):
                 be logarithmically spaced from x_scale
                 to xmax.
             """
-            return x_scale * sinh(linspace(xmin, float(arcsinh(xmax / x_scale)), num=num))
+            return x_scale * sinh(linspace(x_min, float(arcsinh(x_max / x_scale)), num=number))
 
-        R_arcsec = sinhspace(250., xmin=0.05, num=200, x_scale=Re_data / 10.)  # linspace(0.05, 250., num=200)
+        R_arcsec = sinhspace(xmax, x_min=xmin, number=num, x_scale=Re_data / 20.)  # linspace(0.05, 250., num=200)
         R = R_arcsec * float(Re_model / Re_data)
 
         x, y = self.project(inclination=inclination, nx=nx, npsi=npsi, scale=scale,
                             Rmax=R.max(), Rmin=R.min(), **kwargs)
+        X, Y = meshgrid(x, y)
+        dx, dy = gradient(X)[1], gradient(Y)[0]
 
         # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
 
         wdgt = [widgets.FormatLabel('Computing growth curve: '), widgets.Percentage()]
         pbar = ProgressBar(maxval=len(R), widgets=wdgt).start()
 
-        X, Y = meshgrid(x, y)
         growth_curve = []
 
         for k in range(len(R)):
             pbar.update(k + 1)
             w = X ** 2 + Y ** 2 <= R[k] ** 2
-            growth_curve.append(sum(10. ** self.dlos[w]))
+            growth_curve.append(sum(dx[w] * dy[w] * 10. ** self.dlos[w]))
 
         pbar.finish()
 
