@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'lposti'
 
 from fJmodel import FJmodel
@@ -19,6 +20,9 @@ from scipy.interpolate import RectBivariateSpline
 from scipy.optimize import minimize, curve_fit
 import matplotlib.pylab as plt
 import pyfits
+
+
+CALIFA_arcsec_spaxel = 1.
 
 
 class KinData(object):
@@ -151,7 +155,7 @@ class KinData(object):
         elif isinstance(model, basestring):
             f = FJmodel(model)
         else:
-            raise NotImplementedError(" -- ERROR: either pass an FJmodel instance or full qualified path")
+            raise ValueError(" -- ERROR: either pass an FJmodel instance or full qualified path")
 
         # get data
         vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
@@ -193,7 +197,7 @@ class KinData(object):
         smin, smax = npmin(sig[bins[s]]), npmax(sig[bins[s]])
 
         data_contour_levels = linspace(float((log10(mge)).min()) * .6, 0, num=6)
-        model_contour_levels = linspace(float(density_model.min()) * .75, 0, num=6)
+        model_contour_levels = linspace(float(density_model.min()) * .6, 0, num=6)
 
         # do I have to reverse the Velocity field?
         if reverse_v_field:
@@ -209,14 +213,16 @@ class KinData(object):
         ax.set_xlabel("RA [arcsec]")
         ax.set_ylabel("DEC [arcsec]")
         image = plt.imshow(vel_image, cmap=sauron, interpolation='nearest',
-                           extent=[X[s].min() - dx, X[s].max() + dx,
-                                   Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+                           extent=[(X[s].min() - dx) * CALIFA_arcsec_spaxel, (X[s].max() + dx) * CALIFA_arcsec_spaxel,
+                                   (Y[s].min() - dx) * CALIFA_arcsec_spaxel, (Y[s].max() + dx) * CALIFA_arcsec_spaxel],
+                           **kwargs)
 
         image.set_clim(vmin=vmin, vmax=vmax)
         colorbar = fig.colorbar(image)
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
-        ax.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
+        ax.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, log10(mge).T,
+                   colors='k', levels=data_contour_levels)
 
         if one_figure:
             ax2 = fig.add_subplot(222)
@@ -226,8 +232,9 @@ class KinData(object):
         ax2.set_xlabel("RA [arcsec]")
         ax2.set_ylabel("DEC [arcsec]")
         image2 = plt.imshow(sig_image, cmap=sauron, interpolation='nearest',
-                            extent=[X[s].min() - dx, X[s].max() + dx,
-                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+                            extent=[(X[s].min() - dx) * CALIFA_arcsec_spaxel, (X[s].max() + dx) * CALIFA_arcsec_spaxel,
+                                    (Y[s].min() - dx) * CALIFA_arcsec_spaxel, (Y[s].max() + dx) * CALIFA_arcsec_spaxel],
+                            **kwargs)
 
         image2.set_clim(vmin=smin, vmax=smax)
         if one_figure:
@@ -236,7 +243,8 @@ class KinData(object):
             colorbar = fig2.colorbar(image2)
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
-        ax2.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
+        ax2.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, log10(mge).T,
+                    log10(mge).T, colors='k', levels=data_contour_levels)
 
         if one_figure:
             ax3 = fig.add_subplot(223)
@@ -246,8 +254,9 @@ class KinData(object):
         ax3.set_xlabel("RA [arcsec]")
         ax3.set_ylabel("DEC [arcsec]")
         image3 = plt.imshow(vel_image_mod / model_scale[0] * data_scale[0], cmap=sauron, interpolation='nearest',
-                            extent=[X[s].min() - dx, X[s].max() + dx,
-                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+                            extent=[(X[s].min() - dx) * CALIFA_arcsec_spaxel, (X[s].max() + dx) * CALIFA_arcsec_spaxel,
+                                    (Y[s].min() - dx) * CALIFA_arcsec_spaxel, (Y[s].max() + dx) * CALIFA_arcsec_spaxel],
+                            **kwargs)
 
         image3.set_clim(vmin=vmin, vmax=vmax)
         if one_figure:
@@ -256,7 +265,8 @@ class KinData(object):
             colorbar = fig3.colorbar(image3)
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
-        ax3.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+        ax3.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, density_model.T,
+                    colors='k', levels=model_contour_levels)
 
         if one_figure:
             ax4 = fig.add_subplot(224)
@@ -266,8 +276,9 @@ class KinData(object):
         ax4.set_xlabel("RA [arcsec]")
         ax4.set_ylabel("DEC [arcsec]")
         image4 = plt.imshow(sig_image_mod / model_scale[1] * data_scale[1], cmap=sauron, interpolation='nearest',
-                            extent=[X[s].min() - dx, X[s].max() + dx,
-                                    Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+                            extent=[(X[s].min() - dx) * CALIFA_arcsec_spaxel, (X[s].max() + dx) * CALIFA_arcsec_spaxel,
+                                    (Y[s].min() - dx) * CALIFA_arcsec_spaxel, (Y[s].max() + dx) * CALIFA_arcsec_spaxel],
+                            **kwargs)
         image4.set_clim(vmin=smin, vmax=smax)
         if one_figure:
             colorbar = fig.colorbar(image4)
@@ -275,7 +286,8 @@ class KinData(object):
             colorbar = fig4.colorbar(image4)
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
-        ax4.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+        ax4.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, density_model.T,
+                    colors='k', levels=model_contour_levels)
 
         # V_RMS Figure
         if one_figure:
@@ -332,10 +344,10 @@ class KinData(object):
             Rmax = 20.  # f.ar[-1]
         else:
             Rmax = Rmax_model
-        x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+        x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')  # , Rmax=Rmax)
 
         # maxgrid: max value of the observed grid. Used to rescale the model image
-        maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
+        # maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
 
         sigma, velocity, density = RectBivariateSpline(x, y, f.slos), RectBivariateSpline(x, y, f.vlos),\
             RectBivariateSpline(x, y, f.dlos)
@@ -346,16 +358,16 @@ class KinData(object):
         for i in range(nx):
             for j in range(ny):
                 x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[ny - 1 - j]) \
-                    * Rmax / maxgrid
+                    * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[ny - 1 - j]) \
-                    * Rmax / maxgrid
+                    * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 sigma_model[i * ny + j] = sigma.ev(x_rotated, y_rotated)
                 velocity_model[i * ny + j] = velocity.ev(x_rotated, y_rotated)
 
                 x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[j]) \
-                    * Rmax / maxgrid
+                    * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[j]) \
-                    * Rmax / maxgrid
+                    * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 density_model[i, j] = density.ev(x_rotated, y_rotated)
 
         # normalize density to its maximum
@@ -435,24 +447,29 @@ class KinData(object):
             Rmax = 20.  # f.ar[-1]
         else:
             Rmax = Rmax_model
-        x, y = f.project(inclination=inclination, nx=30, npsi=31, Rmax=Rmax)
+        x, y = f.project(inclination=inclination, nx=60, npsi=31, Rmax=Rmax, scale='log')
 
         # peaks of velocity moments, used for re-scaling the model
         data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
         model_scale = npmax(f.vlos), npmax(f.slos)
+
+        id_min, id_max = npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).min()).argmin(),\
+            npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).max()).argmin()
 
         # plot position-velocity diagrams
         fig = plt.figure(figsize=(14, 7.5))
         ax = fig.add_subplot(121)
         ax.set_xlabel("semi-major axis [arcsec]", fontsize=18)
         ax.set_ylabel("velocity [km/s]", fontsize=18)
-        ax.plot(x / npmax(x) * npmax(X_xd_pv), f.vlos[:, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
+        ax.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
+                f.vlos[id_min:id_max, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
         ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
         ax2 = fig.add_subplot(122)
         ax2.set_xlabel("semi-major axis [arcsec]", fontsize=18)
         ax2.set_ylabel("velocity dispersion [km/s]", fontsize=18)
-        ax2.plot(x / npmax(x) * npmax(X_xd_pv), f.slos[:, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
+        ax2.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
+                 f.slos[id_min:id_max, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
         if save_fig:
@@ -503,10 +520,12 @@ class KinData(object):
 
         return flux_contour
 
-    def plot_light_profile(self, Re_fix=None, model=None, inclination=90, Re_model=None, nx=100):
+    def plot_light_profile(self, Re_fix=None, model=None, inclination=90, Re_model=None, nx=100, save_fig=False):
 
         # plotting surface brightness profile with Sersic fits
-        self.get_sb_profile(Re_fix=Re_fix)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        self.get_sb_profile(Re_fix=Re_fix, show=False)
 
         if model is not None and isinstance(model, FJmodel):
 
@@ -514,7 +533,7 @@ class KinData(object):
 
             if Re_model is None:
                 print 'Projecting model to compute Re...'
-                f.project(inclination=inclination, nx=100, scale='log', verbose=False)
+                f.project(inclination=inclination, nx=60, scale='log', verbose=False)
                 Re_model = f.r_eff
 
             r_mod, gc_mod = f.light_profile(inclination=inclination, nx=nx, npsi=61,
@@ -523,24 +542,42 @@ class KinData(object):
 
             gc_scale = self.gc[npabs(self.R_arcsec - self.Re).argmin()] - gc_mod[npabs(r_mod - self.Re).argmin()]
             R_mod, SB_mod = KinData.get_surface_brightness(r_mod, gc_mod + gc_scale)
-            plt.plot(R_mod, SB_mod, 'bo')
+            if Re_fix is not None:
+                ax.plot(R_mod / Re_fix, SB_mod / SB_mod[npabs(R_mod - Re_fix).argmin()], 'bo',
+                        label=r"$f(\bf J)$ model")
+            else:
+                ax.plot(R_mod / self.Re, SB_mod / SB_mod[npabs(R_mod - self.Re).argmin()], 'bo',
+                        label=r"$f(\bf J)$ model")
+            ax.set_xlabel(r"$R/R_{\rm e}$", fontsize=18)
+            ax.set_ylabel(r"$I(R)/I(R_{\rm e})$", fontsize=18)
+            ax.set_xscale('log')
 
             # Plot of the growth curves
             # plt.figure()
             # plt.plot(r_mod, gc_mod + gc_scale, 'bo', self.R_arcsec, self.gc, 'ro')
-            # plt.show()
+            plt.legend(loc='best', fontsize=16)
+            if save_fig:
+                plt.savefig(self.gal_name + "_SB_wmodel.pdf", bbox_inches='tight')
+            plt.show()
 
-    def get_sb_profile(self, Re_fix=None, **kwargs):
+    def get_sb_profile(self, Re_fix=None, show=True, **kwargs):
 
         R, sb = self.get_surface_brightness(self.R_arcsec, self.gc)
         Re, n, I_0, Re_fix, n_fix, I_0_fix = self.fit_sersic_profile(R, -sb, Re_fix=Re_fix, **kwargs)
 
         plt.gca().invert_yaxis()
-        plt.plot(R, sb, 'ro-')
-        plt.plot(R, -KinData.sersic(R, Re, n, I_0), 'k-', lw=2)
+
         if Re_fix is not None:
-            plt.plot(R, -KinData.sersic(R, Re_fix, n_fix, I_0_fix), 'g--', lw=2)
-        plt.show()
+            plt.plot(R / Re_fix, sb / sb[npabs(R - Re_fix).argmin()], 'ro-', label=self.gal_name)
+            plt.plot(R / Re_fix, KinData.sersic(R, Re_fix, n_fix, I_0_fix) /
+                     KinData.sersic(Re_fix, Re_fix, n_fix, I_0_fix), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n_fix)
+        else:
+            plt.plot(R / Re, sb / sb[npabs(R - Re).argmin()], 'ro-', label=self.gal_name)
+            plt.plot(R / Re, KinData.sersic(R, Re, n, I_0) /
+                     KinData.sersic(Re, Re, n, I_0), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n)
+
+        if show:
+            plt.show()
 
     @staticmethod
     def display_pixels(x, y, val, pixelsize=None, angle=None):
