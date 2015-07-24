@@ -19,7 +19,7 @@ from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, 
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
-# from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage.filters import gaussian_filter
 from projection_cy import projection
 
 
@@ -441,7 +441,7 @@ class FJmodel(object):
         return dlos, slos, vlos
 
     def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', Re_model=1., Re_data=1.,
-                      xmin=0.05, xmax=250., num=200, **kwargs):
+                      xmin=0.05, xmax=250., num=200, PSF_correction=False, **kwargs):
 
         def sinhspace(x_max, number, x_scale=1., x_min=0.):
             """
@@ -464,7 +464,11 @@ class FJmodel(object):
         X, Y = meshgrid(x, y)
         dx, dy = gradient(X)[1], gradient(Y)[0]
 
-        # d_psf = gaussian_filter(self.dlos, 1., mode='nearest')
+        d_psf = None
+        if PSF_correction:
+            # find how many pixels are in 1"
+            d_psf = gaussian_filter(10 ** self.dlos, 1.)
+            # raise NotImplementedError("Problems in computing Gaussian Kernel for log-spaced maps")
 
         wdgt = [widgets.FormatLabel('Computing growth curve: '), widgets.Percentage()]
         pbar = ProgressBar(maxval=len(R), widgets=wdgt).start()
@@ -474,7 +478,10 @@ class FJmodel(object):
         for k in range(len(R)):
             pbar.update(k + 1)
             w = X ** 2 + Y ** 2 <= R[k] ** 2
-            growth_curve.append(sum(dx[w] * dy[w] * 10. ** self.dlos[w]))
+            if PSF_correction:
+                growth_curve.append(sum(dx[w] * dy[w] * d_psf[w]))
+            else:
+                growth_curve.append(sum(dx[w] * dy[w] * 10. ** self.dlos[w]))
 
         pbar.finish()
 

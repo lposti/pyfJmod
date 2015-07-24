@@ -16,8 +16,9 @@ from numpy import min as npmin
 from numpy import abs as npabs
 from numpy import reshape as numpy_reshape
 from scipy.spatial import distance
-from scipy.interpolate import RectBivariateSpline
+from scipy.interpolate import interp2d
 from scipy.optimize import minimize, curve_fit
+from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pylab as plt
 import pyfits
 
@@ -147,8 +148,8 @@ class KinData(object):
         colorbar.set_label(r'$\sigma$ [km/s]')
         plt.show()
 
-    def plot_comparison_model(self, model, inclination=90, Rmax_model=None, one_figure=True, save_fig=False,
-                              reverse_v_field=False, **kwargs):
+    def plot_comparison_model(self, model, inclination=90, one_figure=True, save_fig=False,
+                              reverse_v_field=False, PSF_correction=False, **kwargs):
 
         if isinstance(model, FJmodel):
             f = model
@@ -168,9 +169,9 @@ class KinData(object):
         mge = self._get_mge(xt=xt, yt=yt, angle=self.angle)
 
         # get model data
-
-        vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination, Rmax_model,
-                                                                         s, bins, xt, yt, nx, ny)
+        vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination,
+                                                                         s, bins, xt, yt, nx, ny,
+                                                                         PSF_correction=PSF_correction)
 
         vel_image_mod = self.display_pixels(X[s], Y[s], vel_model[bins[s]], pixelsize=dx)
         sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
@@ -295,7 +296,6 @@ class KinData(object):
                 sqrt((vel_image_mod / model_scale[0] * data_scale[0]) ** 2 +
                      (sig_image_mod / model_scale[1] * data_scale[1]) ** 2)
 
-
             fig2 = plt.figure()
             ax = fig2.add_subplot(121)
 
@@ -337,20 +337,21 @@ class KinData(object):
         plt.tight_layout()
         plt.show()
 
-    def _get_model_kinematics(self, f, inclination, Rmax_model, s, bins, xt, yt, nx, ny):
+    def _get_model_kinematics(self, f, inclination, s, bins, xt, yt, nx, ny, PSF_correction=False):
 
         # get model
-        if Rmax_model is None:
-            Rmax = 20.  # f.ar[-1]
-        else:
-            Rmax = Rmax_model
-        x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')  # , Rmax=Rmax)
+        x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')
 
         # maxgrid: max value of the observed grid. Used to rescale the model image
         # maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
 
-        sigma, velocity, density = RectBivariateSpline(x, y, f.slos), RectBivariateSpline(x, y, f.vlos),\
-            RectBivariateSpline(x, y, f.dlos)
+        '''
+        sigma, velocity, density = SmoothBivariateSpline(X.flatten(), Y.flatten(), f.slos.flatten()),\
+            SmoothBivariateSpline(X.flatten(), Y.flatten(), f.vlos.flatten()),\
+            SmoothBivariateSpline(X.flatten(), Y.flatten(), f.dlos.flatten())
+        '''
+        sigma, velocity, density = interp2d(x, y, f.slos.T, kind='cubic'), interp2d(x, y, f.vlos.T, kind='cubic'), \
+            interp2d(x, y, f.dlos.T, kind='cubic')
         sigma_model, velocity_model = zeros(nx * ny), zeros(nx * ny)
         sig_model, vel_model = zeros(npmax(bins[s]) + 1), zeros(npmax(bins[s]) + 1)
         density_model = zeros((nx, ny))
@@ -361,14 +362,21 @@ class KinData(object):
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[ny - 1 - j]) \
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
-                sigma_model[i * ny + j] = sigma.ev(x_rotated, y_rotated)
-                velocity_model[i * ny + j] = velocity.ev(x_rotated, y_rotated)
+                sigma_model[i * ny + j] = sigma(x_rotated, y_rotated)
+                velocity_model[i * ny + j] = velocity(x_rotated, y_rotated)
 
                 x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[j]) \
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[j]) \
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
-                density_model[i, j] = density.ev(x_rotated, y_rotated)
+                density_model[i, j] = density(x_rotated, y_rotated)
+
+        # Compute PSF correction, if needed
+        sigma_model_psf, velocity_model_psf = None, None
+        if PSF_correction:
+            sigma_model_psf = gaussian_filter(sigma_model.reshape((nx, ny)), 3.)  # 3" PSF (CALIFA~1"/pix)
+            velocity_model_psf = gaussian_filter(velocity_model.reshape((nx, ny)), 3.)  # 3" PSF (CALIFA~1"/pix)
+            sigma_model_psf, velocity_model_psf = sigma_model_psf.reshape(nx * ny), velocity_model_psf.reshape(nx * ny)
 
         # normalize density to its maximum
         density_model -= npmax(density_model)
@@ -379,8 +387,12 @@ class KinData(object):
 
         for i in range(max(bins[s]) + 1):
             w = where(bins2 == i)
-            sig_model[i] = average(sigma_model[w])  # / npmax(sigma_model))
-            vel_model[i] = average(velocity_model[w])  # / npmax(velocity_model))
+            if PSF_correction:
+                sig_model[i] = average(sigma_model_psf[w])  # / npmax(sigma_model))
+                vel_model[i] = average(velocity_model_psf[w])  # / npmax(velocity_model))
+            else:
+                sig_model[i] = average(sigma_model[w])  # / npmax(sigma_model))
+                vel_model[i] = average(velocity_model[w])  # / npmax(velocity_model))
 
         return vel_model, sig_model, density_model
 
@@ -427,7 +439,7 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    def plot_comparison_model_vel_profiles(self, model, inclination=90, Rmax_model=None, save_fig=False):
+    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False):
 
         if isinstance(model, FJmodel):
             f = model
@@ -442,12 +454,7 @@ class KinData(object):
 
         xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, dx, bins, vel)
 
-        # get model
-        if Rmax_model is None:
-            Rmax = 20.  # f.ar[-1]
-        else:
-            Rmax = Rmax_model
-        x, y = f.project(inclination=inclination, nx=60, npsi=31, Rmax=Rmax, scale='log')
+        x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')
 
         # peaks of velocity moments, used for re-scaling the model
         data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
@@ -520,7 +527,8 @@ class KinData(object):
 
         return flux_contour
 
-    def plot_light_profile(self, Re_fix=None, model=None, inclination=90, Re_model=None, nx=100, save_fig=False):
+    def plot_light_profile(self, Re_fix=None, model=None, inclination=90, Re_model=None, nx=100,
+                           save_fig=False, **kwargs):
 
         # plotting surface brightness profile with Sersic fits
         fig = plt.figure()
@@ -536,9 +544,10 @@ class KinData(object):
                 f.project(inclination=inclination, nx=60, scale='log', verbose=False)
                 Re_model = f.r_eff
 
-            r_mod, gc_mod = f.light_profile(inclination=inclination, nx=nx, npsi=61,
+            r_mod, gc_mod = f.light_profile(inclination=inclination, nx=nx, npsi=31,
                                             Re_model=Re_model, Re_data=self.Re,
-                                            xmin=self.R_arcsec[0], xmax=self.R_arcsec[-1], num=len(self.R_arcsec))
+                                            xmin=self.R_arcsec[0], xmax=self.R_arcsec[-1], num=len(self.R_arcsec),
+                                            **kwargs)
 
             gc_scale = self.gc[npabs(self.R_arcsec - self.Re).argmin()] - gc_mod[npabs(r_mod - self.Re).argmin()]
             R_mod, SB_mod = KinData.get_surface_brightness(r_mod, gc_mod + gc_scale)
