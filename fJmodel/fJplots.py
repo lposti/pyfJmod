@@ -325,6 +325,58 @@ class FJmodelPlot(PlotInterface):
         if show:
             self.plotFigure()
 
+    def plotProjectedRhoContour(self, inclination=90., show=True, **kwargs):
+
+        self._plot_projection(field='density', inclination=inclination, show=show, **kwargs)
+
+    def plotProjectedSigmaContour(self, inclination=90., show=True, **kwargs):
+
+        self._plot_projection(field='sigma', inclination=inclination, show=show, **kwargs)
+
+    def plotProjectedVelocityContour(self, inclination=90., show=True, **kwargs):
+
+        self._plot_projection(field='velocity', inclination=inclination, show=show, **kwargs)
+
+    def plotProjectedRhoProfile(self, inclination=90., show=True, **kwargs):
+
+        self._plot_projected_profile(field='density', inclination=inclination, show=show, **kwargs)
+
+    def plotProjectedSigmaProfile(self, inclination=90., show=True, **kwargs):
+
+        self._plot_projected_profile(field='sigma', inclination=inclination, show=show, **kwargs)
+
+    def plotProjectedVelocityProfile(self, inclination=90., show=True, **kwargs):
+
+        self._plot_projected_profile(field='velocity', inclination=inclination, show=show, **kwargs)
+
+    def _plot_projected_profile(self, field='density', inclination=90., show=True, **kwargs):
+
+        x, y = self.fJ.project(inclination=inclination, nx=60, npsi=31, scale='log')
+
+        if field is 'density':
+            self.plot(log10(x[len(x) / 2:]), self.fJ.dlos[len(x) / 2:, len(y) / 2], **kwargs)
+        elif field is 'sigma':
+            self.plot(x[len(x) / 2:], self.fJ.slos[len(x) / 2:, len(y) / 2], **kwargs)
+        elif field is 'velocity':
+            self.plot(x[:], self.fJ.vlos[:, len(y) / 2], **kwargs)
+
+        if show:
+            self.plotFigure()
+
+    def _plot_projection(self, field='density', inclination=90., show=True, **kwargs):
+
+        x, y = self.fJ.project(inclination=inclination, nx=60, npsi=31)
+
+        if field is 'density':
+            self.contourf(x, y, self.fJ.dlos, **kwargs)
+        elif field is 'sigma':
+            self.contourf(x, y, self.fJ.slos, **kwargs)
+        elif field is 'velocity':
+            self.contourf(x, y, self.fJ.vlos, **kwargs)
+
+        if show:
+            self.plotFigure()
+
     def _logcontourf(self, f, R=None, z=None, show=True, **kwargs):
 
         # check if f is callable

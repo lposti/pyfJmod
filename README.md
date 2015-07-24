@@ -12,6 +12,7 @@ Python analysis tool for f(J) models
 
 - `numpy` Python package
 - `scipy` Python package
+- `cython` Python package
 - `matplotlib` Python package
 - `progressbar` Python package
 
@@ -20,6 +21,7 @@ I suggest to use `pip` (install in Ubuntu as:`sudo apt-get install python-pip`) 
 ```
 sudo pip install numpy
 sudo pip install scipy
+sudo pip install cython
 sudo pip install matplotlib
 sudo pip install progressbar
 ```
@@ -102,4 +104,46 @@ p1 = FJmodelPlot(f, xlabel=r"$\log\, r$", ylabel=r"$\sigma$", fontsize=18)
 p1.plotSigmaR(show=False)
 p1.plotSigmaz(show=False)
 p1.plotSigmap()
+```
+
+The following example will show how to plot the projected density map for an f(**J**) model:
+
+```python
+from fJmodel.fJplots import *
+
+# load the f(J) model data
+f = FJmodel("/full/path/to/file/fJmodel_file.out")
+
+# create the matplotlib interface to directly plot the data
+p = FJmodelPlot(f, xlabel=r"$x$", ylabel=r"$y$", fontsize=18)
+
+# choose an inclination angle (in [0, 90] degrees)
+angle=90.
+
+# make & show the density profile plot
+p.plotProjectedRhoContour(inclination=angle)
+# there are analogous functions for sigma and velocity
+# p.plotProjectedSigmaContour(inclination=angle)
+# p.plotProjectedVelocityContour(inclination=angle)
+```
+
+The following example will show how to plot the projected density, velocity and velocity dispersion profiles, along the semi-major axis, for an f(**J**) model:
+
+```python
+from fJmodel.fJplots import *
+
+# load the f(J) model data
+f = FJmodel("/full/path/to/file/fJmodel_file.out")
+
+# create the matplotlib interface to directly plot the data
+p = FJmodelPlot(f, xlabel=r"$\log\, R$", ylabel=r"$\Sigma$", fontsize=18)
+
+# choose an inclination angle (in [0, 90] degrees)
+angle=90.
+
+# make & show the density profile plot
+p.plotProjectedRhoProfile(inclination=angle, marker='o', color='b')
+# there are analogous functions for sigma and velocity
+# p.plotProjectedSigmaProfile(inclination=angle, marker='o', color='r')
+# p.plotProjectedVelocityProfile(inclination=angle, marker='o', color='k')
 ```

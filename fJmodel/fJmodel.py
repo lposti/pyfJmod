@@ -491,7 +491,7 @@ class FJmodel(object):
 
         if self.dlos is None or self.slos is None or self.vlos is None:  # pragma: no cover
             if kwargs == {}:
-                x, y = self.project(90, nx=30, npsi=31)
+                x, y = self.project(90, nx=60, npsi=31)
             else:
                 x, y = self.project(**kwargs)
         else:

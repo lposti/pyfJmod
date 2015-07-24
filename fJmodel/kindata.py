@@ -439,7 +439,7 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False):
+    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False, PSF_correction=False):
 
         if isinstance(model, FJmodel):
             f = model
@@ -452,31 +452,44 @@ class KinData(object):
         vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
             self._get_kinematic_data(full_output=True)
 
+        # get model data
+        vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination,
+                                                                         s, bins, xt, yt, nx, ny,
+                                                                         PSF_correction=PSF_correction)
+
         xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, dx, bins, vel)
 
-        x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')
+        # x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')
 
         # peaks of velocity moments, used for re-scaling the model
+        '''
         data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
         model_scale = npmax(f.vlos), npmax(f.slos)
+        '''
+        data_scale = max(npmax(vel[bins[s]]), npmax(sig[bins[s]])),\
+            max(npmax(vel[bins[s]]), npmax(sig[bins[s]]))
+        model_scale = max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])),\
+            max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]]))
 
-        id_min, id_max = npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).min()).argmin(),\
-            npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).max()).argmin()
+        # id_min, id_max = npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).min()).argmin(),\
+        #     npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).max()).argmin()
 
         # plot position-velocity diagrams
         fig = plt.figure(figsize=(14, 7.5))
         ax = fig.add_subplot(121)
         ax.set_xlabel("semi-major axis [arcsec]", fontsize=18)
         ax.set_ylabel("velocity [km/s]", fontsize=18)
-        ax.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
-                f.vlos[id_min:id_max, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
+        # ax.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
+        #         f.vlos[id_min:id_max, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
+        ax.plot(X_xd_pv, (vel_model[bins[s]])[xd] / model_scale[0] * data_scale[0], 'sb')
         ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
         ax2 = fig.add_subplot(122)
         ax2.set_xlabel("semi-major axis [arcsec]", fontsize=18)
         ax2.set_ylabel("velocity dispersion [km/s]", fontsize=18)
-        ax2.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
-                 f.slos[id_min:id_max, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
+        # ax2.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
+        #          f.slos[id_min:id_max, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
+        ax2.plot(X_xd_pv, (sig_model[bins[s]])[xd] / model_scale[1] * data_scale[1], 'sb')
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
 
         if save_fig:
