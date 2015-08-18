@@ -5,7 +5,7 @@ from fJmodel import FJmodel
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
     meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array, full, around, \
-    asarray
+    asarray, nonzero
 from numpy.ma import masked_array
 from linecache import getline
 from math import sin, cos, tan, pi
@@ -374,8 +374,10 @@ class KinData(object):
         # Compute PSF correction, if needed
         sigma_model_psf, velocity_model_psf = None, None
         if PSF_correction:
-            sigma_model_psf = gaussian_filter(sigma_model.reshape((nx, ny)), 3.)  # 3" PSF (CALIFA~1"/pix)
-            velocity_model_psf = gaussian_filter(velocity_model.reshape((nx, ny)), 3.)  # 3" PSF (CALIFA~1"/pix)
+            # 2.7" FWHM-PSF (CALIFA~1"/pix)
+            # for a gaussian: FWHM =~ 2.3548 sigma
+            sigma_model_psf = gaussian_filter(sigma_model.reshape((nx, ny)), 2.7 / 2.3548)
+            velocity_model_psf = gaussian_filter(velocity_model.reshape((nx, ny)), 2.7 / 2.3548)
             sigma_model_psf, velocity_model_psf = sigma_model_psf.reshape(nx * ny), velocity_model_psf.reshape(nx * ny)
 
         # normalize density to its maximum
@@ -439,7 +441,8 @@ class KinData(object):
         ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r')
         plt.show()
 
-    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False, PSF_correction=False):
+    def plot_comparison_model_vel_profiles(self, model, inclination=90, save_fig=False, reverse_v_field=False,
+                                           PSF_correction=False, order='row'):
 
         if isinstance(model, FJmodel):
             f = model
@@ -456,6 +459,10 @@ class KinData(object):
         vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination,
                                                                          s, bins, xt, yt, nx, ny,
                                                                          PSF_correction=PSF_correction)
+
+        # do I have to reverse the Velocity field?
+        if reverse_v_field:
+            vel_model = -vel_model
 
         xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, dx, bins, vel)
 
@@ -474,28 +481,49 @@ class KinData(object):
         # id_min, id_max = npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).min()).argmin(),\
         #     npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).max()).argmin()
 
-        # plot position-velocity diagrams
-        fig = plt.figure(figsize=(14, 7.5))
-        ax = fig.add_subplot(121)
+        '''
+        plot position-velocity diagrams
+        '''
+        fig, ax, ax2 = None, None, None
+        if order is 'row':
+            fig = plt.figure(figsize=(14, 7.5))
+            ax = fig.add_subplot(121)
+        elif order is 'column':
+            fig = plt.figure(figsize=(9, 10))
+            ax = fig.add_subplot(211)
+        else:
+            raise ValueError("order must be either 'row' or 'column'.")
         ax.set_xlabel("semi-major axis [arcsec]", fontsize=18)
         ax.set_ylabel("velocity [km/s]", fontsize=18)
         # ax.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
         #         f.vlos[id_min:id_max, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
-        ax.plot(X_xd_pv, (vel_model[bins[s]])[xd] / model_scale[0] * data_scale[0], 'sb')
-        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
+        ax.plot(X_xd_pv, (vel_model[bins[s]])[xd] / model_scale[0] * data_scale[0], 'sr', label=r"$f(\bf J)$ model")
+        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='b', label=self.gal_name)
 
-        ax2 = fig.add_subplot(122)
+        if order is 'row':
+            ax2 = fig.add_subplot(122)
+        elif order is 'column':
+            ax2 = fig.add_subplot(212)
         ax2.set_xlabel("semi-major axis [arcsec]", fontsize=18)
         ax2.set_ylabel("velocity dispersion [km/s]", fontsize=18)
         # ax2.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
         #          f.slos[id_min:id_max, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
-        ax2.plot(X_xd_pv, (sig_model[bins[s]])[xd] / model_scale[1] * data_scale[1], 'sb')
-        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='r', label=self.gal_name)
+        #idRe = npabs(array(X_xd_pv) - self.Re).argmin()
+        ax2.plot(X_xd_pv, (sig_model[bins[s]])[xd] / model_scale[1] * data_scale[1],
+                 'sr', label=r"$f(\bf J)$ model")
+        #ax2.plot(array(X_xd_pv) / self.Re, (sig_model[bins[s]])[xd] / (sig_model[bins[s]])[idRe],
+        #         'sr', label=r"$f(\bf J)$ model")
+
+        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='b', label=self.gal_name)
+        #ax2.plot(array(X_xd_pv) / self.Re, (sig[bins[s]])[xd] / (sig[bins[s]])[idRe],
+        #         'ob', label=self.gal_name)
+
+
+        ax.legend(loc='best', fontsize=16)
+        ax2.legend(loc='best', fontsize=16)
 
         if save_fig:
-            ax.legend(loc='best')
-            ax2.legend(loc='best')
-            plt.savefig('vprof_mod_comp' + self.gal_name + '.eps', bbox_inches='tight')
+            plt.savefig('vprof_mod_comp' + self.gal_name + '_PSF.eps', bbox_inches='tight')
         plt.show()
 
     def _get_flux_bin(self):
@@ -541,12 +569,12 @@ class KinData(object):
         return flux_contour
 
     def plot_light_profile(self, Re_fix=None, model=None, inclination=90, Re_model=None, nx=100,
-                           save_fig=False, **kwargs):
+                           save_fig=False, normalize=True, **kwargs):
 
         # plotting surface brightness profile with Sersic fits
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        self.get_sb_profile(Re_fix=Re_fix, show=False)
+        self.get_sb_profile(Re_fix=Re_fix, show=False, normalize=normalize)
 
         if model is not None and isinstance(model, FJmodel):
 
@@ -564,15 +592,23 @@ class KinData(object):
 
             gc_scale = self.gc[npabs(self.R_arcsec - self.Re).argmin()] - gc_mod[npabs(r_mod - self.Re).argmin()]
             R_mod, SB_mod = KinData.get_surface_brightness(r_mod, gc_mod + gc_scale)
-            if Re_fix is not None:
-                ax.plot(R_mod / Re_fix, SB_mod / SB_mod[npabs(R_mod - Re_fix).argmin()], 'bo',
-                        label=r"$f(\bf J)$ model")
+            w = nonzero(1. / SB_mod)  # exclude first non-infinite point
+            if normalize:
+                if Re_fix is not None:
+                    ax.plot(R_mod[w[0][1]:] / Re_fix, 10. ** (-0.4 * (SB_mod[w[0][1]:] -
+                                                                      SB_mod[npabs(R_mod - Re_fix).argmin()])), 'ro',
+                            label=r"$f(\bf J)$ model")
+                else:
+                    ax.plot(R_mod[w[0][1]:] / self.Re, 10. ** (-0.4 * (SB_mod[w[0][1]:] -
+                                                                       SB_mod[npabs(R_mod - self.Re).argmin()])), 'ro',
+                            label=r"$f(\bf J)$ model")
             else:
-                ax.plot(R_mod / self.Re, SB_mod / SB_mod[npabs(R_mod - self.Re).argmin()], 'bo',
-                        label=r"$f(\bf J)$ model")
+                ax.plot(R_mod[w[0][1]:], SB_mod[w[0][1]:], 'ro', label=r"$f(\bf J)$ model")
             ax.set_xlabel(r"$R/R_{\rm e}$", fontsize=18)
             ax.set_ylabel(r"$I(R)/I(R_{\rm e})$", fontsize=18)
             ax.set_xscale('log')
+            if normalize:
+                ax.set_yscale('log')
 
             # Plot of the growth curves
             # plt.figure()
@@ -582,21 +618,24 @@ class KinData(object):
                 plt.savefig(self.gal_name + "_SB_wmodel.pdf", bbox_inches='tight')
             plt.show()
 
-    def get_sb_profile(self, Re_fix=None, show=True, **kwargs):
+    def get_sb_profile(self, Re_fix=None, show=True, normalize=True, **kwargs):
 
         R, sb = self.get_surface_brightness(self.R_arcsec, self.gc)
         Re, n, I_0, Re_fix, n_fix, I_0_fix = self.fit_sersic_profile(R, -sb, Re_fix=Re_fix, **kwargs)
 
-        plt.gca().invert_yaxis()
-
-        if Re_fix is not None:
-            plt.plot(R / Re_fix, sb / sb[npabs(R - Re_fix).argmin()], 'ro-', label=self.gal_name)
-            plt.plot(R / Re_fix, KinData.sersic(R, Re_fix, n_fix, I_0_fix) /
-                     KinData.sersic(Re_fix, Re_fix, n_fix, I_0_fix), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n_fix)
+        if normalize:
+            if Re_fix is not None:
+                plt.plot(R / Re_fix, 10. ** (-0.4 * (sb - sb[npabs(R - Re_fix).argmin()])), 'bo-', label=self.gal_name)
+                plt.plot(R / Re_fix, 10. ** (+0.4 * (KinData.sersic(R, Re_fix, n_fix, I_0_fix) -
+                         KinData.sersic(Re_fix, Re_fix, n_fix, I_0_fix))), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n_fix)
+            else:
+                plt.plot(R / Re, 10. ** (-0.4 * (sb - sb[npabs(R - Re).argmin()])), 'bo-', label=self.gal_name)
+                plt.plot(R / Re, 10. ** (+0.4 * (KinData.sersic(R, Re_fix, n_fix, I_0_fix) -
+                         KinData.sersic(Re_fix, Re_fix, n_fix, I_0_fix))), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n)
         else:
-            plt.plot(R / Re, sb / sb[npabs(R - Re).argmin()], 'ro-', label=self.gal_name)
-            plt.plot(R / Re, KinData.sersic(R, Re, n, I_0) /
-                     KinData.sersic(Re, Re, n, I_0), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n)
+            plt.gca().invert_yaxis()
+            plt.plot(R, sb, 'bo-', label=self.gal_name)
+            plt.plot(R, -KinData.sersic(R, Re_fix, n_fix, I_0_fix), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n_fix)
 
         if show:
             plt.show()

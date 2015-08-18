@@ -15,11 +15,12 @@ from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
     cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, logspace,\
-    concatenate, sum, gradient, arcsinh
+    concatenate, sum, gradient, arcsinh, interp
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
 from scipy.ndimage.filters import gaussian_filter
+from scipy.interpolate import interp2d
 from projection_cy import projection
 
 
@@ -86,6 +87,7 @@ class FJmodel(object):
 
             # compute spherically averaged Mass
             self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
+            self.r_half = self._get_half_mass_radius()
 
             # compute intrinsic ellipticity
             try:
@@ -253,7 +255,7 @@ class FJmodel(object):
 
         return massfJ
 
-    def project(self, inclination, nx=60, npsi=31, b=1., scale='linear', Rmax=None, Rmin=None, verbose=True):
+    def project(self, inclination, nx=60, npsi=30, b=1., scale='linear', Rmax=None, Rmin=None, verbose=True):
         """
         Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
         :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
@@ -467,7 +469,13 @@ class FJmodel(object):
         d_psf = None
         if PSF_correction:
             # find how many pixels are in 1"
-            d_psf = gaussian_filter(10 ** self.dlos, 1.)
+            density = interp2d(x, y, self.dlos.T, kind='cubic')
+            density_grid = zeros((num, num))
+            RR = linspace(-R[-1], R[-1], num=len(X))
+            for i in range(len(RR)):
+                for j in range(len(RR)):
+                    density_grid[i, j] = density(RR[i], RR[j])
+            d_psf = gaussian_filter(10 ** density_grid, 1.)
             # raise NotImplementedError("Problems in computing Gaussian Kernel for log-spaced maps")
 
         wdgt = [widgets.FormatLabel('Computing growth curve: '), widgets.Percentage()]
@@ -535,6 +543,23 @@ class FJmodel(object):
             eps[i] = 1. - brentq(f, minR, maxR) / self.ar[i]
 
         return eps
+
+    def _get_half_mass_radius(self):
+        """
+        Private method: gets the half-mass radius, where the mass is intended that contained within the radial grid.
+        It is intended only for (quite-rapidly) converging mass profiles.
+        :return: half-mass radius
+        """
+
+        mass = zeros(self.nr - 2)
+        minR, maxR = self.ar[0] / 2, self.ar[-1] * 2
+
+        for i in range(2, self.nr):
+            mass[i - 2] = 4. * pi * trapz(self.ar[:i] * self.ar[:i] * self.rho(self.ar[:i], 0), self.ar[:i])
+
+        f_half_mass = lambda r: interp(r, self.ar[2:], mass) - self.mass / 2.
+
+        return brentq(f_half_mass, minR, maxR)
 
     def _getq(self, R, z, ql, npot=True):
         """

@@ -34,7 +34,7 @@ cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int np
         cdef ndarray[double_t, ndim=1] yy
 
         cdef:
-            double ymax = Rmax, zmax = Rmax, psi_max = 3.
+            double ymax = Rmax, zmax = Rmax, psi_max = 2 * pi
             double to_radians = pi / 180.
             double sin_incl = sin(incl * to_radians), cos_incl = cos(incl * to_radians)
             double dpsi = 2 * psi_max / float(npsi - 1)
@@ -61,9 +61,10 @@ cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int np
             double rp=0., a=0., I1=0., I2=0., I3=0.
             double psi=0., ch=0., sh=0., xp=0., x=0., z=0., R=0., phi=0., abs_z=0.
             double cphi=0., sphi=0.
-            double dens = 0., Vrot = 0., SigR = 0., Sigp = 0., Sigz = 0.
+            ndarray[double_t, ndim=1] dens, Vrot, SigR, Sigp, Sigz
             double density=0.
 
+        dens, Vrot, SigR, Sigp, Sigz = zeros(npsi), zeros(npsi), zeros(npsi), zeros(npsi), zeros(npsi)
 
         for i in range(nx):
 
@@ -97,21 +98,39 @@ cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int np
                     cphi = cos(phi)
                     sphi = sin(phi)
 
-                    dens = 0.
-                    Vrot = 0.
-                    SigR = 0.
-                    Sigp = 0.
-                    Sigz = 0.
+                    dens[k] = 0.
+                    Vrot[k] = 0.
+                    SigR[k] = 0.
+                    Sigp[k] = 0.
+                    Sigz[k] = 0.
                     fast_moments(npoly, nr, ar, &rhl[0], &vrotl[0], &sigRl[0], &sigpl[0], &sigzl[0],
-                                 R, abs_z, &dens, &Vrot, &SigR, &Sigp, &Sigz)
+                                 R, abs_z, &dens[k], &Vrot[k], &SigR[k], &Sigp[k], &Sigz[k])
 
-                    I1 += ch * dens
-                    I2 += ch * dens * ((SigR * cphi * sin_incl * SigR * cphi * sin_incl
-                                        + (Sigp * Sigp - Vrot * Vrot) * sphi * sin_incl * sphi * sin_incl)
-                                       + Sigz * cos_incl * Sigz * cos_incl)   # +2*SigRz*sin_incl*cos_incl
-                    I3 += ch * dens * Vrot * sphi * sin_incl
+                    I1 += ch * dens[k]
+                    I2 += ch * dens[k] * ((SigR[k] * cphi * sin_incl * SigR[k] * cphi * sin_incl
+                                        + (Sigp[k] * Sigp[k] - Vrot[k] * Vrot[k]) * sphi * sin_incl * sphi * sin_incl)
+                                       + Sigz[k] * cos_incl * Sigz[k] * cos_incl)   # +2*SigRz*sin_incl*cos_incl
+                    I3 += ch * dens[k] * Vrot[k] * sphi * sin_incl
 
+                '''
+                for k in range(npsi):
+                    psi = -psi_max + k * dpsi
+                    ch = cosh(psi)
+                    sh = sinh(psi)
+                    xp = a * sh
+                    x = xp * sin_incl - zp * cos_incl
+                    z = zp * sin_incl + xp * cos_incl
+                    R = sqrt(x * x + yp * yp)
+                    phi = atan2(yp, x)
+                    abs_z = fabs(z)
+                    cphi = cos(phi)
+                    sphi = sin(phi)
+                    I2 += ch * dens[k] * (SigR[k] * cphi * sin_incl * SigR[k] * cphi * sin_incl
+                                        + Sigp[k] * Sigp[k] * sphi * sin_incl * sphi * sin_incl
+                                       + Sigz[k] * cos_incl * Sigz[k] * cos_incl +
+                                       (Vrot[k] * sphi * sin_incl - I3/I1) ** 2 )
 
+                '''
                 density = max(a * dpsi * I1, 1e-10)
                 dlos[nx + i, j], slos[nx + i, j], vlos[nx + i, j] = \
                     log10(density), sqrt(I2 / I1), I3 / I1

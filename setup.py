@@ -15,7 +15,7 @@ if "veryclean" in argv[1:]:
     # Just in case the build directory was created by accident,
     # note that shell=True should be OK here because the command is constant.
     Popen("rm -rf build", shell=True, executable="/bin/bash")
-    Popen("rm -rf *.c", shell=True, executable="/bin/bash")
+    Popen("rm -rf fJmodel/*.c", shell=True, executable="/bin/bash")
     Popen("rm -rf *.so", shell=True, executable="/bin/bash")
 
     # Now do a normal clean
