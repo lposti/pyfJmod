@@ -27,7 +27,7 @@ cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int np
                  int npoly, int nr, ndarray[double_t, ndim=1] ar,
                  ndarray[double_t, ndim=1] rhl, ndarray[double_t, ndim=1] vrotl, ndarray[double_t, ndim=1] sigRl,
                  ndarray[double_t, ndim=1] sigpl, ndarray[double_t, ndim=1] sigzl,
-                 scale='linear', verbose=True):
+                 scale='linear', verbose=True, r_lambda=None):
 
         # Cython-ize code
         cdef int i, j, k
@@ -63,6 +63,7 @@ cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int np
             double cphi=0., sphi=0.
             ndarray[double_t, ndim=1] dens, Vrot, SigR, Sigp, Sigz
             double density=0.
+            double lam_top=0., lam_bot=0.
 
         dens, Vrot, SigR, Sigp, Sigz = zeros(npsi), zeros(npsi), zeros(npsi), zeros(npsi), zeros(npsi)
 
@@ -139,15 +140,18 @@ cpdef projection(double incl, double b, double Rmax, double Rmin, int nx, int np
                 dlos[nx - 1 - i, j], slos[nx - 1 - i, j], vlos[nx - 1 - i, j] = \
                     dlos[nx + i, j], slos[nx + i, j], -vlos[nx + i, j]
 
-                '''
-                if rp < 3:
-                    lam_top += abs(I3) * rp
-                    lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
-                '''
+                if r_lambda is not None:
+                    if rp < r_lambda:
+                        lam_top += abs(I3) * rp
+                        lam_bot += rp * I1 * sqrt(I2 / I1 + pow(I3 / I1, 2))
 
         pbar.finish()
         # dm, sm, vm = npmax(dlos), npmax(slos), npmax(vlos)
-        return dlos, slos, vlos
+
+        if r_lambda is not None:
+            return dlos, slos, vlos, lam_top / lam_bot
+        else:
+            return dlos, slos, vlos
 
 
 cdef void fast_moments(int npoly, int nr, ndarray[double_t, ndim=1] ar,

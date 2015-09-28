@@ -2,10 +2,11 @@
 __author__ = 'lposti'
 
 from fJmodel import FJmodel
+from warnings import warn
 from sauron import sauron
 from numpy import genfromtxt, zeros, linspace, exp, log10, column_stack, round, empty, nan, rot90, \
-    meshgrid, radians, ones_like, where, average, sqrt, gradient, power, dstack, array, full, around, \
-    asarray, nonzero
+    meshgrid, radians, ones_like, where, average, dstack, array, full, around, \
+    asarray, isinf, isnan, sqrt
 from numpy.ma import masked_array
 from linecache import getline
 from math import sin, cos, tan, pi
@@ -16,7 +17,7 @@ from numpy import min as npmin
 from numpy import abs as npabs
 from numpy import reshape as numpy_reshape
 from scipy.spatial import distance
-from scipy.interpolate import interp2d
+from scipy.interpolate import interp2d, interp1d
 from scipy.optimize import minimize, curve_fit
 from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pylab as plt
@@ -39,10 +40,14 @@ class KinData(object):
 
             if directory[-1] == '/':
                 self.gal_name = directory[-8:-1]
-                self.conf_file = directory[:-8] + 'fits_rband/CALIFA_ETGs.conf'
+                self.conf_file = directory[:-8] + 'conf/CALIFA_ETGs.conf'
+                self.conf_mass_file = directory[:-8] + 'conf/califa4dfmodels.dat'
+                self.conf_kpcarcsec_file = directory[:-8] + 'conf/CALIFA_Lorenzo.conf'
             else:
                 self.gal_name = directory[-7:]
-                self.conf_file = directory[:-7] + 'fits_rband/CALIFA_ETGs.conf'
+                self.conf_file = directory[:-7] + 'conf/CALIFA_ETGs.conf'
+                self.conf_mass_file = directory[:-7] + 'conf/califa4dfmodels.dat'
+                self.conf_kpcarcsec_file = directory[:-7] + 'conf/CALIFA_Lorenzo.conf'
             print "Galaxy:", self.gal_name
 
             self.fits_file = directory + '/' + self.gal_name + '.V1200.rscube_INDOUSv2_SN20_stellar_kin.fits'
@@ -62,8 +67,14 @@ class KinData(object):
             raise ValueError("ERROR: either pass the directory where the MGE, kinematic"
                              "and aperture data are or pass the filenames directly.")
 
+        self.pa, self.pa_err = 0., 0.  # get through aperture file
         self.Re = self._get_effective_radius()
-        self.angle = float(getline(self.aperture_file, 4).split()[0])
+        try:
+            self.m_star_tot, self.s_eff, self.m_dyn_Re, self.m_schw = self._get_masses()
+            self.kpc_arcsec = self._get_kpc_over_arcsec()
+        except UnboundLocalError:
+            warn("\n--\n-- For this galaxy I still don't have masses and other global parameters\n--\n", Warning)
+        self.angle = 90. - float(getline(self.aperture_file, 6).split()[0])
         self.R_arcsec, self.gc = None, None
 
         try:
@@ -169,36 +180,53 @@ class KinData(object):
         mge = self._get_mge(xt=xt, yt=yt, angle=self.angle)
 
         # get model data
-        vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination,
-                                                                         s, bins, xt, yt, nx, ny,
-                                                                         PSF_correction=PSF_correction)
+        vel_model, sig_model, dens_contour, dens_model = self._get_model_kinematics(f, inclination,
+                                                                                    s, bins, xt, yt, nx, ny,
+                                                                                    PSF_correction=PSF_correction,
+                                                                                    density_bins=True)
+
+        # shift the systemic velocity
+        xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, bins, vel)
+        vel[bins[s]] = self._shift_systemic_velocity(vel[bins[s]], xd)
 
         vel_image_mod = self.display_pixels(X[s], Y[s], vel_model[bins[s]], pixelsize=dx)
         sig_image_mod = self.display_pixels(X[s], Y[s], sig_model[bins[s]], pixelsize=dx)
 
-        # peaks of velocity moments, used for re-scaling the model
         '''
-        data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
-        model_scale = npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])
+            Computing average sigma and lambda_R within effective radius
         '''
+        s_re, s_mod_re, d_re = [], [], []
+        lr_n, lr_d, v_sq, s_sq = [], [], [], []
+        for t in s:
+            if X[t] ** 2 + Y[t] ** 2 <= self.Re ** 2:
+                d_re.append(10. ** dens_model[bins[t]])
+                s_re.append((vel[bins[t]] ** 2 + sig[bins[t]] ** 2) ** 0.5)
+                s_mod_re.append((vel_model[bins[t]] ** 2 + sig_model[bins[t]] ** 2) ** 0.5)
 
-        '''
-        data_scale = npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2)),\
-            npmax(sqrt(vel[bins[s]] ** 2 + sig[bins[s]] ** 2))
-        model_scale = npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2)),\
-            npmax(sqrt(vel_model[bins[s]] ** 2 + sig_model[bins[s]] ** 2))
-        '''
-        data_scale = max(npmax(vel[bins[s]]), npmax(sig[bins[s]])),\
-            max(npmax(vel[bins[s]]), npmax(sig[bins[s]]))
-        model_scale = max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])),\
-            max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]]))
+                v_sq.append(vel_model[bins[t]] ** 2)
+                s_sq.append(sig_model[bins[t]] ** 2)
+                lr_n.append(10. ** dens_model[bins[t]] * sqrt(X[t] ** 2 + Y[t] ** 2) * npabs(vel_model[bins[t]]))
+                lr_d.append(10. ** dens_model[bins[t]] * sqrt(X[t] ** 2 + Y[t] ** 2) * sqrt(vel_model[bins[t]] ** 2 +
+                                                                                            sig_model[bins[t]] ** 2))
+
+        print
+        print "lambda_R:", array(lr_n).sum() / array(lr_d).sum()
+        print "V/Sigma: ", sqrt(average(v_sq, weights=d_re) / average(s_sq, weights=d_re))
+        print
+        ''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+        # peaks of velocity moments, used for re-scaling the model
+        # data_scale = average(s_re), average(s_re)
+        # model_scale = average(s_mod_re), average(s_mod_re)
+        data_scale = average(s_re, weights=d_re), average(s_re, weights=d_re)
+        model_scale = average(s_mod_re, weights=d_re), average(s_mod_re, weights=d_re)
 
         # colour scales of the velocity and velocity dispersion plots
         vmin, vmax = npmin(vel[bins[s]]), npmax(vel[bins[s]])
         smin, smax = npmin(sig[bins[s]]), npmax(sig[bins[s]])
 
         data_contour_levels = linspace(float((log10(mge)).min()) * .6, 0, num=6)
-        model_contour_levels = linspace(float(density_model.min()) * .6, 0, num=6)
+        model_contour_levels = linspace(float(dens_contour.min()) * .6, 0, num=6)
 
         # do I have to reverse the Velocity field?
         if reverse_v_field:
@@ -266,7 +294,7 @@ class KinData(object):
             colorbar = fig3.colorbar(image3)
         colorbar.set_label(r'$v$ [km/s]')
         # add density contours
-        ax3.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, density_model.T,
+        ax3.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, dens_contour.T,
                     colors='k', levels=model_contour_levels)
 
         if one_figure:
@@ -287,25 +315,29 @@ class KinData(object):
             colorbar = fig4.colorbar(image4)
         colorbar.set_label(r'$\sigma$ [km/s]')
         # add density contours
-        ax4.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, density_model.T,
+        ax4.contour(xt * CALIFA_arcsec_spaxel, yt * CALIFA_arcsec_spaxel, dens_contour.T,
                     colors='k', levels=model_contour_levels)
 
-        # V_RMS Figure
+        # V_RMS or V/sigma Figure
         if one_figure:
-            vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
-                sqrt((vel_image_mod / model_scale[0] * data_scale[0]) ** 2 +
-                     (sig_image_mod / model_scale[1] * data_scale[1]) ** 2)
+            # vrms_image, vrms_image_mod = sqrt(vel_image ** 2 + sig_image ** 2),\
+            #     sqrt((vel_image_mod / model_scale[0] * data_scale[0]) ** 2 +
+            #          (sig_image_mod / model_scale[1] * data_scale[1]) ** 2)
+            vs_image, vs_image_mod = npabs(vel_image) / sig_image, npabs(vel_image_mod) / sig_image_mod
+
+            vsmin, vsmax = npmin(npabs(vel[bins[s]]) / sig[bins[s]]), npmax(npabs(vel[bins[s]]) / sig[bins[s]])
 
             fig2 = plt.figure()
             ax = fig2.add_subplot(121)
 
             ax.set_xlabel("RA [arcsec]")
             ax.set_ylabel("DEC [arcsec]")
-            image = plt.imshow(vrms_image, cmap=sauron, interpolation='nearest',
-                               extent=[X[s].min() - dx, X[s].max() + dx,
-                                       Y[s].min() - dx, Y[s].max() + dx], **kwargs)
+            image5 = plt.imshow(vs_image, cmap=sauron, interpolation='nearest',
+                                extent=[X[s].min() - dx, X[s].max() + dx,
+                                        Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-            colorbar = fig2.colorbar(image)
+            image5.set_clim(vmin=vsmin, vmax=vsmax)
+            colorbar = fig2.colorbar(image5)
             colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
             # add density contours
             ax.contour(xt, yt, log10(mge).T, colors='k', levels=data_contour_levels)
@@ -314,14 +346,15 @@ class KinData(object):
 
             ax2.set_xlabel("RA [arcsec]")
             ax2.set_ylabel("DEC [arcsec]")
-            image2 = plt.imshow(vrms_image_mod, cmap=sauron, interpolation='nearest',
+            image6 = plt.imshow(vs_image_mod, cmap=sauron, interpolation='nearest',
                                 extent=[X[s].min() - dx, X[s].max() + dx,
                                         Y[s].min() - dx, Y[s].max() + dx], **kwargs)
 
-            colorbar = fig2.colorbar(image2)
+            image6.set_clim(vmin=vsmin, vmax=vsmax)
+            colorbar = fig2.colorbar(image6)
             colorbar.set_label(r'$V_{\rm RMS}$ [km/s]')
             # add density contours
-            ax2.contour(xt, yt, density_model.T, colors='k', levels=model_contour_levels)
+            ax2.contour(xt, yt, dens_contour.T, colors='k', levels=model_contour_levels)
 
         # Save figures
 
@@ -337,25 +370,19 @@ class KinData(object):
         plt.tight_layout()
         plt.show()
 
-    def _get_model_kinematics(self, f, inclination, s, bins, xt, yt, nx, ny, PSF_correction=False):
+    def _get_model_kinematics(self, f, inclination, s, bins, xt, yt, nx, ny, PSF_correction=False, density_bins=False):
 
         # get model
-        x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')
+        x, y = f.project(inclination=inclination, nx=60, scale='log')
 
-        # maxgrid: max value of the observed grid. Used to rescale the model image
-        # maxgrid = max(max(npmax(xt), abs(npmin(xt))), max(npmax(yt), abs(npmin(yt))))
-
-        '''
-        sigma, velocity, density = SmoothBivariateSpline(X.flatten(), Y.flatten(), f.slos.flatten()),\
-            SmoothBivariateSpline(X.flatten(), Y.flatten(), f.vlos.flatten()),\
-            SmoothBivariateSpline(X.flatten(), Y.flatten(), f.dlos.flatten())
-        '''
         sigma, velocity, density = interp2d(x, y, f.slos.T, kind='cubic'), interp2d(x, y, f.vlos.T, kind='cubic'), \
             interp2d(x, y, f.dlos.T, kind='cubic')
-        sigma_model, velocity_model = zeros(nx * ny), zeros(nx * ny)
-        sig_model, vel_model = zeros(npmax(bins[s]) + 1), zeros(npmax(bins[s]) + 1)
-        density_model = zeros((nx, ny))
+        sigma_model, velocity_model, density_model = zeros(nx * ny), zeros(nx * ny), zeros(nx * ny)
+        sig_model, vel_model, dens_model = zeros(npmax(bins[s]) + 1), zeros(npmax(bins[s]) + 1), \
+            zeros(npmax(bins[s]) + 1)
+        dens_contour = zeros((nx, ny))
 
+        x_eps, y_eps = [], []
         for i in range(nx):
             for j in range(ny):
                 x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[ny - 1 - j]) \
@@ -364,13 +391,21 @@ class KinData(object):
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 sigma_model[i * ny + j] = sigma(x_rotated, y_rotated)
                 velocity_model[i * ny + j] = velocity(x_rotated, y_rotated)
+                density_model[i * ny + j] = density(x_rotated, y_rotated)
+                x_eps.append(x_rotated)
+                y_eps.append(y_rotated)
 
                 x_rotated = (cos(radians(self.angle)) * xt[i] - sin(radians(self.angle)) * yt[j]) \
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
                 y_rotated = (sin(radians(self.angle)) * xt[i] + cos(radians(self.angle)) * yt[j]) \
                     * float(f.r_eff / self.Re)  # Rmax / maxgrid
-                density_model[i, j] = density(x_rotated, y_rotated)
+                dens_contour[i, j] = density(x_rotated, y_rotated)
 
+        w = array(y_eps) ** 2 + array(x_eps) ** 2 <= self.Re ** 2
+        print
+        print "ellipticity: ", 1. - sqrt(average(array(y_eps)[w] ** 2, weights=10. ** density_model[w]) /
+                                         average(array(x_eps)[w] ** 2, weights=10. ** density_model[w]))
+        print
         # Compute PSF correction, if needed
         sigma_model_psf, velocity_model_psf = None, None
         if PSF_correction:
@@ -380,23 +415,26 @@ class KinData(object):
             velocity_model_psf = gaussian_filter(velocity_model.reshape((nx, ny)), 2.7 / 2.3548)
             sigma_model_psf, velocity_model_psf = sigma_model_psf.reshape(nx * ny), velocity_model_psf.reshape(nx * ny)
 
-        # normalize density to its maximum
-        density_model -= npmax(density_model)
-
         bins2 = numpy_reshape(bins, (ny, nx))
         bins_img = rot90(rot90(rot90(bins2)))
         bins2 = bins_img.reshape(bins_img.shape[0] * bins_img.shape[1])
 
         for i in range(max(bins[s]) + 1):
             w = where(bins2 == i)
-            if PSF_correction:
-                sig_model[i] = average(sigma_model_psf[w])  # / npmax(sigma_model))
-                vel_model[i] = average(velocity_model_psf[w])  # / npmax(velocity_model))
-            else:
-                sig_model[i] = average(sigma_model[w])  # / npmax(sigma_model))
-                vel_model[i] = average(velocity_model[w])  # / npmax(velocity_model))
 
-        return vel_model, sig_model, density_model
+            ''' Luminosity weighted mean '''
+            dens_model[i] = average(density_model[w])
+            if PSF_correction:
+                sig_model[i] = average(sigma_model_psf[w], weights=10. ** density_model[w])
+                vel_model[i] = average(velocity_model_psf[w], weights=10. ** density_model[w])
+            else:
+                sig_model[i] = average(sigma_model[w], weights=10. ** density_model[w])
+                vel_model[i] = average(velocity_model[w], weights=10. ** density_model[w])
+
+        if density_bins:
+            return vel_model, sig_model, dens_contour, dens_model
+        else:
+            return vel_model, sig_model, dens_contour
 
     def plot_vel_profiles(self, **kwargs):
 
@@ -421,7 +459,7 @@ class KinData(object):
             colorbar = fig.colorbar(image)
             colorbar.set_label(r'$v$ [km/s]')
 
-        xd, X_pv, X_xd_pv, x, y = self._get_vel_curve_idx(X, Y, s, dx, bins, vel, full_output=True)
+        xd, X_pv, X_xd_pv, x, y = self._get_vel_curve_idx(X, Y, s, bins, vel, full_output=True)
 
         plt.plot(x, y, 'ko')
         plt.show()
@@ -455,31 +493,38 @@ class KinData(object):
         vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
             self._get_kinematic_data(full_output=True)
 
+        # vel[bins[s]] += 30.
+
         # get model data
-        vel_model, sig_model, density_model = self._get_model_kinematics(f, inclination,
-                                                                         s, bins, xt, yt, nx, ny,
-                                                                         PSF_correction=PSF_correction)
+        vel_model, sig_model, dens_contour, dens_model = self._get_model_kinematics(f, inclination,
+                                                                                    s, bins, xt, yt, nx, ny,
+                                                                                    PSF_correction=PSF_correction,
+                                                                                    density_bins=True)
+
+        '''
+            Computing average sigma within effective radius
+        '''
+        s_re, s_mod_re, d_re = [], [], []
+        for t in s:
+            if X[t] ** 2 + Y[t] ** 2 <= (self.Re / 2) ** 2:
+                d_re.append(10. ** dens_model[bins[t]])
+                s_re.append((vel[bins[t]] ** 2 + sig[bins[t]] ** 2) ** 0.5)
+                s_mod_re.append((vel_model[bins[t]] ** 2 + sig_model[bins[t]] ** 2) ** 0.5)
+        ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
         # do I have to reverse the Velocity field?
         if reverse_v_field:
             vel_model = -vel_model
 
-        xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, dx, bins, vel)
+        xd, X_pv, X_xd_pv = self._get_vel_curve_idx(X, Y, s, bins, vel)
 
-        # x, y = f.project(inclination=inclination, nx=60, npsi=31, scale='log')
+        # rescale the models
+        data_scale = average(s_re, weights=d_re), average(s_re, weights=d_re)
+        model_scale = average(s_mod_re, weights=d_re), average(s_mod_re, weights=d_re)
+        # data_scale = average(s_re), average(s_re)
+        # model_scale = average(s_mod_re), average(s_mod_re)
 
-        # peaks of velocity moments, used for re-scaling the model
-        '''
-        data_scale = npmax(vel[bins[s]]), npmax(sig[bins[s]])
-        model_scale = npmax(f.vlos), npmax(f.slos)
-        '''
-        data_scale = max(npmax(vel[bins[s]]), npmax(sig[bins[s]])),\
-            max(npmax(vel[bins[s]]), npmax(sig[bins[s]]))
-        model_scale = max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]])),\
-            max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]]))
-
-        # id_min, id_max = npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).min()).argmin(),\
-        #     npabs(x * float(self.Re / f.r_eff) - array(X_xd_pv).max()).argmin()
+        vel[bins[s]] = self._shift_systemic_velocity(vel[bins[s]], xd)
 
         '''
         plot position-velocity diagrams
@@ -488,43 +533,119 @@ class KinData(object):
         if order is 'row':
             fig = plt.figure(figsize=(14, 7.5))
             ax = fig.add_subplot(121)
-        elif order is 'column':
-            fig = plt.figure(figsize=(9, 10))
-            ax = fig.add_subplot(211)
-        else:
-            raise ValueError("order must be either 'row' or 'column'.")
-        ax.set_xlabel("semi-major axis [arcsec]", fontsize=18)
-        ax.set_ylabel("velocity [km/s]", fontsize=18)
-        # ax.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
-        #         f.vlos[id_min:id_max, len(f.vlos) / 2] / model_scale[0] * data_scale[0], 'b-')
-        ax.plot(X_xd_pv, (vel_model[bins[s]])[xd] / model_scale[0] * data_scale[0], 'sr', label=r"$f(\bf J)$ model")
-        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='b', label=self.gal_name)
-
-        if order is 'row':
             ax2 = fig.add_subplot(122)
         elif order is 'column':
-            ax2 = fig.add_subplot(212)
-        ax2.set_xlabel("semi-major axis [arcsec]", fontsize=18)
-        ax2.set_ylabel("velocity dispersion [km/s]", fontsize=18)
-        # ax2.plot(x[id_min:id_max] * float(self.Re / f.r_eff),
-        #          f.slos[id_min:id_max, len(f.slos) / 2] / model_scale[1] * data_scale[1], 'b-')
-        #idRe = npabs(array(X_xd_pv) - self.Re).argmin()
+            fig = plt.figure(figsize=(9, 10))
+            ax = fig.add_axes((.1, .5, .8, .4))
+            ax2 = fig.add_axes((.1, .1, .8, .4))
+        else:
+            raise ValueError("order must be either 'row' or 'column'.")
+        ax.set_xlabel(r"$\rm major \, axis \, [arcsec]$", fontsize=18)
+        ax.set_ylabel(r"$\rm velocity \, [km/s]$", fontsize=18)
+
+        x, y = f.project(inclination=inclination, nx=60, scale='log')
+
+        slos_psf, vlos_psf = True, True
+        X_mod = linspace(npmin(X_xd_pv), npmax(X_xd_pv), num=100)
+        if PSF_correction:
+            # 2.7" FWHM-PSF (CALIFA~1"/pix)
+            # for a gaussian: FWHM =~ 2.3548 sigma
+            slos_log, vlos_log = f.slos[:, len(x) / 2], f.vlos[:, len(x) / 2]
+            f_interp = interp1d(x * float(self.Re / f.r_eff), slos_log)
+            slos_lin = f_interp(X_mod)
+            slos_psf = gaussian_filter(slos_lin, 2.7 * 1.6)
+            f_interp = interp1d(x * float(self.Re / f.r_eff), vlos_log)
+            vlos_lin = f_interp(X_mod)
+            vlos_psf = gaussian_filter(vlos_lin, 2.7 * 1.6)
+
+        # all bins
+        # ax.errorbar(X_pv, vel[bins[s]], yerr=vel_err[bins[s]], fmt='.', color='#C3C3EC')
+
+        ax.plot(X_xd_pv, (vel_model[bins[s]])[xd] / model_scale[0] * data_scale[0], 'sr',
+                label=r"$f(\bf J) \, {\rm model}$")
+        ax.plot(X_mod, vlos_psf / model_scale[0] * data_scale[0], 'r')
+        ax.errorbar(X_xd_pv, (vel[bins[s]])[xd], yerr=(vel_err[bins[s]])[xd], fmt='o', color='b',
+                    label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
+        ax.set_xlim([npmin(X_xd_pv) * 1.1, npmax(X_xd_pv) * 1.1])
+
+        ax2.set_xlabel(r"$\rm major \, axis \, [arcsec]$", fontsize=18)
+        ax2.set_ylabel(r"$\rm velocity \, dispersion \, [km/s]$", fontsize=18)
+
+        # all bins
+        # ax2.errorbar(X_pv, sig[bins[s]], yerr=sig_err[bins[s]], fmt='.', color='#C3C3EC')
+
         ax2.plot(X_xd_pv, (sig_model[bins[s]])[xd] / model_scale[1] * data_scale[1],
-                 'sr', label=r"$f(\bf J)$ model")
-        #ax2.plot(array(X_xd_pv) / self.Re, (sig_model[bins[s]])[xd] / (sig_model[bins[s]])[idRe],
-        #         'sr', label=r"$f(\bf J)$ model")
+                 'sr', label=r"$f(\bf J) \, {\rm model}$")
 
-        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='b', label=self.gal_name)
-        #ax2.plot(array(X_xd_pv) / self.Re, (sig[bins[s]])[xd] / (sig[bins[s]])[idRe],
-        #         'ob', label=self.gal_name)
-
+        ax2.plot(X_mod, slos_psf / model_scale[0] * data_scale[0], 'r')
+        ax2.errorbar(X_xd_pv, (sig[bins[s]])[xd], yerr=(sig_err[bins[s]])[xd], fmt='o', color='b',
+                     label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
+        ax2.set_xlim([npmin(X_xd_pv) * 1.1, npmax(X_xd_pv) * 1.1])
 
         ax.legend(loc='best', fontsize=16)
-        ax2.legend(loc='best', fontsize=16)
+        if order is 'column':
+            ax.set_xticklabels([])
+            ax2.set_ylim([(sig[bins[s]])[xd].min() * 0.25, (sig[bins[s]])[xd].max() * 1.2])
+        else:
+            ax2.legend(loc='best', fontsize=16)
 
         if save_fig:
-            plt.savefig('vprof_mod_comp' + self.gal_name + '_PSF.eps', bbox_inches='tight')
+            plt.savefig('vprof_mod_comp' + self.gal_name + '_PSF.pdf', bbox_inches='tight')
         plt.show()
+
+    def plot_mass_profile(self, model, inclination=90., PSF_correction=True, save_fig=False):
+
+        if isinstance(model, FJmodel):
+            f = model
+        elif isinstance(model, basestring):
+            f = FJmodel(model)
+        else:
+            raise NotImplementedError(" -- ERROR: either pass an FJmodel instance or full qualified path")
+
+        # get data
+        vel, sig, vel_err, sig_err, X, Y, bins, s, dx, minx, miny, nx, ny, xt, yt =\
+            self._get_kinematic_data(full_output=True)
+
+        # get model data
+        vel_model, sig_model, dens_contour = self._get_model_kinematics(f, inclination,
+                                                                        s, bins, xt, yt, nx, ny,
+                                                                        PSF_correction=PSF_correction)
+
+        data_scale = max(npmax(vel[bins[s]]), npmax(sig[bins[s]]))
+        model_scale = max(npmax(vel_model[bins[s]]), npmax(sig_model[bins[s]]))
+        v_scale = data_scale / model_scale
+        r_scale = self.Re * self.kpc_arcsec / f.r_eff
+
+        G = 4.302e-3 * 1e-3  # 4.302e-3 pc Mo^-1 (km/s)^2 to kpc Mo^-1 (km/s)^2
+        M_scale = v_scale ** 2 * r_scale / G
+
+        print
+        print "Estimated total mass:", f.m[-1] * M_scale, "5 R_e^2 sigma_e / G:", \
+            5. * self.s_eff ** 2 * self.Re * self.kpc_arcsec / G
+
+        w_max = npabs(f.ar - 20. * f.r_eff).argmin()
+        plt.axvline(1., color='k', ls='--')
+        plt.loglog(f.ar[:w_max] / f.r_eff, f.m[:w_max] * M_scale, 'r-', lw=2)
+        plt.loglog(f.ar[w_max - 1] / f.r_eff, f.m[w_max - 1] * M_scale, 'rp',
+                   label=r"$f(\bf J) \, \rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$", markersize=15)
+        plt.loglog(1., 10. ** self.m_schw, 'kD', label=r"$M_{\rm Schw}(R_{\rm e})$", markersize=12)
+        plt.loglog(f.ar[w_max - 1] / f.r_eff, 10. ** self.m_star_tot, 'y*', label=r"$M_{\ast, \rm TOT}$", markersize=15)
+        plt.loglog(f.ar[w_max - 1] / f.r_eff, 5. * self.s_eff ** 2 * self.Re * self.kpc_arcsec / G, 'bs',
+                   label=r"$5 \,\sigma_{\rm e}^2 R_{\rm e} / G$", markersize=12)
+        plt.xlim([1e-2, 11])
+        plt.xlabel(r"$r/R_{\rm e}$", fontsize=16)
+        plt.ylabel(r"$M(r)/M_\odot$", fontsize=16)
+        plt.legend(loc='best')
+        if save_fig:
+            plt.savefig('mass_prof_' + self.gal_name + '.pdf')
+        plt.show()
+
+    @staticmethod
+    def _shift_systemic_velocity(V, xd):
+
+        v_shift = (npmax(V[xd]) + npmin(V[xd])) / 2.
+        print "shift:", v_shift
+        return V - v_shift
 
     def _get_flux_bin(self):
 
@@ -573,8 +694,12 @@ class KinData(object):
 
         # plotting surface brightness profile with Sersic fits
         fig = plt.figure()
-        ax = fig.add_subplot(111)
-        self.get_sb_profile(Re_fix=Re_fix, show=False, normalize=normalize)
+        ax = fig.add_axes((.1, .3, .8, .6))
+        ax2 = fig.add_axes((.1, .1, .8, .2))
+
+        R_arcsec, gc = self.rebin_profile(self.R_arcsec, self.gc, decimals=2)
+        R_dat, SB_dat = self.get_surface_brightness(R_arcsec, gc)
+        Re, n, I_0, Re_fix, n_fix, I_0_fix = self.fit_sersic_profile(R_dat, -SB_dat, Re_fix=Re_fix, **kwargs)
 
         if model is not None and isinstance(model, FJmodel):
 
@@ -585,56 +710,106 @@ class KinData(object):
                 f.project(inclination=inclination, nx=60, scale='log', verbose=False)
                 Re_model = f.r_eff
 
-            r_mod, gc_mod = f.light_profile(inclination=inclination, nx=nx, npsi=31,
+            r_mod, gc_mod = f.light_profile(inclination=inclination, nx=nx, npsi=nx / 2,
                                             Re_model=Re_model, Re_data=self.Re,
                                             xmin=self.R_arcsec[0], xmax=self.R_arcsec[-1], num=len(self.R_arcsec),
                                             **kwargs)
 
             gc_scale = self.gc[npabs(self.R_arcsec - self.Re).argmin()] - gc_mod[npabs(r_mod - self.Re).argmin()]
+
+            # r_mod_new, gc_mod_new = self.rebin_profile(r_mod, gc_mod + gc_scale)
             R_mod, SB_mod = KinData.get_surface_brightness(r_mod, gc_mod + gc_scale)
-            w = nonzero(1. / SB_mod)  # exclude first non-infinite point
+
+            R_arcsec, gc = self.rebin_profile(self.R_arcsec, self.gc, decimals=2)
+            R_mod, SB_mod, SB_std = self.rebin_profile(R_mod, SB_mod, x_array=R_arcsec)
+
+            # w = nonzero(1. / SB_mod)  # exclude first non-infinite point
             if normalize:
                 if Re_fix is not None:
-                    ax.plot(R_mod[w[0][1]:] / Re_fix, 10. ** (-0.4 * (SB_mod[w[0][1]:] -
-                                                                      SB_mod[npabs(R_mod - Re_fix).argmin()])), 'ro',
-                            label=r"$f(\bf J)$ model")
+                    # ax.plot(R_mod[w[0][1]:] / Re_fix, 10. ** (-0.4 * (SB_mod[w[0][1]:] -
+                    #                                                  SB_mod[npabs(R_mod - Re_fix).argmin()])), 'ro',
+                    ax.plot(R_dat / Re_fix, 10. ** (-0.4 * (SB_dat -
+                                                            SB_dat[npabs(R_dat - Re_fix).argmin()])), 'bo-',
+                            label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
+                    ax.plot(R_mod / Re_fix, 10. ** (-0.4 * (SB_mod -
+                                                            SB_mod[npabs(R_mod - Re_fix).argmin()])), 'ro--',
+                            label=r"$f(\bf J) \, {\rm model}$")
                 else:
-                    ax.plot(R_mod[w[0][1]:] / self.Re, 10. ** (-0.4 * (SB_mod[w[0][1]:] -
-                                                                       SB_mod[npabs(R_mod - self.Re).argmin()])), 'ro',
-                            label=r"$f(\bf J)$ model")
+                    # ax.plot(R_mod[w[0][1]:] / self.Re, 10. ** (-0.4 * (SB_mod[w[0][1]:] -
+                    #                                                   SB_mod[npabs(R_mod - self.Re).argmin()])), 'ro',
+                    ax.plot(R_dat / Re, 10. ** (-0.4 * (SB_dat - SB_dat[npabs(R_dat - Re).argmin()])), 'bo-',
+                            label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
+                    ax.plot(R_mod / self.Re, 10. ** (-0.4 * (SB_mod -
+                                                             SB_mod[npabs(R_mod - self.Re).argmin()])), 'ro--',
+                            label=r"$f(\bf J) \, {\rm model}$")
             else:
-                ax.plot(R_mod[w[0][1]:], SB_mod[w[0][1]:], 'ro', label=r"$f(\bf J)$ model")
-            ax.set_xlabel(r"$R/R_{\rm e}$", fontsize=18)
+                # ax.plot(R_mod[w[0][1]:], SB_mod[w[0][1]:], 'ro', label=r"$f(\bf J) \, {\rm model}$")
+                ax.plot(R_dat, SB_dat, 'bo-', label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
+                ax.plot(R_mod, SB_mod, 'ro--', label=r"$f(\bf J) \, {\rm model}$")
+
             ax.set_ylabel(r"$I(R)/I(R_{\rm e})$", fontsize=18)
             ax.set_xscale('log')
+            ax.set_xticklabels([])
             if normalize:
                 ax.set_yscale('log')
+                plot_data = [10. ** (-0.4 * (SB_dat - SB_dat[npabs(R_dat - Re_fix).argmin()])),
+                             10. ** (-0.4 * (SB_mod - SB_mod[npabs(R_mod - Re_fix).argmin()]))]
+                ax.set_ylim([.7 * npmin((plot_data[0])[~isnan(plot_data[0])]),
+                             1e3])
 
             # Plot of the growth curves
             # plt.figure()
             # plt.plot(r_mod, gc_mod + gc_scale, 'bo', self.R_arcsec, self.gc, 'ro')
-            plt.legend(loc='best', fontsize=16)
+            ax.legend(loc='best', fontsize=16)
+
+            '''
+                Residuals plot
+            '''
+            ax2.set_xscale('log')
+            ax2.axhline(0., color='k', ls='--')
+
+            if Re_fix is not None:
+                SB_dat = 10. ** (-0.4 * (SB_dat - SB_dat[npabs(R_dat - Re_fix).argmin()]))
+                SB_mod = 10. ** (-0.4 * (SB_mod - SB_mod[npabs(R_mod - Re_fix).argmin()]))
+            else:
+                SB_dat = 10. ** (-0.4 * (SB_dat - SB_dat[npabs(R_dat - Re).argmin()]))
+                SB_mod = 10. ** (-0.4 * (SB_mod - SB_mod[npabs(R_mod - Re).argmin()]))
+            w = npabs((SB_dat - SB_mod) / SB_dat) < 10.
+            residuals = ((SB_dat - SB_mod) / SB_dat)[w]
+            if Re_fix is not None:
+                ax2.plot(R_dat[w] / Re_fix, residuals, 'ko-')
+            else:
+                ax2.plot(R_dat[w] / Re, residuals, 'ko-')
+            ax2.set_xlabel(r"$R/R_{\rm e}$", fontsize=18)
+            ax2.set_ylabel(r"$\rm residuals$", fontsize=18)
+            # ax2.set_ylim([residuals.min() * 1.25, residuals.max() * 1.25])
+            # ticks = round(linspace(residuals.min(), residuals.max(), num=8),
+            #               decimals=1)
+            # ax2.yaxis.set_ticks(ticks)
             if save_fig:
                 plt.savefig(self.gal_name + "_SB_wmodel.pdf", bbox_inches='tight')
             plt.show()
 
     def get_sb_profile(self, Re_fix=None, show=True, normalize=True, **kwargs):
 
-        R, sb = self.get_surface_brightness(self.R_arcsec, self.gc)
+        R_arcsec, gc = self.rebin_profile(self.R_arcsec, self.gc, decimals=2)
+        R, sb = self.get_surface_brightness(R_arcsec, gc)
         Re, n, I_0, Re_fix, n_fix, I_0_fix = self.fit_sersic_profile(R, -sb, Re_fix=Re_fix, **kwargs)
 
         if normalize:
             if Re_fix is not None:
-                plt.plot(R / Re_fix, 10. ** (-0.4 * (sb - sb[npabs(R - Re_fix).argmin()])), 'bo-', label=self.gal_name)
+                plt.plot(R / Re_fix, 10. ** (-0.4 * (sb - sb[npabs(R - Re_fix).argmin()])), 'bo-',
+                         label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
                 plt.plot(R / Re_fix, 10. ** (+0.4 * (KinData.sersic(R, Re_fix, n_fix, I_0_fix) -
                          KinData.sersic(Re_fix, Re_fix, n_fix, I_0_fix))), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n_fix)
             else:
-                plt.plot(R / Re, 10. ** (-0.4 * (sb - sb[npabs(R - Re).argmin()])), 'bo-', label=self.gal_name)
+                plt.plot(R / Re, 10. ** (-0.4 * (sb - sb[npabs(R - Re).argmin()])), 'bo-',
+                         label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
                 plt.plot(R / Re, 10. ** (+0.4 * (KinData.sersic(R, Re_fix, n_fix, I_0_fix) -
                          KinData.sersic(Re_fix, Re_fix, n_fix, I_0_fix))), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n)
         else:
             plt.gca().invert_yaxis()
-            plt.plot(R, sb, 'bo-', label=self.gal_name)
+            plt.plot(R, sb, 'bo-', label=r"$\rm " + self.gal_name[:3] + "\," + self.gal_name[3:] + "$")
             plt.plot(R, -KinData.sersic(R, Re_fix, n_fix, I_0_fix), 'k-', lw=2, label=u'Sérsic, n=%2.1f' % n_fix)
 
         if show:
@@ -696,9 +871,11 @@ class KinData(object):
             # f = ax.pcolormesh(x, y, img, cmap=sauron, **kwargs)
             # ax.axis('image')
 
-    def _get_vel_curve_idx(self, X, Y, s, dx, bins, vel, full_output=False):
+    def _get_vel_curve_idx(self, X, Y, s, bins, vel, full_output=False):
 
-        theta, x, y = self.get_major_axis(X[s], Y[s], vel[bins[s]])
+        # theta, x, y = self.get_major_axis(X[s], Y[s], vel[bins[s]])
+        theta, x = radians(90. + self.pa), linspace(X[s].min(), X[s].max(), num=100)
+        y = tan(radians(90. + self.pa)) * x
 
         # plt.plot([(X[s])[id_max], (X[s])[id_min]], [(Y[s])[id_max], (Y[s])[id_min]], 'ms')
 
@@ -753,6 +930,43 @@ class KinData(object):
                 theta_out = theta
 
         return theta_out, x, tan(theta_out) * x
+
+    @staticmethod
+    def rebin_profile(x, y, decimals=3, x_array=None):
+        """
+        Rebin the input profile so that values that have the same y are accreted in only one bin.
+        The x value of the bin will be the mean x value.
+        :param x:
+        :param y:
+        :param decimals:
+        :param x_array:
+        :return:
+        """
+        x_out, y_out, y_list, y_std = [], [], [], []
+        if x_array is not None:
+            for k in range(len(x_array)):
+                x_k, y_k = [], []
+                for i in range(len(x)):
+                    if not isinf(y[i]) and not isnan(y[i]):
+                        if npabs(x_array - x[i]).argmin() == k:
+                            y_k.append(y[i])
+                            x_k.append(x[i])
+                x_out.append(x_array[k])
+                y_out.append(array(y_k).mean())
+                y_std.append(array(y_k).std())
+
+            return array(x_out), array(y_out), array(y_std)
+        else:
+            for i in range(len(y)):
+                if around(y[i], decimals=decimals) in around(y_list, decimals=decimals):
+                    pass
+                else:
+                    y_list.append(y[i])
+                    w = y == y[i]
+                    y_out.append(y[w].mean())
+                    x_out.append(x[w].mean())
+
+            return array(x_out), array(y_out)
 
     @staticmethod
     def get_surface_brightness(R, gc):
@@ -846,25 +1060,6 @@ class KinData(object):
 
         return ret
 
-    def _get_vu(self, X, Y, vel, sig):
-
-        # get MGE data
-        dat = genfromtxt(self.mge_file)
-        sb = dat[:, 0]
-        sigma = dat[:, 1]
-        q = dat[:, 2]
-
-        R = sqrt(power(X, 2) + power(Y, 2))
-        dR = gradient(R)
-        vu = 0.
-        for i in range(len(vel)):
-            """
-            do a proper Sigma(R) Vrms(R) RdR integral...
-            """
-
-            v_rms = sqrt(vel[i] ** 2 + sig[2] ** 2)
-            vu += R[i] * v_rms * dR
-
     def _get_kinematic_data(self, full_output=False):
 
         # get bins
@@ -901,8 +1096,35 @@ class KinData(object):
 
         return bins, s
 
+    def _get_kpc_over_arcsec(self):
+
+        kpc_arcsec = None
+        # read CALIFA_Lorenzo.conf file
+        for n_line in range(24, 34):
+            line = getline(self.conf_kpcarcsec_file, n_line)
+
+            if line.split()[1] == self.gal_name:
+                kpc_arcsec = float(line.split()[13])
+
+        return kpc_arcsec
+
+    def _get_masses(self):
+
+        m_star, m_dyn = None, None
+        s_eff, m_schw= None, None
+        # read califa4dfmodels.dat file
+        for n_line in range(19, 22):
+            line = getline(self.conf_mass_file, n_line)
+
+            if line.split()[1] == self.gal_name:
+                m_star, s_eff, m_dyn, m_schw = float(line.split()[4]), float(line.split()[6]), float(line.split()[9]), \
+                    float(line.split()[12])
+
+        return m_star, s_eff, m_dyn, m_schw
+
     def _get_effective_radius(self):
 
+        Re = None
         # read CALIFA_ETGs.conf file
         for n_line in range(29, 39):
             line = getline(self.conf_file, n_line)
@@ -930,6 +1152,9 @@ class KinData(object):
 
         line = getline(self.aperture_file, 5)
         nx, ny = int(line.split()[0]), int(line.split()[1])
+
+        line = getline(self.aperture_file, 6)
+        self.pa, self.pa_err = float(line.split()[0]), float(line.split()[1])
 
         dx = float(step_x / nx)
 

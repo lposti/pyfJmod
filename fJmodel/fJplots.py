@@ -8,9 +8,11 @@
 __author__ = 'lposti'
 
 
-from numpy import log10, meshgrid, linspace, zeros, reshape
+from numpy import log10, meshgrid, linspace, zeros, reshape, arccos, dot, degrees, cos, pi, sqrt
 from numpy import max as npmax
+from numpy import min as npmin
 import matplotlib.pylab as plt
+from matplotlib.patches import Ellipse
 from fJmodel import FJmodel
 from voronoi import displayBinnedMap
 
@@ -78,6 +80,16 @@ class PlotInterface(object):
             return self.ax.loglog(xdata, ydata, **kwargs)
         else:
             return self.ax[self.idplot].loglog(xdata, ydata, **kwargs)
+
+    def text(self, x, y, text, samefig=False, **kwargs):
+
+        if not samefig or self.idplot < 0:
+            self.idplot += 1
+
+        if self.nplots == 1:
+            self.ax.text(x, y, text, **kwargs)
+        else:
+            self.ax[self.idplot].text(x, y, text, **kwargs)
 
     def contour(self, x, y, z, samefig=False, **kwargs):
 
@@ -147,6 +159,21 @@ class PlotInterface(object):
             img = displayBinnedMap(subax=self.ax[self.idplot], **kwargs)
             plt.colorbar(img, ax=self.ax[self.idplot])
             return img
+
+    def plotEllipse(self, xy, width, height, angle, samefig=False):
+
+        if not samefig or self.idplot < 0:
+            self.idplot += 1
+
+        ell = Ellipse(xy=xy, width=width, height=height, angle=angle)
+
+        if self.nplots == 1:
+            self.ax.add_artist(ell)
+            ell.set_edgecolor('k')
+            ell.set_linewidth(.75)
+            ell.set_facecolor('none')
+        else:
+            raise NotImplementedError('How many plots?!')
 
     def plotFigure(self, name=None, legend=False):
 
@@ -348,6 +375,58 @@ class FJmodelPlot(PlotInterface):
     def plotProjectedVelocityProfile(self, inclination=90., show=True, **kwargs):
 
         self._plot_projected_profile(field='velocity', inclination=inclination, show=show, **kwargs)
+
+    def plotVelocityEllipsoids(self, rad=30., num=10, rmin=None, rmax=None, text=None, show=True):
+
+        X0, Y0, X1, Y1, X2, Y2, X3, Y3 = self.fJ.velocity_ellipsoids(v_len=rad / 2, num=num, rmin=rmin, rmax=rmax)
+        x0, y0, w0, w1, v00, v01, v10, v11 = self.fJ.velocity_ellipsoids(v_len=rad / 2, num=num, rmin=rmin,
+                                                                         rmax=rmax, plot_ellipses=True)
+
+        if rmin is None:
+            rmin = self.fJ.r_half
+        if rmax is None:
+            rmax = 20. * self.fJ.r_half
+
+        rmin, rmax, rad = rmin / self.fJ.r_half, rmax / self.fJ.r_half, rad / self.fJ.r_half
+        X0, Y0 = X0 / self.fJ.r_half, Y0 / self.fJ.r_half
+        x0, y0 = x0 / self.fJ.r_half, y0 / self.fJ.r_half
+
+        X1, Y1, X2, Y2, X3, Y3 = X1 / self.fJ.r_half, Y1 / self.fJ.r_half, X2 / self.fJ.r_half, Y2 / self.fJ.r_half, \
+            X3 / self.fJ.r_half, Y3 / self.fJ.r_half
+
+        self.ax.set_xlim([-rmin * 0.4, rmax * 1.05])
+        self.ax.set_ylim([-rmin * 0.4, rmax * 1.05])
+        self.ax.set_aspect('equal')
+
+        if text is not None:
+            self.text(1.75, 2.75, text, samefig=True, fontsize=18)
+
+        ci = cos(linspace(0., pi / 2))
+        N_angles = num
+        N = len(x0)
+
+        for i in range(N_angles, N, N_angles):
+            self.plot(y0[i] * ci, y0[i] * sqrt(1. - ci * ci), color='k', ls='--', lw=.75)
+
+        i, step, flag = N_angles, 1, False
+        while i < N:
+            if flag:
+                if i % N_angles < step:
+                    step = 1
+                    if rad * w0[i] * N_angles > 1. * y0[i]:
+                        step += 1
+
+            width, height = rad * w0[i], rad * w1[i]
+            angle = degrees(arccos(dot([v00[i], v01[i]], [1, 0])))
+            if angle > 135.:
+                angle = -angle
+            self.plot(xdata=[X0[i], X1[i]], ydata=[Y0[i], Y1[i]], samefig=True, color='k', lw=2)
+            self.plot(xdata=[X2[i], X3[i]], ydata=[Y2[i], Y3[i]], samefig=True, color='r', lw=2)
+            self.plotEllipse((x0[i], y0[i]), width=width, height=height, angle=angle, samefig=True)
+            i += step
+
+        if show:
+            self.plotFigure()
 
     def _plot_projected_profile(self, field='density', inclination=90., show=True, **kwargs):
 

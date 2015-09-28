@@ -5,8 +5,11 @@ dist/
 htmlcov
 /.project
 .idea/pyfJmod.iml
-plot*.py
+plot*.p*
 build/
 fJmodel/projection_cy.c
 fJmodel/projection_cy.o
 projection_cy.so
+chi_vs.p*
+line_profile.p*
+profiling_test.p*

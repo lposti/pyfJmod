@@ -15,7 +15,8 @@ from voronoi import voronoi_2d_binning
 from math import sqrt as msqrt
 from numpy import fromstring, zeros, searchsorted, sqrt, asarray, ndarray, cos, sin, pi, arccos, trapz,\
     cosh, sinh, arctan2, power, log10, linspace, seterr, inf, meshgrid, reshape, isnan, abs, logspace,\
-    concatenate, sum, gradient, arcsinh, interp
+    concatenate, sum, gradient, arcsinh, interp, array, average, argsort
+from numpy.linalg import eig
 from progressbar import ProgressBar, widgets
 from scipy.integrate import tplquad
 from scipy.optimize import brentq
@@ -79,14 +80,15 @@ class FJmodel(object):
             # initialize to None
             self.dlos, self.slos, self.vlos = None, None, None
             self.xmap, self.ymap = None, None
-            self.r_eff, self.v_scale = None, None
+            self.r_eff, self.v_scale, self.lambda_R = None, None, None
 
             # initialize to None
             self.binNum, self.xNode, self.yNode, self.xBar, self.yBar, self.sn, self.nPixels, self.scale = \
                 None, None, None, None, None, None, None, None
 
             # compute spherically averaged Mass
-            self.mass = 4. * pi * trapz(self.ar * self.ar * self.rho(self.ar, 0), self.ar)
+            self.m = self._get_mass_profile()
+            self.mass = self.m[-1]
             self.r_half = self._get_half_mass_radius()
 
             # compute intrinsic ellipticity
@@ -109,7 +111,7 @@ class FJmodel(object):
         R, z = asarray(R), asarray(z)
         return self._getq(R, z, self.phil, npot=False)
 
-    def rho(self, R, z):
+    def rho(self, R, z, diagonal=False):
         """
         API to get density of the given f(J) model.
         :param R: Cylindrical radius (array type)
@@ -117,7 +119,7 @@ class FJmodel(object):
         :return:  Density of the model at location in meridional plane (array type)
         """
         R, z = asarray(R), asarray(z)
-        return self._getq(R, z, self.rhl)
+        return self._getq(R, z, self.rhl, diagonal=diagonal)
 
     def vrot(self, R, z):
         """
@@ -255,7 +257,8 @@ class FJmodel(object):
 
         return massfJ
 
-    def project(self, inclination, nx=60, npsi=30, b=1., scale='linear', Rmax=None, Rmin=None, verbose=True):
+    def project(self, inclination, nx=60, npsi=30, b=1., scale='linear', Rmax=None, Rmin=None, verbose=True,
+                r_lambda=None):
         """
         Project the f(J) model along a line-of-sight specified by the inclination (in degrees)
         :param inclination: inclination of the line-of-sight desired for the projection (in degrees, 90 is edge-on)
@@ -279,15 +282,26 @@ class FJmodel(object):
                                                      Fast_evaluate_moments=self._fast_evaluate_moments,
                                                      verbose=verbose)
         '''
-        self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, Rmin=Rmin, nx=nx,
-                                                     npsi=npsi, npoly=self.npoly, nr=self.nr,
-                                                     ar=self.ar, rhl=self.rhl.reshape((self.nr * self.npoly)),
-                                                     vrotl=self.vrotl.reshape((self.nr * self.npoly)),
-                                                     sigRl=self.sigRl.reshape((self.nr * self.npoly)),
-                                                     sigpl=self.sigpl.reshape((self.nr * self.npoly)),
-                                                     sigzl=self.sigzl.reshape((self.nr * self.npoly)),
-                                                     scale=scale,
-                                                     verbose=verbose)
+        if r_lambda is not None:
+            self.dlos, self.slos, self.vlos, lam = projection(incl=inclination, b=b, Rmax=Rmax, Rmin=Rmin, nx=nx,
+                                                              npsi=npsi, npoly=self.npoly, nr=self.nr,
+                                                              ar=self.ar, rhl=self.rhl.reshape((self.nr * self.npoly)),
+                                                              vrotl=self.vrotl.reshape((self.nr * self.npoly)),
+                                                              sigRl=self.sigRl.reshape((self.nr * self.npoly)),
+                                                              sigpl=self.sigpl.reshape((self.nr * self.npoly)),
+                                                              sigzl=self.sigzl.reshape((self.nr * self.npoly)),
+                                                              scale=scale,
+                                                              verbose=verbose, r_lambda=r_lambda)
+        else:
+            self.dlos, self.slos, self.vlos = projection(incl=inclination, b=b, Rmax=Rmax, Rmin=Rmin, nx=nx,
+                                                         npsi=npsi, npoly=self.npoly, nr=self.nr,
+                                                         ar=self.ar, rhl=self.rhl.reshape((self.nr * self.npoly)),
+                                                         vrotl=self.vrotl.reshape((self.nr * self.npoly)),
+                                                         sigRl=self.sigRl.reshape((self.nr * self.npoly)),
+                                                         sigpl=self.sigpl.reshape((self.nr * self.npoly)),
+                                                         sigzl=self.sigzl.reshape((self.nr * self.npoly)),
+                                                         scale=scale,
+                                                         verbose=verbose)
 
         # remove nans in the maps
         for j in range(2 * nx):
@@ -313,6 +327,10 @@ class FJmodel(object):
         else:
             raise ValueError("ERROR: Parameter 'scale' must be equal to 'linear' or 'log'!")
 
+        if r_lambda is not None:
+            print
+            print "Estimated lambda_R:", lam
+            print
         #
         # find the projected half mass radius
         #
@@ -320,25 +338,64 @@ class FJmodel(object):
         X, Y = meshgrid(self.xmap, self.ymap)
         dx, dy = gradient(X)[1], gradient(Y)[0]
 
-        mass = []
+        mass, lr, rr = [], [], []
         for k in range(nx):
             w = X ** 2 + Y ** 2 <= self.xmap[nx + k] ** 2
             mass.append(sum(dx[w] * dy[w] * 10. ** self.dlos[w]))
+            rr.append(self.xmap[nx + k])
+            lr.append((power(10., self.dlos[w]) * (X[w] ** 2 + Y[w] ** 2) * abs(self.vlos[w])).sum() /
+                      (power(10., self.dlos[w]) * (X[w] ** 2 + Y[w] ** 2) * sqrt(self.vlos[w] ** 2 +
+                                                                                 self.slos[w] ** 2)).sum())
 
-        id_r_eff = abs(mass - mass[-1] / 2.).argmin()
+        id_r_eff = abs(array(mass) - mass[-1] / 2.).argmin()
         self.r_eff = self.xmap[nx + id_r_eff]
-        print "Effective radius:", self.r_eff, "[M/2-M(Re)]/M=", abs(mass - mass[-1] / 2).min() / mass[-1]
+        print "Effective radius:", self.r_eff, "[M/2-M(Re)]/M=", abs(array(mass) - mass[-1] / 2).min() / mass[-1]
+
+        # import matplotlib.pylab as plt
+        # plt.plot(array(rr)/self.r_eff,array(lr),'ro-')
+        # plt.show()
 
         #
         # compute scale velocity
         #
 
-        w = X ** 2 + Y ** 2 <= self.r_eff
+        q_Re = self.dlos[nx + id_r_eff, nx] / self.dlos[nx, nx + id_r_eff]
+
+        w = Y ** 2 + (X / q_Re) ** 2 <= self.r_eff ** 2
 
         self.v_scale = (power(10., self.dlos[w]) * sqrt(self.vlos[w] ** 2 + self.slos[w] ** 2)).sum() /\
             power(10., self.dlos[w]).sum()
+        # self.v_scale = (power(10., self.dlos[w]) * self.slos[w]).sum() /\
+        #     power(10., self.dlos[w]).sum()
 
         print "Velocity scale:", self.v_scale
+
+        '''
+            this must be revised!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        '''
+        #
+        # compute lambda_R parameter
+        #
+
+        radius = sqrt(X ** 2 + Y ** 2)
+        # self.lambda_R = (radius[w] * abs(self.vlos[w])).sum() /\
+        #     (radius[w] * sqrt(self.vlos[w] ** 2 + self.slos[w] ** 2)).sum()
+        self.lambda_R = average(radius[w] * abs(self.vlos[w]), weights=10. ** self.dlos[w]) /\
+            average(radius[w] * sqrt(self.vlos[w] ** 2 + self.slos[w] ** 2), weights=10. ** self.dlos[w])
+
+        # vs = abs(self.vlos[w]).max() / average(self.slos[w], weights=10. ** self.dlos[w])
+        # vs = abs(self.vlos[w]).max() / ((power(10., self.dlos[w]) * self.slos[w]).sum() /
+        #                                 power(10., self.dlos[w]).sum())
+        vs = sqrt(average(self.vlos[w] ** 2, weights=10. ** self.dlos[w]) /
+                  average(self.slos[w] ** 2, weights=10. ** self.dlos[w]))
+
+        eps = 1. - sqrt(average(X[w] ** 2, weights=10. ** self.dlos[w]) /
+                        average(Y[w] ** 2, weights=10. ** self.dlos[w]))
+
+        print "lambda_R:", self.lambda_R, vs, eps
+        '''
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        '''
 
         return self.xmap, self.ymap
 
@@ -442,6 +499,56 @@ class FJmodel(object):
 
         return dlos, slos, vlos
 
+    def velocity_ellipsoids(self, v_len=10, num=None, rmin=None, rmax=None, plot_ellipses=False):
+
+        if num is None:
+            num = 2 * self.ngauss
+        if rmin is None:
+            rmin = self.r_half
+        if rmax is None:
+            rmax = 20. * self.r_half
+
+        ci = cos(linspace(0., pi / 2., num=num))
+
+        X0, Y0, X1, Y1 = [], [], [], []
+        X2, Y2, X3, Y3 = [], [], [], []
+
+        for r in linspace(rmin, rmax, num=8):
+            for j in range(len(ci)):
+                x, y = r * sqrt(1. - ci[j] * ci[j]), r * ci[j]
+
+                w, v = eig(array([[self.sigR(x, y), self.sigRz(x, y) ** 2],
+                                  [self.sigRz(x, y) ** 2, self.sigz(x, y)]]))
+
+                idx = argsort(w)
+                w, v = w[idx], v[idx]
+
+                if plot_ellipses:
+                    X0.append(x)
+                    Y0.append(y)
+                    X1.append(w[0])
+                    Y1.append(w[1])
+                    X2.append(v[0, 0])
+                    Y2.append(v[0, 1])
+                    X3.append(v[1, 0])
+                    Y3.append(v[1, 1])
+                else:
+                    x0, y0 = x + v_len * v[0, 0] * w[0], y + v_len * v[0, 1] * w[0]
+                    x1, y1 = x - v_len * v[0, 0] * w[0], y - v_len * v[0, 1] * w[0]
+                    x2, y2 = x + v_len * v[1, 0] * w[1], y + v_len * v[1, 1] * w[1]
+                    x3, y3 = x - v_len * v[1, 0] * w[1], y - v_len * v[1, 1] * w[1]
+
+                    X0.append(x0)
+                    X1.append(x1)
+                    X2.append(x2)
+                    X3.append(x3)
+                    Y0.append(y0)
+                    Y1.append(y1)
+                    Y2.append(y2)
+                    Y3.append(y3)
+
+        return array(X0), array(Y0), array(X1), array(Y1), array(X2), array(Y2), array(X3), array(Y3)
+
     def light_profile(self, inclination=90, nx=80, npsi=31, scale='log', Re_model=1., Re_data=1.,
                       xmin=0.05, xmax=250., num=200, PSF_correction=False, **kwargs):
 
@@ -544,6 +651,22 @@ class FJmodel(object):
 
         return eps
 
+    def _get_mass_profile(self):
+        """
+        Private method: returns the spherically averaged mass profile, computed in spherical coordinates also
+        for flattened models
+        :return: enclosed-mass profile
+        """
+        # mass = [4. / 3. * pi * self.ar[0] ** 3 * self.rho(self.ar[0], self.ar[0])]
+        mass = [0.]
+        theta = linspace(0., pi, num=self.nr)
+        for i in range(1, len(self.ar)):
+            mass.append(trapz(self.ar[:i] ** 2 * array([
+                trapz(sin(theta) * self.rho(self.ar[j] * sin(theta), self.ar[j] * cos(theta), diagonal=True),
+                      theta) for j in range(i)]), self.ar[:i]))
+
+        return 2. * pi * array(mass)
+
     def _get_half_mass_radius(self):
         """
         Private method: gets the half-mass radius, where the mass is intended that contained within the radial grid.
@@ -551,17 +674,13 @@ class FJmodel(object):
         :return: half-mass radius
         """
 
-        mass = zeros(self.nr - 2)
         minR, maxR = self.ar[0] / 2, self.ar[-1] * 2
 
-        for i in range(2, self.nr):
-            mass[i - 2] = 4. * pi * trapz(self.ar[:i] * self.ar[:i] * self.rho(self.ar[:i], 0), self.ar[:i])
-
-        f_half_mass = lambda r: interp(r, self.ar[2:], mass) - self.mass / 2.
+        f_half_mass = lambda r: interp(r, self.ar, self.m) - self.mass / 2.
 
         return brentq(f_half_mass, minR, maxR)
 
-    def _getq(self, R, z, ql, npot=True):
+    def _getq(self, R, z, ql, npot=True, diagonal=False):
         """
         Private method: gets the intended quantity interpolating the Legendre coefficients
         ql in the location (R, z) in the meridional plane
@@ -639,26 +758,51 @@ class FJmodel(object):
 
                 return q
             else:
-                q, r, c = zeros((R.size, z.size)), zeros((R.size, z.size)), zeros((R.size, z.size))
-                for k in range(R.size):
-                    for j in range(z.size):
-                        r[k, j] = sqrt(R[k] * R[k] + z[j] * z[j])
-                        c[k, j] = z[j] / r[k, j]
+                if diagonal:
+                    if R.size != z.size:
+                        raise ValueError("R,z must have same size in 'diagonal' mode!")
 
-                        pol = self._evenlegend(c[k, j])
+                    q, r, c = zeros(R.size), zeros(R.size), zeros(R.size)
+                    for k in range(R.size):
+
+                        r[k] = sqrt(R[k] * R[k] + z[k] * z[k])
+                        c[k] = z[k] / r[k]
+
+                        pol = self._evenlegend(c[k])
                         if npot:
-                            qp = self._interp(r[k, j], ql)
+                            qp = self._interp(r[k], ql)
 
-                            q[k, j] = .5 * qp[0]
+                            q[k] = .5 * qp[0]
                             for i in range(1, self.npoly):
                                 f = .5 * (4 * i + 1)
-                                q[k, j] += f * qp[i] * pol[i]
+                                q[k] += f * qp[i] * pol[i]
                         else:
-                            qp = self._interp_pot(r[k, j], ql)
+                            qp = self._interp_pot(r[k], ql)
 
-                            q[k, j] = qp[0]
+                            q[k] = qp[0]
                             for i in range(1, self.npoly):
-                                q[k, j] += qp[i] * pol[i]
+                                q[k] += qp[i] * pol[i]
+                else:
+                    q, r, c = zeros((R.size, z.size)), zeros((R.size, z.size)), zeros((R.size, z.size))
+                    for k in range(R.size):
+                        for j in range(z.size):
+                            r[k, j] = sqrt(R[k] * R[k] + z[j] * z[j])
+                            c[k, j] = z[j] / r[k, j]
+
+                            pol = self._evenlegend(c[k, j])
+                            if npot:
+                                qp = self._interp(r[k, j], ql)
+
+                                q[k, j] = .5 * qp[0]
+                                for i in range(1, self.npoly):
+                                    f = .5 * (4 * i + 1)
+                                    q[k, j] += f * qp[i] * pol[i]
+                            else:
+                                qp = self._interp_pot(r[k, j], ql)
+
+                                q[k, j] = qp[0]
+                                for i in range(1, self.npoly):
+                                    q[k, j] += qp[i] * pol[i]
 
                 return q
         except AssertionError:  # pragma: no cover
